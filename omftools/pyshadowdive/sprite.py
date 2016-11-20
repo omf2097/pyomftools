@@ -1,9 +1,21 @@
 import base64
 
 from .protos import OMFObjectMixin
+from .decorators import validate_schema
 
 
 class Sprite(OMFObjectMixin):
+    schema = {
+        'len': {'type': 'integer', 'required': True, 'min': 0, 'max': 65535},
+        'pos_x': {'type': 'integer', 'required': True, 'min': -32767, 'max': 32767},
+        'pos_y': {'type': 'integer', 'required': True, 'min': -32767, 'max': 32767},
+        'width': {'type': 'integer', 'required': True, 'min': 0, 'max': 65535},
+        'height': {'type': 'integer', 'required': True, 'min': 0, 'max': 65535},
+        'index': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'missing': {'type': 'boolean', 'required': True},
+        'raw_image': {'type': 'string', 'required': True, 'nullable': True}
+    }
+
     def __init__(self):
         self.len = 0
         self.pos_x = 0
@@ -48,9 +60,10 @@ class Sprite(OMFObjectMixin):
             'height': self.height,
             'index': self.index,
             'missing': self.missing,
-            'raw_image': base64.b64encode(self._raw_image).decode() if self._raw_image else None
+            'raw_image': base64.b64encode(self.raw_image).decode() if self.raw_image else None
         }
 
+    @validate_schema(schema)
     def unserialize(self, data):
         self.len = data['len']
         self.pos_x = data['pos_x']
@@ -59,7 +72,7 @@ class Sprite(OMFObjectMixin):
         self.height = data['height']
         self.index = data['index']
         self.missing = data['missing']
-        self._raw_image = base64.b64decode(data['raw_image']) if data['raw_image'] else None
+        self.raw_image = base64.b64decode(data['raw_image']) if data['raw_image'] else None
 
     @property
     def raw_image(self):
