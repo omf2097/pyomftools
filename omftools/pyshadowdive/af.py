@@ -1,9 +1,36 @@
 from .protos import OMFEntrypointMixin
 from .afmove import AFMove
+from .decorators import validate_schema
 
 
 class AFFile(OMFEntrypointMixin):
     MOVE_MAX_NUMBER = 70
+
+    schema = {
+        'file_id': {'type': 'integer', 'required': True, 'min': 0, 'max': 65535},
+        'exec_window': {'type': 'integer', 'required': True, 'min': 0, 'max': 65535},
+        'endurance': {'type': 'float', 'required': True},
+        'unknown_b': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'health': {'type': 'integer', 'required': True, 'min': 0, 'max': 65535},
+        'forward_speed': {'type': 'float', 'required': True},
+        'reverse_speed': {'type': 'float', 'required': True},
+        'jump_speed': {'type': 'float', 'required': True},
+        'fall_speed': {'type': 'float', 'required': True},
+        'unknown_c': {'type': 'float', 'required': True, 'min': 0, 'max': 255},
+        'unknown_d': {'type': 'float', 'required': True, 'min': 0, 'max': 255},
+        'sound_table': {
+            'type': 'list',
+            'required': True,
+            'schema': {
+                'type': 'integer',
+            }
+        },
+        'moves': {
+            'type': 'dict',
+            'required': True,
+            'allow_unknown': True,
+        }
+    }
 
     def __init__(self):
         self.file_id = 0
@@ -41,6 +68,7 @@ class AFFile(OMFEntrypointMixin):
             'sound_table': self.sound_table,
         }
 
+    @validate_schema(schema)
     def unserialize(self, data):
         self.file_id = data['file_id']
         self.exec_window = data['exec_window']
