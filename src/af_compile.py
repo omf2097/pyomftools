@@ -1,0 +1,13 @@
+import argparse
+
+from .pyshadowdive.af import AFFile
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Compile AF file from JSON')
+    parser.add_argument('input_file', help="Input .json file")
+    parser.add_argument('output_file', help="Output .AF file")
+    args = parser.parse_args()
+
+    f = AFFile()
+    f.load_json(args.input_file)
+    f.save_af(args.output_file)
