@@ -24,7 +24,7 @@ class AFMove(Animation, OMFObjectMixin):
         'unknown_18': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
         'unknown_19': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
         'points': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
-        'move_string': {'type': 'string', 'required': True},
+        'move_string': {'type': 'string', 'required': True, 'minlength': 21, 'maxlength': 21},
         'footer_string': {'type': 'string', 'required': True},
     }}
 
