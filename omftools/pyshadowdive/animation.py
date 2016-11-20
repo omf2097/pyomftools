@@ -3,6 +3,38 @@ from .sprite import Sprite
 
 
 class Animation(OMFObjectMixin):
+    schema = {
+        'start_x': {'type': 'integer', 'required': True, 'min': -32767, 'max': 32767},
+        'start_y': {'type': 'integer', 'required': True, 'min': -32767, 'max': 32767},
+        'null': {'type': 'integer', 'required': True, 'min': 0, 'max': 0},
+        'anim_string': {'type': 'string', 'required': True},
+        'coord_table': {
+            'type': 'list',
+            'required': True,
+            'schema': {
+                'type': 'dict',
+                'schema': {
+                    'x': {'type': 'integer', 'required': True, 'min': -511, 'max': 511},
+                    'y': {'type': 'integer', 'required': True, 'min': -511, 'max': 511},
+                    'null': {'type': 'integer', 'required': True, 'min': 0, 'max': 0},
+                    'frame_id': {'type': 'integer', 'required': True, 'min': 0, 'max': 63},
+                }
+            }
+        },
+        'extra_strings': {
+            'type': 'list',
+            'required': True,
+            'schema': {
+                'type': 'string',
+            }
+        },
+        'sprite_table': {
+            'type': 'list',
+            'required': True,
+            'allow_unknown': True,
+        }
+    }
+
     def __init__(self):
         self.start_x = 0
         self.start_y = 0

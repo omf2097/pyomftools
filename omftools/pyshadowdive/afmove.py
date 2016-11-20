@@ -1,8 +1,33 @@
 from .animation import Animation
 from .protos import OMFObjectMixin
+from .decorators import validate_schema
 
 
 class AFMove(Animation, OMFObjectMixin):
+    schema = {**Animation.schema, **{
+        'unknown_0': {'type': 'integer', 'required': True, 'min': 0, 'max': 65535},
+        'unknown_2': {'type': 'integer', 'required': True, 'min': 0, 'max': 65535},
+        'unknown_4': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'unknown_5': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'unknown_6': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'unknown_7': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'unknown_8': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'unknown_9': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'unknown_10': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'unknown_11': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'next_anim_id': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'category': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'unknown_14': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'scrap_amount': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'successor_id': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'damage_amount': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'unknown_18': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'unknown_19': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'points': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'move_string': {'type': 'string', 'required': True},
+        'footer_string': {'type': 'string', 'required': True},
+    }}
+
     def __init__(self):
         super(AFMove, self).__init__()
         self.unknown_0 = 0
@@ -102,6 +127,7 @@ class AFMove(Animation, OMFObjectMixin):
         }
         return {**m_sup, **m_int}
 
+    @validate_schema(schema)
     def unserialize(self, data):
         super(AFMove, self).unserialize(data)
         self.unknown_0 = data['unknown_0']
