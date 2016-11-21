@@ -126,11 +126,11 @@ class OMFObjectMixin(object):
 
 
 class OMFEntrypointMixin(OMFObjectMixin):
-    def load_af(self, filename):
+    def load_native(self, filename):
         with open(filename, 'rb') as handle:
             self.read(OMFParser(handle))
 
-    def save_af(self, filename):
+    def save_native(self, filename):
         with open(filename, 'wb') as handle:
             self.write(OMFParser(handle))
 

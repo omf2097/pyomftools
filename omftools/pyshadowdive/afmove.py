@@ -101,8 +101,7 @@ class AFMove(Animation, OMFObjectMixin):
         parser.put_var_str(self.footer_string, size_includes_zero=True)
 
     def serialize(self):
-        m_sup = super(AFMove, self).serialize()
-        m_int = {
+        return {**super(AFMove, self).serialize(), **{
             'unknown_0': self.unknown_0,
             'unknown_2': self.unknown_2,
             'unknown_4': self.unknown_4,
@@ -124,8 +123,7 @@ class AFMove(Animation, OMFObjectMixin):
             'points': self.points,
             'move_string': self.move_string,
             'footer_string': self.footer_string
-        }
-        return {**m_sup, **m_int}
+        }}
 
     @validate_schema(schema)
     def unserialize(self, data):
