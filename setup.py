@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 setup(
     name='OMFTools',
@@ -10,5 +13,6 @@ setup(
     author_email='katajakasa@gmail.com',
     url='https://github.com/omf2097/pyomftools',
     packages=['omftools', 'omftools.pyshadowdive'],
-    license='MIT'
+    license='MIT',
+    install_requires=['cerberus']
 )
