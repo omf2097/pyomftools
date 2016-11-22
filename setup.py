@@ -10,4 +10,5 @@ setup(
     author_email='katajakasa@gmail.com',
     url='https://github.com/omf2097/pyomftools',
     packages=['omftools', 'omftools.pyshadowdive'],
+    license='MIT'
 )
