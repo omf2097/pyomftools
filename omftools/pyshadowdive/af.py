@@ -16,8 +16,8 @@ class AFFile(OMFEntrypointMixin):
         'reverse_speed': {'type': 'float', 'required': True},
         'jump_speed': {'type': 'float', 'required': True},
         'fall_speed': {'type': 'float', 'required': True},
-        'unknown_c': {'type': 'float', 'required': True, 'min': 0, 'max': 255},
-        'unknown_d': {'type': 'float', 'required': True, 'min': 0, 'max': 255},
+        'unknown_c': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
+        'unknown_d': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
         'sound_table': {
             'type': 'list',
             'required': True,
