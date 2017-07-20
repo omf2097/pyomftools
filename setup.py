@@ -12,7 +12,12 @@ setup(
     author='Tuomas Virtanen',
     author_email='katajakasa@gmail.com',
     url='https://github.com/omf2097/pyomftools',
-    packages=['omftools', 'omftools.pyshadowdive'],
+    packages=[
+        'omftools',
+        'omftools.pyshadowdive',
+        'omftools/afui',
+        'omftools/afui/ui'
+    ],
     license='MIT',
-    install_requires=['cerberus']
+    install_requires=['cerberus', 'PyQt5']
 )
