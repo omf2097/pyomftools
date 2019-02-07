@@ -1,149 +1,61 @@
-import struct
 import json
+from abc import ABCMeta
+from validx import exc, Dict, Validator
+
+from .utils.parser import BinaryParser
+from .utils.exceptions import OMFInvalidDataException
 
 
-class OMFException(Exception):
-    pass
+class DataObject(metaclass=ABCMeta):
+    __slots__ = ()
+
+    def read(self, parser: BinaryParser) -> 'DataObject':
+        raise NotImplementedError()
+
+    def write(self, parser: BinaryParser) -> None:
+        raise NotImplementedError()
+
+    def unserialize(self, data: dict) -> 'DataObject':
+        raise NotImplementedError()
+
+    def serialize(self) -> dict:
+        raise NotImplementedError()
 
 
-class OMFInvalidDataException(OMFException):
-    pass
+class Entrypoint(DataObject):
+    __slots__ = ()
 
+    schema: Validator = Dict()
 
-class OMFParser(object):
-    def __init__(self, handle):
-        self.handle = handle
+    def load_native(self, filename: str) -> 'Entrypoint':
+        with open(filename, 'rb', buffering=8192) as handle:
+            self.read(BinaryParser(handle))
+        return self
 
-    def get_pos(self):
-        return self.handle.tell()
+    def save_native(self, filename: str) -> None:
+        with open(filename, 'wb', buffering=8192) as handle:
+            self.write(BinaryParser(handle))
 
-    def check_uint8(self, compare_to):
-        got = self.get_uint8()
-        if got != compare_to:
-            raise OMFInvalidDataException("Got {}, was expecting {}".format(got, compare_to))
-
-    def check_uint16(self, compare_to):
-        got = self.get_uint16()
-        if got != compare_to:
-            raise OMFInvalidDataException("Got {}, was expecting {}".format(got, compare_to))
-
-    def check_uint32(self, compare_to):
-        got = self.get_uint32()
-        if got != compare_to:
-            raise OMFInvalidDataException("Got {}, was expecting {}".format(got, compare_to))
-
-    def get_str(self, length):
-        return self.handle.read(length).decode() if length > 0 else ''
-
-    def get_bytes(self, length):
-        return self.handle.read(length)
-
-    def get_int8(self):
-        return struct.unpack('<b', self.handle.read(1))[0]
-
-    def get_uint8(self):
-        return struct.unpack('<B', self.handle.read(1))[0]
-
-    def get_int16(self):
-        return struct.unpack('<h', self.handle.read(2))[0]
-
-    def get_uint16(self):
-        return struct.unpack('<H', self.handle.read(2))[0]
-
-    def get_int32(self):
-        return struct.unpack('<i', self.handle.read(4))[0]
-
-    def get_uint32(self):
-        return struct.unpack('<I', self.handle.read(4))[0]
-
-    def get_float(self):
-        return struct.unpack('<f', self.handle.read(4))[0]
-
-    def get_boolean(self):
-        return self.get_uint8() == 1
-
-    def get_var_str(self, size_includes_zero=False):
-        m_len = self.get_uint16()
-        if m_len == 0 and size_includes_zero:
-            return ''
-        data = self.get_str(m_len - (1 if size_includes_zero else 0))
-        self.check_uint8(0)
-        return data
-
-    def put_str(self, data):
-        self.handle.write(data.encode())
-
-    def put_bytes(self, data):
-        self.handle.write(data)
-
-    def put_int8(self, data):
-        self.handle.write(struct.pack('<b', data))
-
-    def put_uint8(self, data):
-        self.handle.write(struct.pack('<B', data))
-
-    def put_int16(self, data):
-        self.handle.write(struct.pack('<h', data))
-
-    def put_uint16(self, data):
-        self.handle.write(struct.pack('<H', data))
-
-    def put_int32(self, data):
-        self.handle.write(struct.pack('<i', data))
-
-    def put_uint32(self, data):
-        self.handle.write(struct.pack('<I', data))
-
-    def put_float(self, data):
-        self.handle.write(struct.pack('<f', data))
-
-    def put_boolean(self, data):
-        self.put_uint8(1 if data else 0)
-
-    def put_var_str(self, data, size_includes_zero=False):
-        m_data = data.encode()
-        m_len = len(m_data)
-        if m_len == 0 and size_includes_zero:
-            self.put_uint16(0)
-            return
-        self.put_uint16(m_len + (1 if size_includes_zero else 0))
-        self.handle.write(m_data)
-        self.put_uint8(0)
-
-
-class OMFObjectMixin(object):
-    def read(self, parser):
-        pass
-
-    def write(self, parser):
-        pass
-
-    def serialize(self):
-        return {}
-
-    def unserialize(self, data):
-        pass
-
-
-class OMFEntrypointMixin(OMFObjectMixin):
-    def load_native(self, filename):
-        with open(filename, 'rb') as handle:
-            self.read(OMFParser(handle))
-
-    def save_native(self, filename):
-        with open(filename, 'wb') as handle:
-            self.write(OMFParser(handle))
-
-    def load_json(self, filename):
-        with open(filename, 'rb') as handle:
+    def load_json(self, filename: str) -> 'Entrypoint':
+        with open(filename, 'rb', buffering=8192) as handle:
             self.from_json(handle.read().decode())
+        return self
 
-    def save_json(self, filename, **kwargs):
-        with open(filename, 'wb') as handle:
+    def save_json(self, filename: str, **kwargs) -> None:
+        with open(filename, 'wb', buffering=8192) as handle:
             handle.write(self.to_json(**kwargs).encode())
 
-    def to_json(self, **kwargs):
+    def to_json(self, **kwargs) -> str:
         return json.dumps(self.serialize(), **kwargs)
 
-    def from_json(self, data):
-        return self.unserialize(json.loads(data))
+    def from_json(self, data: str) -> 'Entrypoint':
+        decoded_data = json.loads(data)
+
+        try:
+            self.schema(decoded_data)
+        except exc.ValidationError as e:
+            e.sort()
+            rows = [f"{c}: {m}" for c, m in exc.format_error(e)]
+            raise OMFInvalidDataException('\n'.join(rows))
+
+        return self.unserialize(decoded_data)

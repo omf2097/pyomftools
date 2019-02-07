@@ -88,11 +88,15 @@ ENV/
 # Rope project settings
 .ropeproject
 
+venv
+.venv
 .idea
 *.AF
+*.BK
 *.json
 *.json.*
 *.json-*
 *.AF.*
 *.AF-*
-
+*.BK.*
+*.BK-*

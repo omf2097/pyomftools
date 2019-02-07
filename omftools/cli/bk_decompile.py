@@ -1,6 +1,6 @@
 import argparse
 
-from .pyshadowdive.bk import BKFile
+from omftools.pyshadowdive.bk import BKFile
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Decompile BK file to JSON')
@@ -8,7 +8,7 @@ if __name__ == "__main__":
     parser.add_argument('output_file', help="Output .json file")
     args = parser.parse_args()
 
-    f = BKFile()
-    f.load_native(args.input_file)
-    f.save_json(args.output_file, indent=4)
+    BKFile()\
+        .load_native(args.input_file)\
+        .save_json(args.output_file, indent=4)
     exit(0)

@@ -1,6 +1,6 @@
 import argparse
 
-from .pyshadowdive.af import AFFile
+from omftools.pyshadowdive.af import AFFile
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Compile AF file from JSON')
@@ -8,7 +8,7 @@ if __name__ == "__main__":
     parser.add_argument('output_file', help="Output .AF file")
     args = parser.parse_args()
 
-    f = AFFile()
-    f.load_json(args.input_file)
-    f.save_native(args.output_file)
+    AFFile()\
+        .load_json(args.input_file)\
+        .save_native(args.output_file)
     exit(0)

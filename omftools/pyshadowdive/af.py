@@ -1,57 +1,63 @@
-from .protos import OMFEntrypointMixin
+import typing
+from validx import Int, Dict, List, Str
+
+from .protos import Entrypoint
 from .afmove import AFMove
-from .decorators import validate_schema
+
+from .utils.validator import UInt8, UInt16, UInt32, Int32
 
 
-class AFFile(OMFEntrypointMixin):
+class AFFile(Entrypoint):
     MOVE_MAX_NUMBER = 70
 
-    schema = {
-        'file_id': {'type': 'integer', 'required': True, 'min': 0, 'max': 65535},
-        'exec_window': {'type': 'integer', 'required': True, 'min': 0, 'max': 65535},
-        'endurance': {'type': 'float', 'required': True},
-        'unknown_b': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
-        'health': {'type': 'integer', 'required': True, 'min': 0, 'max': 65535},
-        'forward_speed': {'type': 'float', 'required': True},
-        'reverse_speed': {'type': 'float', 'required': True},
-        'jump_speed': {'type': 'float', 'required': True},
-        'fall_speed': {'type': 'float', 'required': True},
-        'unknown_c': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
-        'unknown_d': {'type': 'integer', 'required': True, 'min': 0, 'max': 255},
-        'sound_table': {
-            'type': 'list',
-            'required': True,
-            'schema': {
-                'type': 'integer',
-            }
-        },
-        'moves': {
-            'type': 'dict',
-            'required': True,
-            'allow_unknown': True,
-        }
-    }
+    __slots__ = (
+        'file_id',
+        'exec_window',
+        'endurance',
+        'unknown_b',
+        'health',
+        'forward_speed',
+        'reverse_speed',
+        'jump_speed',
+        'fall_speed',
+        'unknown_c',
+        'unknown_d',
+        'sound_table',
+        'moves',
+    )
+
+    schema = Dict({
+        'file_id': UInt16,
+        'exec_window': UInt16,
+        'endurance': UInt32,
+        'unknown_b': UInt8,
+        'health': UInt16,
+        'forward_speed': Int32,
+        'reverse_speed': Int32,
+        'jump_speed': Int32,
+        'fall_speed': Int32,
+        'unknown_c': UInt8,
+        'unknown_d': UInt8,
+        'sound_table': List(UInt8, maxlen=30, minlen=30),
+        'moves': Dict(extra=(Str(pattern=r'^[0-9]+$'), AFMove.schema))
+    })
 
     def __init__(self):
-        self.file_id = 0
-        self.exec_window = 0
-        self._endurance = 0
-        self.unknown_b = 0
-        self.health = 0
-        self._forward_speed = 0
-        self._reverse_speed = 0
-        self._jump_speed = 0
-        self._fall_speed = 0
-        self.unknown_c = 0
-        self.unknown_d = 0
-        self.moves = {}
-        self.sound_table = []
+        self.file_id: int = 0
+        self.exec_window: int = 0
+        self.endurance: int = 0
+        self.unknown_b: int = 0
+        self.health: int = 0
+        self.forward_speed: int = 0
+        self.reverse_speed: int = 0
+        self.jump_speed: int = 0
+        self.fall_speed: int = 0
+        self.unknown_c: int = 0
+        self.unknown_d: int = 0
+        self.moves: typing.Dict[int, AFMove] = {}
+        self.sound_table: typing.List[int] = []
 
     def serialize(self):
-        moves = {}
-        for key, move in self.moves.items():
-            moves[key] = move.serialize()
-
         return {
             'file_id': self.file_id,
             'exec_window': self.exec_window,
@@ -64,11 +70,10 @@ class AFFile(OMFEntrypointMixin):
             'fall_speed': self.fall_speed,
             'unknown_c': self.unknown_c,
             'unknown_d': self.unknown_d,
-            'moves': moves,
+            'moves': {k: v.serialize() for k, v in self.moves.items()},
             'sound_table': self.sound_table,
         }
 
-    @validate_schema(schema)
     def unserialize(self, data):
         self.file_id = data['file_id']
         self.exec_window = data['exec_window']
@@ -81,23 +86,20 @@ class AFFile(OMFEntrypointMixin):
         self.fall_speed = data['fall_speed']
         self.unknown_c = data['unknown_c']
         self.unknown_d = data['unknown_d']
-        self.moves = {}
-        for k, m in data['moves'].items():
-            move = AFMove()
-            move.unserialize(m)
-            self.moves[int(k)] = move
+        self.moves = {int(k): AFMove().unserialize(v) for k, v in data['moves'].items()}
         self.sound_table = data['sound_table']
+        return self
 
     def read(self, parser):
         self.file_id = parser.get_uint16()
         self.exec_window = parser.get_uint16()
-        self._endurance = parser.get_uint32()
+        self.endurance = parser.get_uint32()
         self.unknown_b = parser.get_uint8()
         self.health = parser.get_uint16()
-        self._forward_speed = parser.get_int32()
-        self._reverse_speed = parser.get_int32()
-        self._jump_speed = parser.get_int32()
-        self._fall_speed = parser.get_int32()
+        self.forward_speed = parser.get_int32()
+        self.reverse_speed = parser.get_int32()
+        self.jump_speed = parser.get_int32()
+        self.fall_speed = parser.get_int32()
         self.unknown_c = parser.get_uint8()
         self.unknown_d = parser.get_uint8()
 
@@ -106,25 +108,25 @@ class AFFile(OMFEntrypointMixin):
             move_no = parser.get_uint8()
             if move_no >= self.MOVE_MAX_NUMBER:
                 break
-            move = AFMove()
-            move.read(parser)
-            self.moves[move_no] = move
+            self.moves[move_no] = AFMove().read(parser)
 
         # Read sound table
         for m in range(0, 30):
             sound = parser.get_uint8()
             self.sound_table.append(sound)
 
+        return self
+
     def write(self, parser):
         parser.put_uint16(self.file_id)
         parser.put_uint16(self.exec_window)
-        parser.put_uint32(self._endurance)
+        parser.put_uint32(self.endurance)
         parser.put_uint8(self.unknown_b)
         parser.put_uint16(self.health)
-        parser.put_int32(self._forward_speed)
-        parser.put_int32(self._reverse_speed)
-        parser.put_int32(self._jump_speed)
-        parser.put_int32(self._fall_speed)
+        parser.put_int32(self.forward_speed)
+        parser.put_int32(self.reverse_speed)
+        parser.put_int32(self.jump_speed)
+        parser.put_int32(self.fall_speed)
         parser.put_uint8(self.unknown_c)
         parser.put_uint8(self.unknown_d)
 
@@ -141,41 +143,41 @@ class AFFile(OMFEntrypointMixin):
             parser.put_uint8(sound)
 
     @property
-    def endurance(self):
-        return self._endurance / 256.0
+    def real_endurance(self):
+        return self.endurance / 256.0
 
-    @endurance.setter
-    def endurance(self, value):
-        self._endurance = int(value * 256.0)
-
-    @property
-    def forward_speed(self):
-        return self._forward_speed / 256.0
-
-    @forward_speed.setter
-    def forward_speed(self, value):
-        self._forward_speed = int(value * 256.0)
+    @real_endurance.setter
+    def real_endurance(self, value):
+        self.endurance = int(value * 256.0)
 
     @property
-    def reverse_speed(self):
-        return self._reverse_speed / 256.0
+    def real_forward_speed(self):
+        return self.forward_speed / 256.0
 
-    @reverse_speed.setter
-    def reverse_speed(self, value):
-        self._reverse_speed = int(value * 256.0)
-
-    @property
-    def jump_speed(self):
-        return self._jump_speed / 256.0
-
-    @jump_speed.setter
-    def jump_speed(self, value):
-        self._jump_speed = int(value * 256.0)
+    @real_forward_speed.setter
+    def real_forward_speed(self, value):
+        self.forward_speed = int(value * 256.0)
 
     @property
-    def fall_speed(self):
-        return self._fall_speed / 256.0
+    def real_reverse_speed(self):
+        return self.reverse_speed / 256.0
 
-    @fall_speed.setter
-    def fall_speed(self, value):
-        self._fall_speed = int(value * 256.0)
+    @real_reverse_speed.setter
+    def real_reverse_speed(self, value):
+        self.reverse_speed = int(value * 256.0)
+
+    @property
+    def real_jump_speed(self):
+        return self.jump_speed / 256.0
+
+    @real_jump_speed.setter
+    def real_jump_speed(self, value):
+        self.jump_speed = int(value * 256.0)
+
+    @property
+    def real_fall_speed(self):
+        return self.fall_speed / 256.0
+
+    @real_fall_speed.setter
+    def real_fall_speed(self, value):
+        self.fall_speed = int(value * 256.0)
