@@ -100,3 +100,5 @@ venv
 *.AF-*
 *.BK.*
 *.BK-*
+
+.mypy_cache

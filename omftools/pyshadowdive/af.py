@@ -1,5 +1,5 @@
 import typing
-from validx import Int, Dict, List, Str
+from validx import Dict, List, Str
 
 from .protos import Entrypoint
 from .afmove import AFMove
@@ -39,7 +39,10 @@ class AFFile(Entrypoint):
         'unknown_c': UInt8,
         'unknown_d': UInt8,
         'sound_table': List(UInt8, maxlen=30, minlen=30),
-        'moves': Dict(extra=(Str(pattern=r'^[0-9]+$'), AFMove.schema))
+        'moves': Dict(extra=(
+            Str(pattern=r'^[0-9]+$'),
+            AFMove.schema
+        ))
     })
 
     def __init__(self):
@@ -70,7 +73,8 @@ class AFFile(Entrypoint):
             'fall_speed': self.fall_speed,
             'unknown_c': self.unknown_c,
             'unknown_d': self.unknown_d,
-            'moves': {k: v.serialize() for k, v in self.moves.items()},
+            'moves': {k: v.serialize()
+                      for k, v in self.moves.items()},
             'sound_table': self.sound_table,
         }
 
@@ -86,7 +90,8 @@ class AFFile(Entrypoint):
         self.fall_speed = data['fall_speed']
         self.unknown_c = data['unknown_c']
         self.unknown_d = data['unknown_d']
-        self.moves = {int(k): AFMove().unserialize(v) for k, v in data['moves'].items()}
+        self.moves = {int(k): AFMove().unserialize(v)
+                      for k, v in data['moves'].items()}
         self.sound_table = data['sound_table']
         return self
 

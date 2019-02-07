@@ -16,17 +16,20 @@ class BinaryParser:
     def check_uint8(self, compare_to: int) -> None:
         got = self.get_uint8()
         if got != compare_to:
-            raise OMFInvalidDataException(f"Got {got}, was expecting {compare_to}")
+            raise OMFInvalidDataException(
+                f"Got {got}, was expecting {compare_to}")
 
     def check_uint16(self, compare_to: int) -> None:
         got = self.get_uint16()
         if got != compare_to:
-            raise OMFInvalidDataException(f"Got {got}, was expecting {compare_to}")
+            raise OMFInvalidDataException(
+                f"Got {got}, was expecting {compare_to}")
 
     def check_uint32(self, compare_to: int) -> None:
         got = self.get_uint32()
         if got != compare_to:
-            raise OMFInvalidDataException(f"Got {got}, was expecting {compare_to}")
+            raise OMFInvalidDataException(
+                f"Got {got}, was expecting {compare_to}")
 
     def get_str(self, length: int) -> str:
         return self.handle.read(length).decode() if length > 0 else ''

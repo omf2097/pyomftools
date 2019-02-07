@@ -1,5 +1,5 @@
 import typing
-from validx import Int, Dict, List, Str
+from validx import Dict, List, Str
 import io
 
 from .protos import Entrypoint
@@ -31,7 +31,10 @@ class BKFile(Entrypoint):
         'background_width': UInt16,
         'background_height': UInt16,
         'background_image': List(UInt8),
-        'animations': Dict(extra=(Str(pattern=r'^[0-9]+$'), BKAnimation.schema)),
+        'animations': Dict(extra=(
+            Str(pattern=r'^[0-9]+$'),
+            BKAnimation.schema
+        )),
         'sound_table': List(UInt8, maxlen=30, minlen=30),
         'palettes': List(PaletteMapping.schema),
     })
@@ -53,8 +56,10 @@ class BKFile(Entrypoint):
             'background_width': self.background_width,
             'background_height': self.background_height,
             'background_image': self.background_image,
-            'animations': {k: v.serialize() for k, v in self.animations.items()},
-            'palettes': [palette.serialize() for palette in self.palettes],
+            'animations': {k: v.serialize()
+                           for k, v in self.animations.items()},
+            'palettes': [palette.serialize()
+                         for palette in self.palettes],
             'sound_table': self.sound_table
         }
 
@@ -65,8 +70,10 @@ class BKFile(Entrypoint):
         self.background_height = data['background_height']
         self.background_image = data['background_image']
         self.sound_table = data['sound_table']
-        self.palettes = [PaletteMapping().unserialize(v) for v in data['palettes']]
-        self.animations = {int(k): BKAnimation().unserialize(v) for k, v in data['animations'].items()}
+        self.palettes = [PaletteMapping().unserialize(v)
+                         for v in data['palettes']]
+        self.animations = {int(k): BKAnimation().unserialize(v)
+                           for k, v in data['animations'].items()}
         return self
 
     def read(self, parser):
@@ -77,7 +84,7 @@ class BKFile(Entrypoint):
 
         # Read all animations (up to max ANIMATION_MAX_NUMBER)
         while True:
-            k = parser.get_uint32()  # Skip
+            parser.get_uint32()  # Skip
             anim_no = parser.get_uint8()
             if anim_no >= self.ANIMATION_MAX_NUMBER:
                 break
@@ -85,14 +92,17 @@ class BKFile(Entrypoint):
 
         # Read the raw Background image (VGA palette format)
         background_size = self.background_height * self.background_width
-        self.background_image = [parser.get_uint8() for _ in range(background_size)]
+        self.background_image = [parser.get_uint8()
+                                 for _ in range(background_size)]
 
         # Read up all available color palettes
         palette_count = parser.get_uint8()
-        self.palettes = [PaletteMapping().read(parser) for _ in range(palette_count)]
+        self.palettes = [PaletteMapping().read(parser)
+                         for _ in range(palette_count)]
 
         # Get sound mappings
-        self.sound_table = [parser.get_uint8() for _ in range(30)]
+        self.sound_table = [parser.get_uint8()
+                            for _ in range(30)]
 
         return self
 
@@ -103,13 +113,16 @@ class BKFile(Entrypoint):
         parser.put_uint16(self.background_height)
 
         for key, ani in self.animations.items():
-            # Write animation to binary buffer so that we can tell its length
+            # Write animation to binary buffer so that
+            # we can tell its length
             buf = io.BytesIO()
             ani.write(BinaryParser(buf))
             ani_data = buf.getvalue()
 
-            # Write offset of next animation, then ID, then the animation blob
-            offset = parser.get_pos() + len(ani_data) + 5  # include next offset and key to offset
+            # Write offset of next animation, then ID,
+            # then the animation blob. Add +5 to offset to account
+            # for the next offset and ID.
+            offset = parser.get_pos() + len(ani_data) + 5
             parser.put_uint32(offset)
             parser.put_uint8(key)
             parser.put_bytes(ani_data)

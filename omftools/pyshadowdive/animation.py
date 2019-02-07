@@ -16,7 +16,7 @@ class Animation(DataObject):
         'extra_strings',
         'sprites',
     )
-    
+
     schema = Dict({
         'start_x': Int16,
         'start_y': Int16,
