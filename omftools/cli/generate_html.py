@@ -9,6 +9,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 from omftools.pyshadowdive.af import AFFile
 from omftools.pyshadowdive.bk import BKFile
+from omftools.pyshadowdive.sounds import SoundFile
 from omftools.pyshadowdive.altpals import AltPalettes
 from omftools.pyshadowdive.utils.exceptions import OMFInvalidDataException
 from omftools.pyshadowdive.utils.types import Palette
@@ -24,9 +25,27 @@ class Filenames:
     af: typing.List[str]
     bk: typing.List[str]
     alt_pals: str
+    sounds: str
 
 
-def generate_altpals(alt_pals: AltPalettes, files: Filenames, output_dir: str, ):
+def generate_sounds(file: str, files: Filenames, output_dir: str):
+    filename = 'SOUNDS.DAT'
+    sounds = SoundFile().load_native(file)
+
+    for idx, sound in enumerate(sounds.sounds):
+        if sound.data:
+            sound.save_wav(os.path.join(output_dir, f'{filename}-{idx}.wav'))
+
+    with open(os.path.join(output_dir, f'{filename}.html'), 'wb') as fd:
+        tpl = env.get_template('sounds_index.html')
+        content = tpl.render(
+            sounds=sounds,
+            files=files,
+            filename=filename)
+        fd.write(content.encode())
+
+
+def generate_altpals(alt_pals: AltPalettes, files: Filenames, output_dir: str):
     filename = 'ALTPALS.DAT'
 
     with open(os.path.join(output_dir, f'{filename}.html'), 'wb') as fd:
@@ -102,11 +121,13 @@ def main():
     af_files = glob(os.path.join(args.input_dir, '*.AF'))
     bk_files = glob(os.path.join(args.input_dir, '*.BK'))
     alt_pals_file = os.path.join(args.input_dir, 'ALTPALS.DAT')
+    sounds_file = os.path.join(args.input_dir, 'SOUNDS.DAT')
 
     files = Filenames(
         af=[os.path.basename(v) for v in af_files],
         bk=[os.path.basename(v) for v in bk_files],
         alt_pals=os.path.basename(alt_pals_file),
+        sounds=os.path.basename(sounds_file),
     )
 
     # palettes file
@@ -114,6 +135,9 @@ def main():
 
     print(f'Generating ALTPALS.DAT')
     generate_altpals(alt_pals, files, args.output_dir)
+
+    print(f'Generating SOUNDS.DAT')
+    generate_sounds(sounds_file, files, args.output_dir)
 
     for af_file in af_files:
         print(f"Generating {af_file}")

@@ -26,7 +26,7 @@
     <thead>
         <tr>
             <th scope="col">#</th>
-            <th scope="col">String</th>
+            <th scope="col">Sound</th>
             <th scope="col">Play</th>
         </tr>
     </thead>
@@ -35,7 +35,12 @@
         <tr>
             <th scope="row">{{ loop.index }}</th>
             <td>{{ sound_table[s] }}</td>
-            <td>play</td>
+            <td>
+                <audio controls>
+                    <source src="SOUNDS.DAT-{{ sound_table[s] }}.wav" type="audio/wav">
+                    Your browser does not support the audio tag.
+                </audio>
+            </td>
         </tr>
     {% endfor %}
     </tbody>

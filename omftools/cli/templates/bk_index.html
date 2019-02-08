@@ -62,13 +62,11 @@
 </div>
 <div class="row">
 {% for palette in bk.palettes %}
-    <div class="col-xl pb-4">
+    <div class="palette-block m-3">
         <div class="card">
             <div class="card-header text-white">
-                Palette {{ loop.index }}
-            </div>
-            <div class="card-body text-white">
-                <div class="dropdown">
+                <div class="float-left m-1">Palette {{ loop.index }}</div>
+                <div class="dropdown float-right">
                     <button class="btn btn-sm btn-secondary dropdown-toggle remapping"
                             type="button"
                             id="remapping_{{ loop.index }}"
@@ -82,7 +80,9 @@
                             <a class="dropdown-item" href="#" id="remap_{{ loop.index }}_{{ m }}">Remapping {{ m }}</a>
                         {% endfor %}
                     </div>
-                </div><br />
+                </div>
+            </div>
+            <div class="card-body text-white">
                 {{ tables.print_palette(palette.colors) }}
             </div>
         </div>

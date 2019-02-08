@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header">Sounds list</div>
+            <div class="card-body">
+                <table class="table table-hover table-borderless">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Unknown</th>
+                            <th scope="col">Length</th>
+                            <th scope="col">Play</th>
+                            <th scope="col">Download</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for sound in sounds.sounds %}
+                        <tr>
+                            <th scope="row" class="p-3">{{ loop.index0 }}</th>
+                            <td class="p-3">{{ sound.unknown }}</td>
+                            <td class="p-3">{{ sound.data|length }}</td>
+                            <td>
+                                {% if sound.data|length > 0 %}
+                                <audio controls>
+                                    <source src="{{ filename }}-{{ loop.index0 }}.wav" type="audio/wav">
+                                    Your browser does not support the audio tag.
+                                </audio>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if sound.data|length > 0 %}
+                                    <a href="{{ filename }}-{{ loop.index0 }}.wav">{{ filename }}-{{ loop.index0 }}.wav</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block header %}{{ filename }}{% endblock %}
+
+{% block title %}{{ filename }} - {{ super() }}{% endblock %}
