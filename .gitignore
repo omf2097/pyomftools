@@ -103,3 +103,4 @@ venv
 
 .mypy_cache
 output/
+cards/
