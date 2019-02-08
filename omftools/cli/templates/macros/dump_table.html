@@ -43,7 +43,7 @@
 {%- endmacro %}
 
 {% macro print_sprites(filename, key, sprites) -%}
-<table class="table table-borderless table-hover table-sm">
+<table class="table table-borderless table-striped table-xl">
     <thead>
         <tr>
             <th scope="col">#</th>
@@ -53,7 +53,6 @@
             <th scope="col">H</th>
             <th scope="col">Index</th>
             <th scope="col">Missing</th>
-            <th scope="col">Sprite</th>
         </tr>
     </thead>
     <tbody>
@@ -66,7 +65,10 @@
             <td>{{ s.height }}</td>
             <td>{{ s.index }}</td>
             <td>{{ s.missing }}</td>
-            <td>
+        </tr>
+        <tr>
+            <td></td>
+            <td colspan="6">
                 <img srcset="{{ filename }}-{{ key }}-{{ loop.index0 }}.png 0.5x"
                      class="sprite"
                      alt="Sprite for animation {{ key }} sprite {{ loop.index0 }}">

@@ -45,8 +45,11 @@ def generate_bk(file: str, files: Filenames, output_dir: str, alt_pals: AltPalet
     bk.save_background(os.path.join(output_dir, f'{filename}-bg.png'))
 
     pal = bk.palettes[0].colors
-    for m in range(48):
-        pal[m] = alt_pals.palettes[0][m+48]
+    if file.startswith('ARENA') or file.startswith('MECHLAB'):
+        c1 = pal[0]
+        for m in range(48):
+            pal[m] = alt_pals.palettes[0][m+96]
+        pal[0] = c1
 
     for key, animation in bk.animations.items():
         for idx, sprite in enumerate(animation.sprites):
@@ -70,8 +73,8 @@ def generate_af(file: str, files: Filenames, output_dir: str, alt_pals: AltPalet
     af = AFFile().load_native(file)
 
     pal: Palette = [(0, 0, 0) for _ in range(256)]
-    for m in range(48):
-        pal[m] = alt_pals.palettes[0][m+48]
+    for m in range(96):
+        pal[m] = alt_pals.palettes[0][m+96]
 
     for key, animation in af.moves.items():
         for idx, sprite in enumerate(animation.sprites):
