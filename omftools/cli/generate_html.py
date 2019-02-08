@@ -1,6 +1,9 @@
 import argparse
 import os
+import typing
 from glob import glob
+from dataclasses import dataclass
+from shutil import copyfile
 
 from jinja2 import Environment, PackageLoader, select_autoescape
 
@@ -16,7 +19,26 @@ env = Environment(
 )
 
 
-def generate_bk(file: str, bk_filenames: list, af_filenames: list, output_dir: str, alt_pals: AltPalettes):
+@dataclass
+class Filenames:
+    af: typing.List[str]
+    bk: typing.List[str]
+    alt_pals: str
+
+
+def generate_altpals(alt_pals: AltPalettes, files: Filenames, output_dir: str, ):
+    filename = 'ALTPALS.DAT'
+
+    with open(os.path.join(output_dir, f'{filename}.html'), 'wb') as fd:
+        tpl = env.get_template('altpals_index.html')
+        content = tpl.render(
+            alt_pals=alt_pals,
+            files=files,
+            filename=filename)
+        fd.write(content.encode())
+
+
+def generate_bk(file: str, files: Filenames, output_dir: str, alt_pals: AltPalettes):
     filename = os.path.basename(file)
     bk = BKFile().load_native(file)
 
@@ -38,13 +60,12 @@ def generate_bk(file: str, bk_filenames: list, af_filenames: list, output_dir: s
         tpl = env.get_template('bk_index.html')
         content = tpl.render(
             bk=bk,
-            bk_files=bk_filenames,
-            af_files=af_filenames,
+            files=files,
             filename=filename)
         fd.write(content.encode())
 
 
-def generate_af(file: str, bk_filenames: list, af_filenames: list, output_dir: str, alt_pals: AltPalettes):
+def generate_af(file: str, files: Filenames, output_dir: str, alt_pals: AltPalettes):
     filename = os.path.basename(file)
     af = AFFile().load_native(file)
 
@@ -64,8 +85,7 @@ def generate_af(file: str, bk_filenames: list, af_filenames: list, output_dir: s
         tpl = env.get_template('af_index.html')
         content = tpl.render(
             af=af,
-            bk_files=bk_filenames,
-            af_files=af_filenames,
+            files=files,
             filename=filename)
         fd.write(content.encode())
 
@@ -78,21 +98,32 @@ def main():
 
     af_files = glob(os.path.join(args.input_dir, '*.AF'))
     bk_files = glob(os.path.join(args.input_dir, '*.BK'))
+    alt_pals_file = os.path.join(args.input_dir, 'ALTPALS.DAT')
 
-    af_filenames = [os.path.basename(v) for v in af_files]
-    bk_filenames = [os.path.basename(v) for v in bk_files]
-    alt_pals_filename = os.path.join(args.input_dir, 'ALTPALS.DAT')
+    files = Filenames(
+        af=[os.path.basename(v) for v in af_files],
+        bk=[os.path.basename(v) for v in bk_files],
+        alt_pals=os.path.basename(alt_pals_file),
+    )
 
     # palettes file
-    alt_pals = AltPalettes().load_native(alt_pals_filename)
+    alt_pals = AltPalettes().load_native(alt_pals_file)
+
+    print(f'Generating ALTPALS.DAT')
+    generate_altpals(alt_pals, files, args.output_dir)
 
     for af_file in af_files:
         print(f"Generating {af_file}")
-        generate_af(af_file, bk_filenames, af_filenames, args.output_dir, alt_pals)
+        generate_af(af_file, files, args.output_dir, alt_pals)
 
     for bk_file in bk_files:
         print(f"Generating {bk_file}")
-        generate_bk(bk_file, bk_filenames, af_filenames, args.output_dir, alt_pals)
+        generate_bk(bk_file, files, args.output_dir, alt_pals)
+
+    copyfile(
+        os.path.join(args.output_dir, f'ARENA0.BK.html'),
+        os.path.join(args.output_dir, 'index.html')
+    )
 
     exit(0)
 

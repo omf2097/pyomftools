@@ -23,6 +23,10 @@
                 image-rendering: -webkit-optimize-contrast;
                 image-rendering: crisp-edges;
             }
+            .palette-block {
+                width: 600px;
+                height: 600px;
+            }
         </style>
     </head>
     <body>
@@ -36,7 +40,7 @@
                             Fighters
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            {% for file in af_files %}
+                            {% for file in files.af %}
                                 <a class="dropdown-item" href="{{ file }}.html">{{ file }}</a>
                             {% endfor %}
                         </div>
@@ -46,9 +50,17 @@
                             Scenes
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            {% for file in bk_files %}
+                            {% for file in files.bk %}
                                 <a class="dropdown-item" href="{{ file }}.html">{{ file }}</a>
                             {% endfor %}
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="sceneDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Others
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ files.alt_pals }}.html">{{ files.alt_pals }}</a>
                         </div>
                     </li>
                 </ul>

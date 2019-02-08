@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import "macros/dump_table.html" as tables %}
+
+{% block body %}
+
+<div class="row">
+    {% for palette in alt_pals.palettes %}
+    <div class="col-xl pb-4">
+        <div class="card">
+            <div class="card-header text-white">
+                Palette {{ loop.index }}
+            </div>
+            <div class="card-body text-white">
+                {{ tables.print_palette(palette) }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <div class="col-xl"></div>
+</div>
+
+{% endblock %}
+
+{% block header %}{{ filename }}{% endblock %}
+
+{% block title %}{{ filename }} - {{ super() }}{% endblock %}

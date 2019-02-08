@@ -127,9 +127,7 @@
     {% for y in range(16) %}
         <tr>
             {% for x in range(16) %}
-            <td style="background-color: rgb({{ p[x+(y*16)][0] }},{{ p[x+(y*16)][1] }},{{ p[x+(y*16)][2] }})">
-                {{ x+(y*16) }}
-            </td>
+            <td style="background-color: rgb({{ p[x+(y*16)][0] }},{{ p[x+(y*16)][1] }},{{ p[x+(y*16)][2] }})">{{ '{:02X}'.format(x+(y*16)) }}</td>
             {% endfor %}
         </tr>
     {% endfor %}
