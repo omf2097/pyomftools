@@ -1,5 +1,8 @@
 cerberus==1.0.1
 pillow==5.4.1
 validx==0.3
+jinja2==2.10
+
+# Testing
 mypy==0.660
 flake8==3.7.5

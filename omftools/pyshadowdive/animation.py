@@ -64,15 +64,8 @@ class Animation(DataObject):
         self.base_string = parser.get_var_str()
         extra_str_count = parser.get_uint8()
 
-        self.extra_strings = []
-        for k in range(0, extra_str_count):
-            self.extra_strings.append(parser.get_var_str())
-
-        self.sprites = []
-        for s in range(0, sprite_count):
-            sprite = Sprite()
-            sprite.read(parser)
-            self.sprites.append(sprite)
+        self.extra_strings = [parser.get_var_str() for _ in range(extra_str_count)]
+        self.sprites = [Sprite().read(parser) for _ in range(sprite_count)]
 
         return self
 
@@ -120,13 +113,7 @@ class Animation(DataObject):
         self.start_x = data['start_x']
         self.start_y = data['start_y']
         self.hit_coords = data['hit_coords']
-
-        self.sprites = []
-        for sprite in data['sprites']:
-            sp_obj = Sprite()
-            sp_obj.unserialize(sprite)
-            self.sprites.append(sp_obj)
-
+        self.sprites = [Sprite().unserialize(sprite) for sprite in data['sprites']]
         self.base_string = data['base_string']
         self.extra_strings = data['extra_strings']
         return self

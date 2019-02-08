@@ -29,10 +29,13 @@ class PaletteMapping(DataObject):
 
     def read(self, parser: BinaryParser) -> 'PaletteMapping':
         for m in range(0, 256):
+            r = parser.get_uint8()
+            g = parser.get_uint8()
+            b = parser.get_uint8()
             self.colors.append((
-                parser.get_uint8(),
-                parser.get_uint8(),
-                parser.get_uint8(),
+                (r << 2) | ((r & 0x30) >> 4),
+                (g << 2) | ((g & 0x30) >> 4),
+                (b << 2) | ((b & 0x30) >> 4),
             ))
         for k in range(0, 19):
             remap: Remapping = []
@@ -44,9 +47,9 @@ class PaletteMapping(DataObject):
     def write(self, parser):
         for m in range(0, 256):
             c = self.colors[m]
-            parser.put_uint8(c[0])
-            parser.put_uint8(c[1])
-            parser.put_uint8(c[2])
+            parser.put_uint8((c[0] & 0xff) >> 2)
+            parser.put_uint8((c[1] & 0xff) >> 2)
+            parser.put_uint8((c[2] & 0xff) >> 2)
 
         for k in range(0, 19):
             for m in range(0, 256):

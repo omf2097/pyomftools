@@ -52,6 +52,29 @@ class MoveCategory(IntEnum):
     DESTRUCTION = 13
 
 
+AF_ANIMATION_NAMES = {
+    1: 'Jumping',
+    2: 'Getting up',
+    3: 'Stunned',
+    4: 'Crouching',
+    5: 'Standing block',
+    6: 'Crouching block',
+    7: 'Burning oil',
+    8: 'Blocking scrape',
+    9: 'Damage',
+    10: 'Walking',
+    11: 'Idle',
+    12: 'Scrap',
+    13: 'Bolt',
+    14: 'Screw',
+    48: 'Victory',
+    49: 'Loss',
+    55: 'Blast 1',
+    56: 'Blast 2',
+    57: 'Blast 3',
+}
+
+
 class AFMove(Animation):
     __slots__ = (
        'ai_opts',
@@ -125,6 +148,12 @@ class AFMove(Animation):
         self.move_string: str = ""
         self.enemy_string: str = ""
 
+    @staticmethod
+    def get_name(index: int):
+        if index in AF_ANIMATION_NAMES:
+            return AF_ANIMATION_NAMES[index]
+        return None
+
     def read(self, parser) -> 'AFMove':
         super(AFMove, self).read(parser)
         self.ai_opts = AIOptions(parser.get_uint16())
@@ -146,7 +175,7 @@ class AFMove(Animation):
         self.collision_opts = parser.get_uint8()
         self.extra_string_selector = parser.get_uint8()
         self.points = parser.get_uint8()
-        self.move_string = parser.get_str(21)
+        self.move_string = parser.get_null_padded_str(21)
         self.enemy_string = parser.get_var_str(size_includes_zero=True)
         return self
 
@@ -171,7 +200,7 @@ class AFMove(Animation):
         parser.put_uint8(self.collision_opts)
         parser.put_uint8(self.extra_string_selector)
         parser.put_uint8(self.points)
-        parser.put_str(self.move_string)
+        parser.put_null_padded_str(self.move_string, 21)
         parser.put_var_str(self.enemy_string, size_includes_zero=True)
 
     def serialize(self) -> dict:

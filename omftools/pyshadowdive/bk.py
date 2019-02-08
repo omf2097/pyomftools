@@ -7,8 +7,9 @@ from .bkanim import BKAnimation
 from .palettes import PaletteMapping
 
 from .utils.parser import BinaryParser
-from .utils.types import Image
+from .utils.types import EncodedImage
 from .utils.validator import UInt16, UInt32, UInt8
+from .utils.images import generate_png, save_png
 
 
 class BKFile(Entrypoint):
@@ -47,7 +48,7 @@ class BKFile(Entrypoint):
         self.animations: typing.Dict[int, BKAnimation] = {}
         self.palettes: typing.List[PaletteMapping] = []
         self.sound_table: typing.List[int] = []
-        self.background_image: Image = []
+        self.background_image: EncodedImage = []
 
     def serialize(self):
         return {
@@ -142,3 +143,12 @@ class BKFile(Entrypoint):
 
         for sound in self.sound_table:
             parser.put_uint8(sound)
+
+    def save_background(self, filename: str):
+        save_png(
+            generate_png(self.background_image,
+                         self.background_width,
+                         self.background_height,
+                         self.palettes[0].colors),
+            filename
+        )

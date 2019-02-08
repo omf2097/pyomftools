@@ -1,9 +1,18 @@
 import json
+import typing
+from enum import Enum
 from abc import ABCMeta
 from validx import exc, Dict, Validator
 
 from .utils.parser import BinaryParser
 from .utils.exceptions import OMFInvalidDataException
+
+PropertyDict = typing.List[
+    typing.Tuple[
+        str,
+        typing.Union[str, float, int],
+        typing.Union[str, float, int, None],
+    ]]
 
 
 class DataObject(metaclass=ABCMeta):
@@ -20,6 +29,16 @@ class DataObject(metaclass=ABCMeta):
 
     def serialize(self) -> dict:
         raise NotImplementedError()
+
+    def get_props(self) -> PropertyDict:
+        content: PropertyDict = []
+        for slots in [getattr(cls, '__slots__', []) for cls in type(self).__mro__]:
+            for attr in slots:
+                var = getattr(self, attr, None)
+                if type(var) in [float, int, str] or issubclass(type(var), Enum):
+                    dec_var = getattr(self, f'real_{attr}', None)
+                    content.append((attr, var, dec_var))
+        return content
 
 
 class Entrypoint(DataObject):

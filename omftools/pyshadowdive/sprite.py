@@ -1,8 +1,11 @@
 from validx import Dict, Bool, List
+import typing
 
 from .protos import DataObject
 from .utils.validator import UInt16, Int16, UInt8
-from .utils.types import Image
+from .utils.types import EncodedImage, RawImage, Palette, TransparencyMask
+from .utils.exceptions import OMFInvalidDataException
+from .utils.images import save_png, generate_png
 
 
 class Sprite(DataObject):
@@ -33,7 +36,7 @@ class Sprite(DataObject):
         self.missing: bool = False
         self.width: int = 0
         self.height: int = 0
-        self.image: Image = []
+        self.image: EncodedImage = []
 
     def read(self, parser):
         image_len = parser.get_uint16()
@@ -49,6 +52,53 @@ class Sprite(DataObject):
             self.image = [parser.get_uint8() for _ in range(image_len)]
 
         return self
+
+    def decode_image(self) -> RawImage:
+        if self.width == 0 or self.height == 0 or len(self.image) == 0:
+            return []
+
+        in_size = len(self.image)
+        out_size: int = self.width * self.height
+        out: RawImage = [0 for _ in range(out_size)]
+
+        x: int = 0
+        y: int = 0
+        i: int = 0
+        while i < in_size:
+            c: int = self.image[i] + (self.image[i+1] << 8)
+            data, op = divmod(c, 4)
+            i += 2
+
+            if op == 0:
+                x = data
+            elif op == 2:
+                y = data
+            elif op == 1:
+                while data > 0:
+                    pos = (y * self.width) + x
+                    out[pos] = self.image[i]
+                    i += 1
+                    x += 1
+                    data -= 1
+                x = 0
+            elif op == 3:
+                if i != in_size:
+                    raise OMFInvalidDataException("Bad image data!")
+
+        return out
+
+    def save_png(self, filename: str, palette: Palette):
+        dec_data = self.decode_image()
+        if not dec_data:
+            raise OMFInvalidDataException("Decoded image data resulted in an image of size 0!")
+        save_png(
+            img=generate_png(dec_data,
+                             self.width,
+                             self.height,
+                             palette),
+            filename=filename,
+            transparency=0
+        )
 
     def write(self, parser):
         image_len = len(self.image)

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% import "macros/dump_table.html" as tables %}
+
+{% block body %}
+<div class="row">
+    <div class="col-lg-2">
+        <div class="card">
+            <div class="card-header text-white">Animation catalog</div>
+            <div class="card-body text-white">
+                <ul>
+                {% for key, move in af.moves.items() %}
+                    <li>
+                        <a href="#animation_{{ key }}">
+                            Move {{ key }}{% if move.get_name(key) %}: {{ move.get_name(key) }}{% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="card">
+            <div class="card-header text-white">Header</div>
+            <div class="card-body text-white">
+                {{ tables.print_props(af.get_props(), decoded=True) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2">
+        <div class="card">
+            <div class="card-header text-white">Sounds table</div>
+            <div class="card-body text-white">
+                {{ tables.print_sounds(af.sound_table) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg"></div>
+</div>
+
+{% for key, move in af.moves.items() %}
+<div class="row">
+    <div class="col-sm">
+        <h2 id="animation_{{ key }}">Move {{ key }}{% if move.get_name(key) %}: {{ move.get_name(key) }}{% endif %}</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg">
+        <div class="card">
+            <div class="card-header">Header</div>
+            <div class="card-body">
+                {{ tables.print_props(move.get_props()) }}
+            </div>
+        </div>
+    </div>
+    {% if move.extra_strings %}
+    <div class="col-lg">
+        <div class="card">
+            <div class="card-header text-white">Extra strings</div>
+            <div class="card-body text-white">
+                {{ tables.print_extra_strings(move.extra_strings) }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if move.hit_coords %}
+    <div class="col-lg">
+        <div class="card">
+            <div class="card-header text-white">Collision coordinates</div>
+            <div class="card-body text-white">
+                {{ tables.print_coords(move.hit_coords) }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="col-lg-3">
+        <div class="card">
+            <div class="card-header text-white">Sprites</div>
+            <div class="card-body text-white">
+                {{ tables.print_sprites(filename, key, move.sprites) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block header %}{{ filename }}{% endblock %}
+
+{% block title %}{{ filename }} - {{ super() }}{% endblock %}

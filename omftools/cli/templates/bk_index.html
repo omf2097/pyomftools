@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% import "macros/dump_table.html" as tables %}
+
+
+{% block jsvars %}
+    <script type="text/javascript">
+        var remappings = {
+            {% for palette in bk.palettes %}'{{ loop.index }}': {{ palette.remaps|tojson|safe }},
+            {% endfor %}
+        };
+    </script>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-lg-2">
+        <div class="card">
+            <div class="card-header text-white">Animation catalog</div>
+            <div class="card-body text-white">
+                <ul>
+                {% for key, animation in bk.animations.items() %}
+                    <li>
+                        <a href="#animation_{{ key }}">
+                            Animation {{ key }}{% if animation.get_name(key) %}: {{ animation.get_name(key) }}{% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="card">
+            <div class="card-header text-white">Header</div>
+            <div class="card-body text-white">
+                {{ tables.print_props(bk.get_props()) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2">
+        <div class="card">
+            <div class="card-header text-white">Sounds table</div>
+            <div class="card-body text-white">
+                {{ tables.print_sounds(bk.sound_table) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg">
+        <div class="card">
+            <div class="card-header text-white">Background</div>
+            <div class="card-body text-white">
+                <img src="{{ filename }}-bg.png" style="width: 100%;" class="img-fluid" alt="Background for {{ filename }}" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm">
+        <h2>Palettes</h2>
+    </div>
+</div>
+<div class="row">
+{% for palette in bk.palettes %}
+    <div class="col-lg-3">
+        <div class="card">
+            <div class="card-header text-white">
+                <span class="pt-5">Palette {{ loop.index }}</span>
+            </div>
+            <div class="card-body text-white">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-secondary dropdown-toggle remapping"
+                            type="button"
+                            id="remapping_{{ loop.index }}"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false">
+                        No remapping
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        {% for m in range(1, 20) %}
+                            <a class="dropdown-item" href="#" id="remap_{{ loop.index }}_{{ m }}">Remapping {{ m }}</a>
+                        {% endfor %}
+                    </div>
+                </div><br />
+                {{ tables.print_palette(palette.colors) }}
+            </div>
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+{% for key, animation in bk.animations.items() %}
+<div class="row">
+    <div class="col-sm">
+        <h2 id="animation_{{ key }}">Animation {{ key }}{% if animation.get_name(key) %}: {{ animation.get_name(key) }}{% endif %}</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg">
+        <div class="card">
+            <div class="card-header text-white">Header</div>
+            <div class="card-body text-white">
+                {{ tables.print_props(animation.get_props()) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header text-white">Sprites</div>
+            <div class="card-body text-white">
+                {{ tables.print_sprites(filename, key, animation.sprites) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block header %}{{ filename }}{% endblock %}
+
+{% block title %}{{ filename }} - {{ super() }}{% endblock %}

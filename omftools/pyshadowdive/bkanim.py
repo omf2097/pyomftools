@@ -4,6 +4,22 @@ from .animation import Animation
 from .utils.validator import UInt8, UInt16
 
 
+BK_ANIMATION_NAMES = {
+    6: 'Round',
+    7: 'Number',
+    8: 'You lose',
+    9: 'You win',
+    10: 'Fight',
+    11: 'Ready',
+    20: 'Left wall hit',
+    21: 'Right wall hit',
+    24: 'Dust 1',
+    25: 'Dust 2',
+    26: 'Dust 3',
+    27: 'Match marker',
+}
+
+
 class BKAnimation(Animation):
     __slots__ = (
         'null',
@@ -34,6 +50,12 @@ class BKAnimation(Animation):
         self.probability: int = 0
         self.hazard_damage: int = 0
         self.footer_string: str = ""
+
+    @staticmethod
+    def get_name(index: int):
+        if index in BK_ANIMATION_NAMES:
+            return BK_ANIMATION_NAMES[index]
+        return None
 
     def read(self, parser) -> 'BKAnimation':
         self.null = parser.get_uint8()

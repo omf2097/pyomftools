@@ -31,8 +31,20 @@ class BinaryParser:
             raise OMFInvalidDataException(
                 f"Got {got}, was expecting {compare_to}")
 
+    def get_null_padded_str(self, max_length: int) -> str:
+        chars = bytearray()
+        ended = False
+        for k in range(max_length):
+            c = self.handle.read(1)
+            if c[0] == 0:
+                ended = True
+            if ended:
+                continue
+            chars.append(c[0])
+        return chars.decode('cp437')
+
     def get_str(self, length: int) -> str:
-        return self.handle.read(length).decode() if length > 0 else ''
+        return self.handle.read(length).decode('cp437') if length > 0 else ''
 
     def get_bytes(self, length: int) -> bytes:
         return self.handle.read(length)
@@ -69,8 +81,15 @@ class BinaryParser:
         self.check_uint8(0)
         return data
 
+    def put_null_padded_str(self, data: str, max_length: int) -> None:
+        buf = data.encode('cp437')[:max_length]
+        left = max_length - len(buf)
+        self.handle.write(buf)
+        for _ in range(left):
+            self.handle.write(b'\0')
+
     def put_str(self, data: str) -> None:
-        self.handle.write(data.encode())
+        self.handle.write(data.encode('cp437'))
 
     def put_bytes(self, data: bytes) -> None:
         self.handle.write(data)

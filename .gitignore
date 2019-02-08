@@ -102,3 +102,4 @@ venv
 *.BK-*
 
 .mypy_cache
+output/
