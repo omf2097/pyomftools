@@ -3,6 +3,7 @@ from validx import Dict, List, Str
 
 from .protos import Entrypoint
 from .afmove import AFMove
+from .sprite import Sprite
 
 from .utils.validator import UInt8, UInt16, UInt32, Int32
 
@@ -114,6 +115,16 @@ class AFFile(Entrypoint):
             if move_no >= self.MOVE_MAX_NUMBER:
                 break
             self.moves[move_no] = AFMove().read(parser)
+
+        # Find missing image data by index
+        index_table: typing.Dict[int, Sprite] = {}
+        for key, m in self.moves.items():
+            for idx, sprite in enumerate(m.sprites):
+                if sprite.missing:
+                    if sprite.index in index_table:
+                        sprite.image = index_table[sprite.index].image
+                else:
+                    index_table[sprite.index] = sprite
 
         # Read sound table
         for m in range(0, 30):

@@ -1,14 +1,15 @@
 from validx import Dict, Bool, List
-import typing
 
 from .protos import DataObject
 from .utils.validator import UInt16, Int16, UInt8
-from .utils.types import EncodedImage, RawImage, Palette, TransparencyMask
+from .utils.types import EncodedImage, RawImage, Palette
 from .utils.exceptions import OMFInvalidDataException
 from .utils.images import save_png, generate_png
 
 
 class Sprite(DataObject):
+    TRANSPARENCY_INDEX = 50
+
     __slots__ = (
         'pos_x',
         'pos_y',
@@ -59,7 +60,7 @@ class Sprite(DataObject):
 
         in_size = len(self.image)
         out_size: int = self.width * self.height
-        out: RawImage = [0 for _ in range(out_size)]
+        out: RawImage = [self.TRANSPARENCY_INDEX for _ in range(out_size)]
 
         x: int = 0
         y: int = 0
@@ -97,12 +98,12 @@ class Sprite(DataObject):
                              self.height,
                              palette),
             filename=filename,
-            transparency=0
+            transparency=self.TRANSPARENCY_INDEX
         )
 
     def write(self, parser):
         image_len = len(self.image)
-        parser.put_uint16(image_len)
+        parser.put_uint16(image_len if image_len and not self.missing else 0)
         parser.put_int16(self.pos_x)
         parser.put_int16(self.pos_y)
         parser.put_uint16(self.width)
