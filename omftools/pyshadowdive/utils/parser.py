@@ -1,5 +1,6 @@
 import struct
 import typing
+import os
 
 from .exceptions import OMFInvalidDataException
 
@@ -12,6 +13,9 @@ class BinaryParser:
 
     def get_pos(self) -> int:
         return self.handle.tell()
+
+    def set_pos(self, pos: int) -> None:
+        self.handle.seek(pos, os.SEEK_SET)
 
     def check_uint8(self, compare_to: int) -> None:
         got = self.get_uint8()

@@ -1,8 +1,9 @@
 from validx import Dict, Bool, List
 
 from .protos import DataObject
+from .palette import Palette
 from .utils.validator import UInt16, Int16, UInt8
-from .utils.types import EncodedImage, RawImage, Palette
+from .utils.types import EncodedImage, RawImage
 from .utils.exceptions import OMFInvalidDataException
 from .utils.images import save_png, generate_png
 

@@ -9,10 +9,11 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 from omftools.pyshadowdive.af import AFFile
 from omftools.pyshadowdive.bk import BKFile
+from omftools.pyshadowdive.tournament import TournamentFile
 from omftools.pyshadowdive.sounds import SoundFile
-from omftools.pyshadowdive.altpals import AltPalettes
+from omftools.pyshadowdive.altpals import AltPaletteFile
 from omftools.pyshadowdive.utils.exceptions import OMFInvalidDataException
-from omftools.pyshadowdive.utils.types import Palette
+from omftools.pyshadowdive.palette import Palette
 
 env = Environment(
     loader=PackageLoader(__name__),
@@ -24,6 +25,7 @@ env = Environment(
 class Filenames:
     af: typing.List[str]
     bk: typing.List[str]
+    trn: typing.List[str]
     alt_pals: str
     sounds: str
 
@@ -45,7 +47,7 @@ def generate_sounds(file: str, files: Filenames, output_dir: str):
         fd.write(content.encode())
 
 
-def generate_altpals(alt_pals: AltPalettes, files: Filenames, output_dir: str):
+def generate_altpals(alt_pals: AltPaletteFile, files: Filenames, output_dir: str):
     filename = 'ALTPALS.DAT'
 
     with open(os.path.join(output_dir, f'{filename}.html'), 'wb') as fd:
@@ -57,7 +59,27 @@ def generate_altpals(alt_pals: AltPalettes, files: Filenames, output_dir: str):
         fd.write(content.encode())
 
 
-def generate_bk(file: str, files: Filenames, output_dir: str, alt_pals: AltPalettes):
+def generate_trn(file: str, files: Filenames, output_dir: str):
+    filename = os.path.basename(file)
+    trn = TournamentFile().load_native(file)
+
+    for idx, sprite in enumerate(trn.locale_logos):
+        sprite_file = os.path.join(output_dir, f'{filename}-{idx}.png')
+        try:
+            sprite.save_png(sprite_file, trn.palette)
+        except OMFInvalidDataException:
+            print(f"Skipping {sprite_file}")
+
+    with open(os.path.join(output_dir, f'{filename}.html'), 'wb') as fd:
+        tpl = env.get_template('trn_index.html')
+        content = tpl.render(
+            trn=trn,
+            files=files,
+            filename=filename)
+        fd.write(content.encode())
+
+
+def generate_bk(file: str, files: Filenames, output_dir: str, alt_pals: AltPaletteFile):
     filename = os.path.basename(file)
     bk = BKFile().load_native(file)
 
@@ -65,10 +87,10 @@ def generate_bk(file: str, files: Filenames, output_dir: str, alt_pals: AltPalet
 
     pal = bk.palettes[0].colors
     if file.startswith('ARENA') or file.startswith('MECHLAB'):
-        c1 = pal[0]
+        c1 = pal.data[0]
         for m in range(48):
-            pal[m] = alt_pals.palettes[0][m+96]
-        pal[0] = c1
+            pal.data[m] = alt_pals.palettes[0].data[m+96]
+        pal.data[0] = c1
 
     for key, animation in bk.animations.items():
         for idx, sprite in enumerate(animation.sprites):
@@ -87,19 +109,15 @@ def generate_bk(file: str, files: Filenames, output_dir: str, alt_pals: AltPalet
         fd.write(content.encode())
 
 
-def generate_af(file: str, files: Filenames, output_dir: str, alt_pals: AltPalettes):
+def generate_af(file: str, files: Filenames, output_dir: str, alt_pals: AltPaletteFile):
     filename = os.path.basename(file)
     af = AFFile().load_native(file)
-
-    pal: Palette = [(0, 0, 0) for _ in range(256)]
-    for m in range(96):
-        pal[m] = alt_pals.palettes[0][m+96]
 
     for key, animation in af.moves.items():
         for idx, sprite in enumerate(animation.sprites):
             sprite_file = os.path.join(output_dir, f'{filename}-{key}-{idx}.png')
             try:
-                sprite.save_png(sprite_file, pal)
+                sprite.save_png(sprite_file, alt_pals.palettes[0])
             except OMFInvalidDataException:
                 print(f"Skipping {sprite_file}")
 
@@ -120,24 +138,30 @@ def main():
 
     af_files = glob(os.path.join(args.input_dir, '*.AF'))
     bk_files = glob(os.path.join(args.input_dir, '*.BK'))
+    trn_files = glob(os.path.join(args.input_dir, '*.TRN'))
     alt_pals_file = os.path.join(args.input_dir, 'ALTPALS.DAT')
     sounds_file = os.path.join(args.input_dir, 'SOUNDS.DAT')
 
     files = Filenames(
         af=[os.path.basename(v) for v in af_files],
         bk=[os.path.basename(v) for v in bk_files],
+        trn=[os.path.basename(v) for v in trn_files],
         alt_pals=os.path.basename(alt_pals_file),
         sounds=os.path.basename(sounds_file),
     )
 
     # palettes file
-    alt_pals = AltPalettes().load_native(alt_pals_file)
+    alt_pals = AltPaletteFile().load_native(alt_pals_file)
 
     print(f'Generating ALTPALS.DAT')
     generate_altpals(alt_pals, files, args.output_dir)
 
     print(f'Generating SOUNDS.DAT')
     generate_sounds(sounds_file, files, args.output_dir)
+
+    for trn_file in trn_files:
+        print(f"Generating {trn_file}")
+        generate_trn(trn_file, files, args.output_dir)
 
     for af_file in af_files:
         print(f"Generating {af_file}")

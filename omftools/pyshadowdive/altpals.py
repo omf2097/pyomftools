@@ -1,10 +1,10 @@
 import typing
 
 from .protos import Entrypoint
-from .palettes import Palette
+from .palette import Palette
 
 
-class AltPalettes(Entrypoint):
+class AltPaletteFile(Entrypoint):
     __slots__ = (
         'palettes',
     )
@@ -14,21 +14,9 @@ class AltPalettes(Entrypoint):
 
     def serialize(self):
         return {
-            'palettes': self.palettes,
+            'palettes': [p.serialize() for p in self.palettes],
         }
 
     def read(self, parser):
-        self.palettes = []
-        for p in range(11):
-            colors = []
-            for m in range(0, 256):
-                r = parser.get_uint8()
-                g = parser.get_uint8()
-                b = parser.get_uint8()
-                colors.append((
-                    (r << 2) | ((r & 0x30) >> 4),
-                    (g << 2) | ((g & 0x30) >> 4),
-                    (b << 2) | ((b & 0x30) >> 4),
-                ))
-            self.palettes.append(colors)
+        self.palettes = [Palette().read(parser) for _ in range(11)]
         return self

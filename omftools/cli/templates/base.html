@@ -57,6 +57,16 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="sceneDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Tournaments
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            {% for file in files.trn %}
+                                <a class="dropdown-item" href="{{ file }}.html">{{ file }}</a>
+                            {% endfor %}
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="sceneDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Others
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">

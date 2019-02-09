@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% import "macros/dump_table.html" as tables %}
+
+{% block body %}
+<div class="row">
+    <div class="col-lg">
+        <div class="card">
+            <div class="card-header text-white">Header</div>
+            <div class="card-body text-white">
+                {{ tables.print_props(trn.get_props()) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg">
+        <div class="card">
+            <div class="card-header text-white">Logo</div>
+            <div class="card-body text-white">
+                <img srcset="{{ filename }}-0.png 0.5x"
+                     class="sprite"
+                     alt="Logo for tournament">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="palette-block m-3">
+        <div class="card">
+            <div class="card-header text-white">Palette</div>
+            <div class="card-body text-white">
+                {{ tables.print_palette(trn.palette.data) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% for m in range(10) %}
+<div class="row">
+    <div class="col-sm">
+        <h2 id="locale_{{ loop.index0 }}">Locale {{ loop.index }}</h2>
+    </div>
+</div>
+<div class="row">
+
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block header %}{{ filename }}{% endblock %}
+
+{% block title %}{{ filename }} - {{ super() }}{% endblock %}

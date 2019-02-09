@@ -1,7 +1,6 @@
 import typing
 
 Color = typing.Tuple[int, int, int]
-Palette = typing.List[Color]
 Remapping = typing.List[int]
 Remappings = typing.List[Remapping]
 EncodedImage = typing.List[int]

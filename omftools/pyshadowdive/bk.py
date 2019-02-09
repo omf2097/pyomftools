@@ -4,7 +4,7 @@ import io
 
 from .protos import Entrypoint
 from .bkanim import BKAnimation
-from .palettes import PaletteMapping
+from .palette_mapping import PaletteMapping
 
 from .utils.parser import BinaryParser
 from .utils.types import EncodedImage
