@@ -39,7 +39,7 @@
                         <a class="nav-link dropdown-toggle" href="#" id="fighterDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Fighters
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <div class="dropdown-menu" aria-labelledby="fighterDropdown">
                             {% for file in files.af %}
                                 <a class="dropdown-item" href="{{ file }}.html">{{ file }}</a>
                             {% endfor %}
@@ -49,7 +49,7 @@
                         <a class="nav-link dropdown-toggle" href="#" id="sceneDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Scenes
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <div class="dropdown-menu" aria-labelledby="sceneDropdown">
                             {% for file in files.bk %}
                                 <a class="dropdown-item" href="{{ file }}.html">{{ file }}</a>
                             {% endfor %}
@@ -59,17 +59,27 @@
                         <a class="nav-link dropdown-toggle" href="#" id="sceneDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Tournaments
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <div class="dropdown-menu" aria-labelledby="sceneDropdown">
                             {% for file in files.trn %}
                                 <a class="dropdown-item" href="{{ file }}.html">{{ file }}</a>
                             {% endfor %}
                         </div>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="sceneDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="photosDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Photos
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="photosDropdown">
+                            {% for file in files.pic %}
+                                <a class="dropdown-item" href="{{ file }}.html">{{ file }}</a>
+                            {% endfor %}
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="othersDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Others
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <div class="dropdown-menu" aria-labelledby="othersDropdown">
                             <a class="dropdown-item" href="{{ files.alt_pals }}.html">{{ files.alt_pals }}</a>
                             <a class="dropdown-item" href="{{ files.sounds }}.html">{{ files.sounds }}</a>
                         </div>

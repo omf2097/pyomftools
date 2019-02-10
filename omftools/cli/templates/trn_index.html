@@ -3,7 +3,23 @@
 
 {% block body %}
 <div class="row">
-    <div class="col-lg">
+    <div class="col">
+        <div class="card">
+            <div class="card-header text-white">Pilot catalog</div>
+            <div class="card-body text-white">
+                <ul>
+                {% for pilot in trn.pilots %}
+                    <li>
+                        <a href="#pilot_{{ loop.index }}">
+                            Pilot {{ loop.index }}: {{ pilot.name }}
+                        </a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col">
         <div class="card">
             <div class="card-header text-white">Header</div>
             <div class="card-body text-white">
@@ -11,7 +27,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg">
+    <div class="col">
         <div class="card">
             <div class="card-header text-white">Logo</div>
             <div class="card-body text-white">
@@ -32,15 +48,152 @@
         </div>
     </div>
 </div>
-{% for m in range(10) %}
-<div class="row">
-    <div class="col-sm">
-        <h2 id="locale_{{ loop.index0 }}">Locale {{ loop.index }}</h2>
-    </div>
-</div>
-<div class="row">
 
-</div>
+{% for pilot in trn.pilots %}
+    <div class="row">
+        <div class="col">
+            <h2 id="pilot_{{ loop.index }}">Pilot {{ loop.index }}: {{ pilot.name }}</h2>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-lg-1">
+            <div class="card">
+                <div class="card-header text-white">Photo</div>
+                <div class="card-body text-white p-3">
+                    <img srcset="{{ trn.pic_filename }}-{{ pilot.photo_id }}.png 0.5x" />
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-header text-white">Quotes</div>
+                <div class="card-body text-white">
+                    <table class="table table-borderless table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="col-1">Locale</th>
+                                <th scope="col">Quote</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for m in range(2) %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{ pilot.quotes[m] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header text-white">Palette (0-48)</div>
+                <div class="card-body text-white">
+                    {{ tables.print_palette(pilot.palette.data, groups=3) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header text-white">Pilot details</div>
+                <div class="card-body text-white">
+                    {{ tables.print_props(pilot.get_selected_props(pilot.PILOT_GROUP)) }}
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-header text-white">Tournament details</div>
+                <div class="card-body text-white">
+                    {{ tables.print_props(pilot.get_selected_props(pilot.TOURNAMENT_GROUP)) }}
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-header text-white">Enhancements</div>
+                <div class="card-body text-white">
+                    <table class="table table-borderless table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="col-1">HAR</th>
+                                <th scope="col">Enhancements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for har_name in har_names %}
+                            <tr>
+                                <th scope="row">{{ har_name }}</th>
+                                <td>{{ pilot.enhancements[loop.index0] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-header text-white">Requirements</div>
+                <div class="card-body text-white">
+                    {{ tables.print_props(pilot.get_selected_props(pilot.REQUIREMENTS_GROUP)) }}
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-header text-white">AI Options</div>
+                <div class="card-body text-white">
+                    {{ tables.print_props(pilot.get_selected_props(pilot.AI_OPTS_GROUP)) }}
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-header text-white">Miscellaneous</div>
+                <div class="card-body text-white">
+                    {{ tables.print_props(pilot.get_selected_props(pilot.OTHER_GROUP)) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endfor %}
+
+{% for m in range(2) %}
+    <div class="row">
+        <div class="col-sm">
+            <h2 id="locale_{{ loop.index0 }}">Locale {{ loop.index }}</h2>
+        </div>
+    </div>
+    {% for k in range(11) %}
+    <div class="row mb-3">
+        <div class="col-xl-6">
+            {% if k == 0 %}
+            <div class="card">
+                <div class="card-header text-white">{{ trn.locale_titles[m] }}</div>
+                <div class="card-body text-white">
+                    {{ trn.locale_descriptions[m] }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header text-white">End text for pilot {{ loop.index }}</div>
+                <div class="card-body text-white">
+                    {% for p in range(10) %}
+                        <p>{{ trn.locale_end_texts[m][k][p] }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 {% endfor %}
 
 {% endblock %}

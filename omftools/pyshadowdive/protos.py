@@ -30,6 +30,16 @@ class DataObject(metaclass=ABCMeta):
     def serialize(self) -> dict:
         raise NotImplementedError()
 
+    def get_selected_props(self, prop_names: typing.List[str]) -> PropertyDict:
+        content: PropertyDict = []
+        for attr in prop_names:
+            content.append((
+                attr,
+                getattr(self, attr, None),
+                getattr(self, f'real_{attr}', None),
+            ))
+        return content
+
     def get_props(self) -> PropertyDict:
         content: PropertyDict = []
         for slots in [getattr(cls, '__slots__', []) for cls in type(self).__mro__]:

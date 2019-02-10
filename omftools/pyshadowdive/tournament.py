@@ -1,8 +1,9 @@
 import typing
 
-from .protos import Entrypoint, DataObject
+from .protos import Entrypoint
 from .sprite import Sprite
 from .palette import Palette
+from .pilot import Pilot
 
 
 class TournamentFile(Entrypoint):
@@ -22,6 +23,7 @@ class TournamentFile(Entrypoint):
         'locale_titles',
         'locale_end_texts',
         'palette',
+        'pilots',
     )
 
     def __init__(self):
@@ -37,6 +39,7 @@ class TournamentFile(Entrypoint):
         self.locale_descriptions: typing.List[str] = []
         self.locale_titles: typing.List[str] = []
         self.locale_end_texts: typing.List[typing.List[typing.List[str]]] = []
+        self.pilots: typing.List[Pilot] = []
 
     def serialize(self):
         return {
@@ -52,6 +55,7 @@ class TournamentFile(Entrypoint):
             'locale_titles': self.locale_titles,
             'locale_end_texts': self.locale_end_texts,
             'palette': self.palette.serialize(),
+            'pilots': [p.serialize() for p in self.pilots],
         }
 
     def read(self, parser):
@@ -72,6 +76,7 @@ class TournamentFile(Entrypoint):
         # Enemy data
         for m in range(enemy_count):
             parser.set_pos(offsets[m])
+            self.pilots.append(Pilot().read(parser))
 
         # Seek to locales
         parser.set_pos(offsets[enemy_count])

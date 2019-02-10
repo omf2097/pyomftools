@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% import "macros/dump_table.html" as tables %}
+
+{% block body %}
+
+{% for photo in pic.photos %}
+<div class="row">
+    <div class="col">
+        <h2 id="photo_{{ loop.index }}">Photo {{ loop.index }}</h2>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col">
+        <div class="card">
+            <div class="card-header text-white">Image</div>
+            <div class="card-body text-white p-3">
+                <img srcset="{{ filename }}-{{ loop.index0 }}.png 0.5x" />
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card">
+            <div class="card-header text-white">
+                Photo descriptor
+            </div>
+            <div class="card-body text-white">
+                <table class="table table-borderless table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Key</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">is_player</th>
+                            <td>{{ photo.is_player }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">sex</th>
+                            <td>{{ photo.sex }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">unknown</th>
+                            <td>{{ photo.unknown }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card">
+            <div class="card-header text-white">Palette (0-48)</div>
+            <div class="card-body text-white">
+                {{ tables.print_palette(photo.palette.data, groups=3) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block header %}{{ filename }}{% endblock %}
+
+{% block title %}{{ filename }} - {{ super() }}{% endblock %}

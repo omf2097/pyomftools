@@ -6,10 +6,41 @@ from .exceptions import OMFInvalidDataException
 
 
 class BinaryParser:
-    __slots__ = ('handle',)
+    __slots__ = ('handle', 'xor_key',)
 
     def __init__(self, handle: typing.BinaryIO) -> None:
         self.handle = handle
+        self.xor_key: int = None
+
+    def xor_data(self, data: bytes) -> bytearray:
+        c = bytearray(data)
+        for m in range(len(c)):
+            c[m] = self.xor_key ^ c[m]
+
+            self.xor_key += 1
+            if self.xor_key > 255:
+                self.xor_key = 0
+        return c
+
+    def write(self, data: bytes) -> None:
+        if self.xor_key is not None:
+            self.handle.write(self.xor_data(data))
+        else:
+            self.handle.write(data)
+
+    def read(self, size: int) -> bytes:
+        data = self.handle.read(size)
+        if self.xor_key is not None:
+            return bytes(self.xor_data(data))
+        else:
+            return data
+
+    def set_xor_key(self, key: typing.Optional[int] = None):
+        assert key is None or 0 <= key <= 255
+        self.xor_key = key
+
+    def skip(self, size: int) -> None:
+        self.read(size)
 
     def get_pos(self) -> int:
         return self.handle.tell()
@@ -39,7 +70,7 @@ class BinaryParser:
         chars = bytearray()
         ended = False
         for k in range(max_length):
-            c = self.handle.read(1)
+            c = self.read(1)
             if c[0] == 0:
                 ended = True
             if ended:
@@ -48,31 +79,31 @@ class BinaryParser:
         return chars.decode('cp437')
 
     def get_str(self, length: int) -> str:
-        return self.handle.read(length).decode('cp437') if length > 0 else ''
+        return self.read(length).decode('cp437') if length > 0 else ''
 
     def get_bytes(self, length: int) -> bytes:
-        return self.handle.read(length)
+        return self.read(length)
 
     def get_int8(self) -> int:
-        return struct.unpack('<b', self.handle.read(1))[0]
+        return struct.unpack('<b', self.read(1))[0]
 
     def get_uint8(self) -> int:
-        return struct.unpack('<B', self.handle.read(1))[0]
+        return struct.unpack('<B', self.read(1))[0]
 
     def get_int16(self) -> int:
-        return struct.unpack('<h', self.handle.read(2))[0]
+        return struct.unpack('<h', self.read(2))[0]
 
     def get_uint16(self) -> int:
-        return struct.unpack('<H', self.handle.read(2))[0]
+        return struct.unpack('<H', self.read(2))[0]
 
     def get_int32(self) -> int:
-        return struct.unpack('<i', self.handle.read(4))[0]
+        return struct.unpack('<i', self.read(4))[0]
 
     def get_uint32(self) -> int:
-        return struct.unpack('<I', self.handle.read(4))[0]
+        return struct.unpack('<I', self.read(4))[0]
 
     def get_float(self) -> float:
-        return struct.unpack('<f', self.handle.read(4))[0]
+        return struct.unpack('<f', self.read(4))[0]
 
     def get_boolean(self) -> bool:
         return self.get_uint8() == 1
@@ -88,36 +119,36 @@ class BinaryParser:
     def put_null_padded_str(self, data: str, max_length: int) -> None:
         buf = data.encode('cp437')[:max_length]
         left = max_length - len(buf)
-        self.handle.write(buf)
+        self.write(buf)
         for _ in range(left):
-            self.handle.write(b'\0')
+            self.write(b'\0')
 
     def put_str(self, data: str) -> None:
-        self.handle.write(data.encode('cp437'))
+        self.write(data.encode('cp437'))
 
     def put_bytes(self, data: bytes) -> None:
-        self.handle.write(data)
+        self.write(data)
 
     def put_int8(self, data: int) -> None:
-        self.handle.write(struct.pack('<b', data))
+        self.write(struct.pack('<b', data))
 
     def put_uint8(self, data: int) -> None:
-        self.handle.write(struct.pack('<B', data))
+        self.write(struct.pack('<B', data))
 
     def put_int16(self, data: int) -> None:
-        self.handle.write(struct.pack('<h', data))
+        self.write(struct.pack('<h', data))
 
     def put_uint16(self, data: int) -> None:
-        self.handle.write(struct.pack('<H', data))
+        self.write(struct.pack('<H', data))
 
     def put_int32(self, data: int) -> None:
-        self.handle.write(struct.pack('<i', data))
+        self.write(struct.pack('<i', data))
 
     def put_uint32(self, data: int) -> None:
-        self.handle.write(struct.pack('<I', data))
+        self.write(struct.pack('<I', data))
 
     def put_float(self, data: float) -> None:
-        self.handle.write(struct.pack('<f', data))
+        self.write(struct.pack('<f', data))
 
     def put_boolean(self, data: bool) -> None:
         self.put_uint8(1 if data else 0)
@@ -129,5 +160,5 @@ class BinaryParser:
             self.put_uint16(0)
             return
         self.put_uint16(m_len + (1 if size_includes_zero else 0))
-        self.handle.write(m_data)
+        self.write(m_data)
         self.put_uint8(0)

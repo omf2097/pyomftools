@@ -30,9 +30,9 @@ class Palette(DataObject):
             g = parser.get_uint8()
             b = parser.get_uint8()
             self.data[m] = (
-                (r << 2) | ((r & 0x30) >> 4),
-                (g << 2) | ((g & 0x30) >> 4),
-                (b << 2) | ((b & 0x30) >> 4),
+                int((r * 255) / 63.0),
+                int((g * 255) / 63.0),
+                int((b * 255) / 63.0),
             )
         return self
 
@@ -43,9 +43,9 @@ class Palette(DataObject):
             g = parser.get_uint8()
             b = parser.get_uint8()
             self.data.append((
-                (r << 2) | ((r & 0x30) >> 4),
-                (g << 2) | ((g & 0x30) >> 4),
-                (b << 2) | ((b & 0x30) >> 4),
+                int((r * 255) / 63.0),
+                int((g * 255) / 63.0),
+                int((b * 255) / 63.0),
             ))
         return self
 
