@@ -411,9 +411,9 @@ class Pilot(DataObject):
         self.color_3 = parser.get_uint8()
 
     def read_pilot_block(self, parser: BinaryParser):
-        self.trn_name = parser.get_str(13)
-        self.trn_desc = parser.get_str(31)
-        self.trn_image = parser.get_str(13)
+        self.trn_name = parser.get_null_padded_str(13)
+        self.trn_desc = parser.get_null_padded_str(31)
+        self.trn_image = parser.get_null_padded_str(13)
 
         self.unk_f_c = parser.get_float()
         self.unk_f_d = parser.get_float()
