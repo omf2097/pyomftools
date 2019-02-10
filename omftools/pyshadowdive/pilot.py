@@ -381,7 +381,7 @@ class Pilot(DataObject):
         }
 
     def read_player_block(self, parser: BinaryParser):
-        self.name = parser.get_str(18)
+        self.name = parser.get_null_padded_str(18)
         self.wins = parser.get_uint16()
         self.losses = parser.get_uint16()
         self.rank = parser.get_uint8()
