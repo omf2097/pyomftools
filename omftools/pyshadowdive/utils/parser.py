@@ -12,6 +12,13 @@ class BinaryParser:
         self.handle = handle
         self.xor_key: int = None
 
+    def get_file_size(self) -> int:
+        pos = self.get_pos()
+        self.handle.seek(0, os.SEEK_END)
+        size = self.handle.tell()
+        self.set_pos(pos)
+        return size
+
     def xor_data(self, data: bytes) -> bytearray:
         c = bytearray(data)
         for m in range(len(c)):

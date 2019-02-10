@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col">
+        <table class="table table-borderless table-striped table-hover table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col" style="min-width: 200px;">Title</th>
+                    <th scope="col">String</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for m in range(language.strings|length) %}
+                <tr>
+                    <th scope="row">{{ loop.index }}</th>
+                    <td>{{ language.titles[m] }}</td>
+                    <td>{{ language.strings[m] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block header %}{{ filename }}{% endblock %}
+
+{% block title %}{{ filename }} - {{ super() }}{% endblock %}

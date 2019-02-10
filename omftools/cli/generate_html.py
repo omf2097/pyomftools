@@ -16,6 +16,7 @@ from omftools.pyshadowdive.pic import PicFile
 from omftools.pyshadowdive.altpals import AltPaletteFile
 from omftools.pyshadowdive.utils.exceptions import OMFInvalidDataException
 from omftools.pyshadowdive.palette import Palette
+from omftools.pyshadowdive.language import LanguageFile
 
 env = Environment(
     loader=PackageLoader(__name__),
@@ -31,6 +32,7 @@ class Filenames:
     pic: typing.List[str]
     alt_pals: str
     sounds: str
+    english: str
 
 
 har_names = [
@@ -46,6 +48,19 @@ har_names = [
     "Chronos",
     "Nova",
 ]
+
+
+def generate_language(file: str, files: Filenames, output_dir: str):
+    filename = 'ENGLISH.DAT'
+    language = LanguageFile().load_native(file)
+
+    with open(os.path.join(output_dir, f'{filename}.html'), 'wb') as fd:
+        tpl = env.get_template('language_index.html')
+        content = tpl.render(
+            language=language,
+            files=files,
+            filename=filename)
+        fd.write(content.encode())
 
 
 def generate_sounds(file: str, files: Filenames, output_dir: str):
@@ -183,6 +198,7 @@ def main():
     pic_files = glob(os.path.join(args.input_dir, '*.PIC'))
     alt_pals_file = os.path.join(args.input_dir, 'ALTPALS.DAT')
     sounds_file = os.path.join(args.input_dir, 'SOUNDS.DAT')
+    english_file = os.path.join(args.input_dir, 'ENGLISH.DAT')
 
     files = Filenames(
         af=[os.path.basename(v) for v in af_files],
@@ -191,17 +207,21 @@ def main():
         pic=[os.path.basename(v) for v in pic_files],
         alt_pals=os.path.basename(alt_pals_file),
         sounds=os.path.basename(sounds_file),
+        english=os.path.basename(english_file),
     )
 
     # palettes file
     alt_pals = AltPaletteFile().load_native(alt_pals_file)
     src_pal = copy.deepcopy(BKFile().load_native(bk_files[0]).palettes[0].colors)
 
-    print(f'Generating ALTPALS.DAT')
+    print('Generating ALTPALS.DAT')
     generate_altpals(alt_pals, files, args.output_dir)
 
-    print(f'Generating SOUNDS.DAT')
+    print('Generating SOUNDS.DAT')
     generate_sounds(sounds_file, files, args.output_dir)
+
+    print('Generating ENGLISH.DAT')
+    generate_language(english_file, files, args.output_dir)
 
     for pic_file in pic_files:
         print(f"Generating {pic_file}")
