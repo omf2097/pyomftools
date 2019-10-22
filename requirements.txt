@@ -1,5 +1,5 @@
 cerberus==1.0.1
-pillow==5.4.1
+pillow==6.2.0
 validx==0.3
 jinja2==2.10.1
 
