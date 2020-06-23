@@ -13,11 +13,11 @@ class Sex(IntEnum):
 
 class Photo(DataObject):
     __slots__ = (
-        'is_player',
-        'sex',
-        'palette',
-        'unknown',
-        'sprite',
+        "is_player",
+        "sex",
+        "palette",
+        "unknown",
+        "sprite",
     )
 
     def __init__(self):
@@ -29,14 +29,14 @@ class Photo(DataObject):
 
     def serialize(self):
         return {
-            'is_player': self.is_player,
-            'sex': self.sex.value,
-            'palette': self.palette.serialize(),
-            'unknown': self.unknown,
-            'sprite': self.sprite.serialize(),
+            "is_player": self.is_player,
+            "sex": self.sex.value,
+            "palette": self.palette.serialize(),
+            "unknown": self.unknown,
+            "sprite": self.sprite.serialize(),
         }
 
-    def read(self, parser) -> 'Photo':
+    def read(self, parser) -> "Photo":
         self.is_player = parser.get_uint8() > 0
         self.sex = Sex(parser.get_uint16())
         self.palette = Palette().read_range(parser, 0, 48)
@@ -48,19 +48,17 @@ class Photo(DataObject):
 
 
 class PicFile(Entrypoint):
-    __slots__ = (
-        'photos',
-    )
+    __slots__ = ("photos",)
 
     def __init__(self):
         self.photos: typing.List[Photo] = []
 
     def serialize(self):
         return {
-            'photos': [p.serialize() for p in self.photos],
+            "photos": [p.serialize() for p in self.photos],
         }
 
-    def read(self, parser) -> 'PicFile':
+    def read(self, parser) -> "PicFile":
         photo_count = parser.get_uint32()
         assert 0 <= photo_count <= 256
 

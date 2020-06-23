@@ -9,20 +9,17 @@ from .utils.types import Remappings, Remapping
 
 class PaletteMapping(DataObject):
     __slots__ = (
-        'colors',
-        'remaps',
+        "colors",
+        "remaps",
     )
 
-    schema = Dict({
-        'colors': Palette.schema,
-        'remaps': List(List(UInt8)),
-    })
+    schema = Dict({"colors": Palette.schema, "remaps": List(List(UInt8)),})
 
     def __init__(self):
         self.colors: Palette = Palette()
         self.remaps: Remappings = []
 
-    def read(self, parser: BinaryParser) -> 'PaletteMapping':
+    def read(self, parser: BinaryParser) -> "PaletteMapping":
         self.colors = Palette().read(parser)
         for k in range(0, 19):
             remap: Remapping = []
@@ -38,12 +35,9 @@ class PaletteMapping(DataObject):
                 parser.put_uint8(self.remaps[k][m])
 
     def serialize(self) -> dict:
-        return {
-            'colors': self.colors.serialize(),
-            'remaps': self.remaps
-        }
+        return {"colors": self.colors.serialize(), "remaps": self.remaps}
 
-    def unserialize(self, data: dict) -> 'PaletteMapping':
-        self.colors = Palette().unserialize(data['colors'])
-        self.remaps = data['remaps']
+    def unserialize(self, data: dict) -> "PaletteMapping":
+        self.colors = Palette().unserialize(data["colors"])
+        self.remaps = data["remaps"]
         return self

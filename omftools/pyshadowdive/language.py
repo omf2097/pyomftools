@@ -5,8 +5,8 @@ from .protos import Entrypoint
 
 class LanguageFile(Entrypoint):
     __slots__ = (
-        'titles',
-        'strings',
+        "titles",
+        "strings",
     )
 
     def __init__(self):
@@ -15,11 +15,11 @@ class LanguageFile(Entrypoint):
 
     def serialize(self):
         return {
-            'titles': self.titles,
-            'strings': self.strings,
+            "titles": self.titles,
+            "strings": self.strings,
         }
 
-    def read(self, parser) -> 'LanguageFile':
+    def read(self, parser) -> "LanguageFile":
         file_size = parser.get_file_size()
 
         # Read titles and offsets
@@ -32,8 +32,8 @@ class LanguageFile(Entrypoint):
             self.titles.append(parser.get_null_padded_str(32))
         offsets.append(file_size)
 
-        for m in range(len(offsets)-1):
-            block_size = offsets[m+1] - offsets[m]
+        for m in range(len(offsets) - 1):
+            block_size = offsets[m + 1] - offsets[m]
             parser.set_pos(offsets[m])
             parser.set_xor_key(block_size & 0xFF)
             self.strings.append(parser.get_null_padded_str(block_size))

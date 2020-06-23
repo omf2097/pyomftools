@@ -5,16 +5,14 @@ from .palette import Palette
 
 
 class AltPaletteFile(Entrypoint):
-    __slots__ = (
-        'palettes',
-    )
+    __slots__ = ("palettes",)
 
     def __init__(self):
         self.palettes: typing.List[Palette] = []
 
     def serialize(self):
         return {
-            'palettes': [p.serialize() for p in self.palettes],
+            "palettes": [p.serialize() for p in self.palettes],
         }
 
     def read(self, parser):

@@ -5,7 +5,7 @@ from .utils.audio import save_wav
 
 
 class Sound(DataObject):
-    __slots__ = ('data', 'unknown')
+    __slots__ = ("data", "unknown")
 
     def __init__(self):
         self.data: typing.List[int] = []
@@ -13,8 +13,8 @@ class Sound(DataObject):
 
     def serialize(self):
         return {
-            'unknown': self.unknown,
-            'data': self.data,
+            "unknown": self.unknown,
+            "data": self.data,
         }
 
     def read(self, parser):
@@ -33,16 +33,14 @@ class Sound(DataObject):
 
 
 class SoundFile(Entrypoint):
-    __slots__ = (
-        'sounds',
-    )
+    __slots__ = ("sounds",)
 
     def __init__(self):
         self.sounds: typing.List[Sound] = []
 
     def serialize(self):
         return {
-            'sounds': [s.serialize() for s in self.sounds],
+            "sounds": [s.serialize() for s in self.sounds],
         }
 
     def read(self, parser):

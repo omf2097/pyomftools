@@ -12,24 +12,26 @@ class Sprite(DataObject):
     TRANSPARENCY_INDEX = 50
 
     __slots__ = (
-        'pos_x',
-        'pos_y',
-        'width',
-        'height',
-        'index',
-        'missing',
-        'image',
+        "pos_x",
+        "pos_y",
+        "width",
+        "height",
+        "index",
+        "missing",
+        "image",
     )
 
-    schema = Dict({
-        'pos_x': Int16,
-        'pos_y': Int16,
-        'width': UInt16,
-        'height': UInt16,
-        'index': UInt8,
-        'missing': Bool(),
-        'image': List(UInt8, maxlen=65535)
-    })
+    schema = Dict(
+        {
+            "pos_x": Int16,
+            "pos_y": Int16,
+            "width": UInt16,
+            "height": UInt16,
+            "index": UInt8,
+            "missing": Bool(),
+            "image": List(UInt8, maxlen=65535),
+        }
+    )
 
     def __init__(self):
         self.pos_x: int = 0
@@ -40,7 +42,7 @@ class Sprite(DataObject):
         self.height: int = 0
         self.image: EncodedImage = []
 
-    def read(self, parser) -> 'Sprite':
+    def read(self, parser) -> "Sprite":
         image_len = parser.get_uint16()
         self.pos_x = parser.get_int16()
         self.pos_y = parser.get_int16()
@@ -67,7 +69,7 @@ class Sprite(DataObject):
         y: int = 0
         i: int = 0
         while i < in_size:
-            c: int = self.image[i] + (self.image[i+1] << 8)
+            c: int = self.image[i] + (self.image[i + 1] << 8)
             data, op = divmod(c, 4)
             i += 2
 
@@ -92,14 +94,13 @@ class Sprite(DataObject):
     def save_png(self, filename: str, palette: Palette):
         dec_data = self.decode_image()
         if not dec_data:
-            raise OMFInvalidDataException("Decoded image data resulted in an image of size 0!")
+            raise OMFInvalidDataException(
+                "Decoded image data resulted in an image of size 0!"
+            )
         save_png(
-            img=generate_png(dec_data,
-                             self.width,
-                             self.height,
-                             palette),
+            img=generate_png(dec_data, self.width, self.height, palette),
             filename=filename,
-            transparency=self.TRANSPARENCY_INDEX
+            transparency=self.TRANSPARENCY_INDEX,
         )
 
     def write(self, parser):
@@ -118,23 +119,23 @@ class Sprite(DataObject):
 
     def serialize(self):
         return {
-            'pos_x': self.pos_x,
-            'pos_y': self.pos_y,
-            'width': self.width,
-            'height': self.height,
-            'index': self.index,
-            'missing': self.missing,
-            'image': self.image,
+            "pos_x": self.pos_x,
+            "pos_y": self.pos_y,
+            "width": self.width,
+            "height": self.height,
+            "index": self.index,
+            "missing": self.missing,
+            "image": self.image,
         }
 
-    def unserialize(self, data) -> 'Sprite':
-        self.pos_x = data['pos_x']
-        self.pos_y = data['pos_y']
-        self.width = data['width']
-        self.height = data['height']
-        self.index = data['index']
-        self.missing = data['missing']
-        self.image = data['image']
+    def unserialize(self, data) -> "Sprite":
+        self.pos_x = data["pos_x"]
+        self.pos_y = data["pos_y"]
+        self.width = data["width"]
+        self.height = data["height"]
+        self.index = data["index"]
+        self.missing = data["missing"]
+        self.image = data["image"]
         return self
 
     @property

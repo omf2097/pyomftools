@@ -12,39 +12,38 @@ class AFFile(Entrypoint):
     MOVE_MAX_NUMBER = 70
 
     __slots__ = (
-        'file_id',
-        'exec_window',
-        'endurance',
-        'unknown_b',
-        'health',
-        'forward_speed',
-        'reverse_speed',
-        'jump_speed',
-        'fall_speed',
-        'unknown_c',
-        'unknown_d',
-        'sound_table',
-        'moves',
+        "file_id",
+        "exec_window",
+        "endurance",
+        "unknown_b",
+        "health",
+        "forward_speed",
+        "reverse_speed",
+        "jump_speed",
+        "fall_speed",
+        "unknown_c",
+        "unknown_d",
+        "sound_table",
+        "moves",
     )
 
-    schema = Dict({
-        'file_id': UInt16,
-        'exec_window': UInt16,
-        'endurance': UInt32,
-        'unknown_b': UInt8,
-        'health': UInt16,
-        'forward_speed': Int32,
-        'reverse_speed': Int32,
-        'jump_speed': Int32,
-        'fall_speed': Int32,
-        'unknown_c': UInt8,
-        'unknown_d': UInt8,
-        'sound_table': List(UInt8, maxlen=30, minlen=30),
-        'moves': Dict(extra=(
-            Str(pattern=r'^[0-9]+$'),
-            AFMove.schema
-        ))
-    })
+    schema = Dict(
+        {
+            "file_id": UInt16,
+            "exec_window": UInt16,
+            "endurance": UInt32,
+            "unknown_b": UInt8,
+            "health": UInt16,
+            "forward_speed": Int32,
+            "reverse_speed": Int32,
+            "jump_speed": Int32,
+            "fall_speed": Int32,
+            "unknown_c": UInt8,
+            "unknown_d": UInt8,
+            "sound_table": List(UInt8, maxlen=30, minlen=30),
+            "moves": Dict(extra=(Str(pattern=r"^[0-9]+$"), AFMove.schema)),
+        }
+    )
 
     def __init__(self):
         self.file_id: int = 0
@@ -63,37 +62,35 @@ class AFFile(Entrypoint):
 
     def serialize(self):
         return {
-            'file_id': self.file_id,
-            'exec_window': self.exec_window,
-            'endurance': self.endurance,
-            'unknown_b': self.unknown_b,
-            'health': self.health,
-            'forward_speed': self.forward_speed,
-            'reverse_speed': self.reverse_speed,
-            'jump_speed': self.jump_speed,
-            'fall_speed': self.fall_speed,
-            'unknown_c': self.unknown_c,
-            'unknown_d': self.unknown_d,
-            'moves': {k: v.serialize()
-                      for k, v in self.moves.items()},
-            'sound_table': self.sound_table,
+            "file_id": self.file_id,
+            "exec_window": self.exec_window,
+            "endurance": self.endurance,
+            "unknown_b": self.unknown_b,
+            "health": self.health,
+            "forward_speed": self.forward_speed,
+            "reverse_speed": self.reverse_speed,
+            "jump_speed": self.jump_speed,
+            "fall_speed": self.fall_speed,
+            "unknown_c": self.unknown_c,
+            "unknown_d": self.unknown_d,
+            "moves": {k: v.serialize() for k, v in self.moves.items()},
+            "sound_table": self.sound_table,
         }
 
     def unserialize(self, data):
-        self.file_id = data['file_id']
-        self.exec_window = data['exec_window']
-        self.endurance = data['endurance']
-        self.unknown_b = data['unknown_b']
-        self.health = data['health']
-        self.forward_speed = data['forward_speed']
-        self.reverse_speed = data['reverse_speed']
-        self.jump_speed = data['jump_speed']
-        self.fall_speed = data['fall_speed']
-        self.unknown_c = data['unknown_c']
-        self.unknown_d = data['unknown_d']
-        self.moves = {int(k): AFMove().unserialize(v)
-                      for k, v in data['moves'].items()}
-        self.sound_table = data['sound_table']
+        self.file_id = data["file_id"]
+        self.exec_window = data["exec_window"]
+        self.endurance = data["endurance"]
+        self.unknown_b = data["unknown_b"]
+        self.health = data["health"]
+        self.forward_speed = data["forward_speed"]
+        self.reverse_speed = data["reverse_speed"]
+        self.jump_speed = data["jump_speed"]
+        self.fall_speed = data["fall_speed"]
+        self.unknown_c = data["unknown_c"]
+        self.unknown_d = data["unknown_d"]
+        self.moves = {int(k): AFMove().unserialize(v) for k, v in data["moves"].items()}
+        self.sound_table = data["sound_table"]
         return self
 
     def read(self, parser):

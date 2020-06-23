@@ -5,41 +5,46 @@ from .utils.validator import UInt8, UInt16
 
 
 BK_ANIMATION_NAMES = {
-    6: 'Round',
-    7: 'Number',
-    8: 'You lose',
-    9: 'You win',
-    10: 'Fight',
-    11: 'Ready',
-    20: 'Left wall hit',
-    21: 'Right wall hit',
-    24: 'Dust 1',
-    25: 'Dust 2',
-    26: 'Dust 3',
-    27: 'Match marker',
+    6: "Round",
+    7: "Number",
+    8: "You lose",
+    9: "You win",
+    10: "Fight",
+    11: "Ready",
+    20: "Left wall hit",
+    21: "Right wall hit",
+    24: "Dust 1",
+    25: "Dust 2",
+    26: "Dust 3",
+    27: "Match marker",
 }
 
 
 class BKAnimation(Animation):
     __slots__ = (
-        'null',
-        'chain_hit',
-        'chain_no_hit',
-        'repeat',
-        'probability',
-        'hazard_damage',
-        'footer_string',
+        "null",
+        "chain_hit",
+        "chain_no_hit",
+        "repeat",
+        "probability",
+        "hazard_damage",
+        "footer_string",
     )
 
-    schema = Dict({**Animation.schema.schema, **{
-        'null': UInt8,
-        'chain_hit': UInt8,
-        'chain_no_hit': UInt8,
-        'repeat': UInt8,
-        'probability': UInt16,
-        'hazard_damage': UInt8,
-        'footer_string': Str()
-    }})
+    schema = Dict(
+        {
+            **Animation.schema.schema,
+            **{
+                "null": UInt8,
+                "chain_hit": UInt8,
+                "chain_no_hit": UInt8,
+                "repeat": UInt8,
+                "probability": UInt16,
+                "hazard_damage": UInt8,
+                "footer_string": Str(),
+            },
+        }
+    )
 
     def __init__(self):
         super(BKAnimation, self).__init__()
@@ -57,7 +62,7 @@ class BKAnimation(Animation):
             return BK_ANIMATION_NAMES[index]
         return None
 
-    def read(self, parser) -> 'BKAnimation':
+    def read(self, parser) -> "BKAnimation":
         self.null = parser.get_uint8()
         self.chain_hit = parser.get_uint8()
         self.chain_no_hit = parser.get_uint8()
@@ -79,23 +84,26 @@ class BKAnimation(Animation):
         super(BKAnimation, self).write(parser)
 
     def serialize(self):
-        return {**super(BKAnimation, self).serialize(), **{
-            'null': self.null,
-            'chain_hit': self.chain_hit,
-            'chain_no_hit': self.chain_no_hit,
-            'repeat': self.repeat,
-            'probability': self.probability,
-            'hazard_damage': self.hazard_damage,
-            'footer_string': self.footer_string,
-        }}
+        return {
+            **super(BKAnimation, self).serialize(),
+            **{
+                "null": self.null,
+                "chain_hit": self.chain_hit,
+                "chain_no_hit": self.chain_no_hit,
+                "repeat": self.repeat,
+                "probability": self.probability,
+                "hazard_damage": self.hazard_damage,
+                "footer_string": self.footer_string,
+            },
+        }
 
-    def unserialize(self, data) -> 'BKAnimation':
+    def unserialize(self, data) -> "BKAnimation":
         super(BKAnimation, self).unserialize(data)
-        self.null = data['null']
-        self.chain_hit = data['chain_hit']
-        self.chain_no_hit = data['chain_no_hit']
-        self.repeat = data['repeat']
-        self.probability = data['probability']
-        self.hazard_damage = data['hazard_damage']
-        self.footer_string = data['footer_string']
+        self.null = data["null"]
+        self.chain_hit = data["chain_hit"]
+        self.chain_no_hit = data["chain_no_hit"]
+        self.repeat = data["repeat"]
+        self.probability = data["probability"]
+        self.hazard_damage = data["hazard_damage"]
+        self.footer_string = data["footer_string"]
         return self

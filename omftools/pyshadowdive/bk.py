@@ -16,29 +16,28 @@ class BKFile(Entrypoint):
     ANIMATION_MAX_NUMBER = 50
 
     __slots__ = (
-        'file_id',
-        'unknown_a',
-        'background_width',
-        'background_height',
-        'background_image',
-        'animations',
-        'sound_table',
-        'palettes',
+        "file_id",
+        "unknown_a",
+        "background_width",
+        "background_height",
+        "background_image",
+        "animations",
+        "sound_table",
+        "palettes",
     )
 
-    schema = Dict({
-        'file_id': UInt32,
-        'unknown_a': UInt8,
-        'background_width': UInt16,
-        'background_height': UInt16,
-        'background_image': List(UInt8),
-        'animations': Dict(extra=(
-            Str(pattern=r'^[0-9]+$'),
-            BKAnimation.schema
-        )),
-        'sound_table': List(UInt8, maxlen=30, minlen=30),
-        'palettes': List(PaletteMapping.schema),
-    })
+    schema = Dict(
+        {
+            "file_id": UInt32,
+            "unknown_a": UInt8,
+            "background_width": UInt16,
+            "background_height": UInt16,
+            "background_image": List(UInt8),
+            "animations": Dict(extra=(Str(pattern=r"^[0-9]+$"), BKAnimation.schema)),
+            "sound_table": List(UInt8, maxlen=30, minlen=30),
+            "palettes": List(PaletteMapping.schema),
+        }
+    )
 
     def __init__(self):
         self.file_id = 0
@@ -52,29 +51,27 @@ class BKFile(Entrypoint):
 
     def serialize(self):
         return {
-            'file_id': self.file_id,
-            'unknown_a': self.unknown_a,
-            'background_width': self.background_width,
-            'background_height': self.background_height,
-            'background_image': self.background_image,
-            'animations': {k: v.serialize()
-                           for k, v in self.animations.items()},
-            'palettes': [palette.serialize()
-                         for palette in self.palettes],
-            'sound_table': self.sound_table
+            "file_id": self.file_id,
+            "unknown_a": self.unknown_a,
+            "background_width": self.background_width,
+            "background_height": self.background_height,
+            "background_image": self.background_image,
+            "animations": {k: v.serialize() for k, v in self.animations.items()},
+            "palettes": [palette.serialize() for palette in self.palettes],
+            "sound_table": self.sound_table,
         }
 
     def unserialize(self, data):
-        self.file_id = data['file_id']
-        self.unknown_a = data['unknown_a']
-        self.background_width = data['background_width']
-        self.background_height = data['background_height']
-        self.background_image = data['background_image']
-        self.sound_table = data['sound_table']
-        self.palettes = [PaletteMapping().unserialize(v)
-                         for v in data['palettes']]
-        self.animations = {int(k): BKAnimation().unserialize(v)
-                           for k, v in data['animations'].items()}
+        self.file_id = data["file_id"]
+        self.unknown_a = data["unknown_a"]
+        self.background_width = data["background_width"]
+        self.background_height = data["background_height"]
+        self.background_image = data["background_image"]
+        self.sound_table = data["sound_table"]
+        self.palettes = [PaletteMapping().unserialize(v) for v in data["palettes"]]
+        self.animations = {
+            int(k): BKAnimation().unserialize(v) for k, v in data["animations"].items()
+        }
         return self
 
     def read(self, parser):
@@ -93,17 +90,14 @@ class BKFile(Entrypoint):
 
         # Read the raw Background image (VGA palette format)
         background_size = self.background_height * self.background_width
-        self.background_image = [parser.get_uint8()
-                                 for _ in range(background_size)]
+        self.background_image = [parser.get_uint8() for _ in range(background_size)]
 
         # Read up all available color palettes
         palette_count = parser.get_uint8()
-        self.palettes = [PaletteMapping().read(parser)
-                         for _ in range(palette_count)]
+        self.palettes = [PaletteMapping().read(parser) for _ in range(palette_count)]
 
         # Get sound mappings
-        self.sound_table = [parser.get_uint8()
-                            for _ in range(30)]
+        self.sound_table = [parser.get_uint8() for _ in range(30)]
 
         return self
 
@@ -132,7 +126,7 @@ class BKFile(Entrypoint):
 
         # Write ending of the animations block
         parser.put_uint32(parser.get_pos())
-        parser.put_uint8(self.ANIMATION_MAX_NUMBER+1)
+        parser.put_uint8(self.ANIMATION_MAX_NUMBER + 1)
 
         for pixel in self.background_image:
             parser.put_uint8(pixel)
@@ -146,9 +140,11 @@ class BKFile(Entrypoint):
 
     def save_background(self, filename: str):
         save_png(
-            generate_png(self.background_image,
-                         self.background_width,
-                         self.background_height,
-                         self.palettes[0].colors),
-            filename
+            generate_png(
+                self.background_image,
+                self.background_width,
+                self.background_height,
+                self.palettes[0].colors,
+            ),
+            filename,
         )

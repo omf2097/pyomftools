@@ -1,4 +1,3 @@
-
 class OMFException(Exception):
     pass
 

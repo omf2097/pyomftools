@@ -11,29 +11,29 @@ class TournamentFile(Entrypoint):
     MAX_LOCALES = 10
 
     __slots__ = (
-        'bk_name',
-        'winnings_multiplier',
-        'unknown_a',
-        'registration_fee',
-        'assumed_initial_value',
-        'tournament_id',
-        'pic_filename',
-        'locale_logos',
-        'locale_descriptions',
-        'locale_titles',
-        'locale_end_texts',
-        'palette',
-        'pilots',
+        "bk_name",
+        "winnings_multiplier",
+        "unknown_a",
+        "registration_fee",
+        "assumed_initial_value",
+        "tournament_id",
+        "pic_filename",
+        "locale_logos",
+        "locale_descriptions",
+        "locale_titles",
+        "locale_end_texts",
+        "palette",
+        "pilots",
     )
 
     def __init__(self):
-        self.bk_name: str = ''
+        self.bk_name: str = ""
         self.winnings_multiplier: float = 0.0
         self.unknown_a: int = 0
         self.registration_fee: int = 0
         self.assumed_initial_value: int = 0
         self.tournament_id: int = 0
-        self.pic_filename: str = ''
+        self.pic_filename: str = ""
         self.palette: Palette = Palette()
         self.locale_logos: typing.List[Sprite] = []
         self.locale_descriptions: typing.List[str] = []
@@ -43,19 +43,19 @@ class TournamentFile(Entrypoint):
 
     def serialize(self):
         return {
-            'bk_name': self.bk_name,
-            'winnings_multiplier': self.winnings_multiplier,
-            'unknown_a': self.unknown_a,
-            'registration_fee': self.registration_fee,
-            'assumed_initial_value': self.assumed_initial_value,
-            'tournament_id': self.tournament_id,
-            'pic_filename': self.pic_filename,
-            'locale_logos': [logo.serialize() for logo in self.locale_logos],
-            'locale_descriptions': self.locale_descriptions,
-            'locale_titles': self.locale_titles,
-            'locale_end_texts': self.locale_end_texts,
-            'palette': self.palette.serialize(),
-            'pilots': [p.serialize() for p in self.pilots],
+            "bk_name": self.bk_name,
+            "winnings_multiplier": self.winnings_multiplier,
+            "unknown_a": self.unknown_a,
+            "registration_fee": self.registration_fee,
+            "assumed_initial_value": self.assumed_initial_value,
+            "tournament_id": self.tournament_id,
+            "pic_filename": self.pic_filename,
+            "locale_logos": [logo.serialize() for logo in self.locale_logos],
+            "locale_descriptions": self.locale_descriptions,
+            "locale_titles": self.locale_titles,
+            "locale_end_texts": self.locale_end_texts,
+            "palette": self.palette.serialize(),
+            "pilots": [p.serialize() for p in self.pilots],
         }
 
     def read(self, parser):
@@ -71,7 +71,7 @@ class TournamentFile(Entrypoint):
 
         # Enemy block offsets
         parser.set_pos(300)
-        offsets = [parser.get_uint32() for _ in range(enemy_count+1)]
+        offsets = [parser.get_uint32() for _ in range(enemy_count + 1)]
 
         # Enemy data
         for m in range(enemy_count):
@@ -82,7 +82,9 @@ class TournamentFile(Entrypoint):
         parser.set_pos(offsets[enemy_count])
 
         # Load logo sprites
-        self.locale_logos: typing.List[Sprite] = [Sprite().read(parser) for _ in range(self.MAX_LOCALES)]
+        self.locale_logos: typing.List[Sprite] = [
+            Sprite().read(parser) for _ in range(self.MAX_LOCALES)
+        ]
 
         # Tournament palette
         self.palette = Palette().read_range(parser, 128, 40)
@@ -102,7 +104,9 @@ class TournamentFile(Entrypoint):
         for t in range(self.MAX_LOCALES):
             pilots = []
             for h in range(11):
-                pilots.append([parser.get_var_str(size_includes_zero=True) for _ in range(10)])
+                pilots.append(
+                    [parser.get_var_str(size_includes_zero=True) for _ in range(10)]
+                )
             self.locale_end_texts.append(pilots)
 
         return self

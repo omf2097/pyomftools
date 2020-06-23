@@ -77,76 +77,81 @@ class MoveCategory(IntEnum):
 
 
 AF_ANIMATION_NAMES = {
-    1: 'Jumping',
-    2: 'Getting up',
-    3: 'Stunned',
-    4: 'Crouching',
-    5: 'Standing block',
-    6: 'Crouching block',
-    7: 'Burning oil',
-    8: 'Blocking scrape',
-    9: 'Damage',
-    10: 'Walking',
-    11: 'Idle',
-    12: 'Scrap',
-    13: 'Bolt',
-    14: 'Screw',
-    48: 'Victory',
-    49: 'Loss',
-    55: 'Blast 1',
-    56: 'Blast 2',
-    57: 'Blast 3',
+    1: "Jumping",
+    2: "Getting up",
+    3: "Stunned",
+    4: "Crouching",
+    5: "Standing block",
+    6: "Crouching block",
+    7: "Burning oil",
+    8: "Blocking scrape",
+    9: "Damage",
+    10: "Walking",
+    11: "Idle",
+    12: "Scrap",
+    13: "Bolt",
+    14: "Screw",
+    48: "Victory",
+    49: "Loss",
+    55: "Blast 1",
+    56: "Blast 2",
+    57: "Blast 3",
 }
 
 
 class AFMove(Animation):
     __slots__ = (
-       'ai_opts',
-       'pos_constraint',
-       'unknown_4',
-       'unknown_5',
-       'unknown_6',
-       'unknown_7',
-       'unknown_8',
-       'unknown_9',
-       'unknown_10',
-       'unknown_11',
-       'next_animation_id',
-       'category',
-       'unknown_14',
-       'scrap_amount',
-       'successor_id',
-       'damage_amount',
-       'collision_opts',
-       'extra_string_selector',
-       'points',
-       'move_string',
-       'enemy_string',
+        "ai_opts",
+        "pos_constraint",
+        "unknown_4",
+        "unknown_5",
+        "unknown_6",
+        "unknown_7",
+        "unknown_8",
+        "unknown_9",
+        "unknown_10",
+        "unknown_11",
+        "next_animation_id",
+        "category",
+        "unknown_14",
+        "scrap_amount",
+        "successor_id",
+        "damage_amount",
+        "collision_opts",
+        "extra_string_selector",
+        "points",
+        "move_string",
+        "enemy_string",
     )
 
-    schema = Dict({**Animation.schema.schema, **{
-        'ai_opts': UInt16,
-        'pos_constraint': UInt16,
-        'unknown_4': UInt8,
-        'unknown_5': UInt8,
-        'unknown_6': UInt8,
-        'unknown_7': UInt8,
-        'unknown_8': UInt8,
-        'unknown_9': UInt8,
-        'unknown_10': UInt8,
-        'unknown_11': UInt8,
-        'next_animation_id': UInt8,
-        'category': UInt8,
-        'unknown_14': UInt8,
-        'scrap_amount': UInt8,
-        'successor_id': UInt8,
-        'damage_amount': UInt8,
-        'collision_opts': UInt8,
-        'extra_string_selector': UInt8,
-        'points': UInt8,
-        'move_string': Str(maxlen=21),
-        'enemy_string': Str(),
-    }})
+    schema = Dict(
+        {
+            **Animation.schema.schema,
+            **{
+                "ai_opts": UInt16,
+                "pos_constraint": UInt16,
+                "unknown_4": UInt8,
+                "unknown_5": UInt8,
+                "unknown_6": UInt8,
+                "unknown_7": UInt8,
+                "unknown_8": UInt8,
+                "unknown_9": UInt8,
+                "unknown_10": UInt8,
+                "unknown_11": UInt8,
+                "next_animation_id": UInt8,
+                "category": UInt8,
+                "unknown_14": UInt8,
+                "scrap_amount": UInt8,
+                "successor_id": UInt8,
+                "damage_amount": UInt8,
+                "collision_opts": UInt8,
+                "extra_string_selector": UInt8,
+                "points": UInt8,
+                "move_string": Str(maxlen=21),
+                "enemy_string": Str(),
+            },
+        }
+    )
 
     def __init__(self):
         super(AFMove, self).__init__()
@@ -178,7 +183,7 @@ class AFMove(Animation):
             return AF_ANIMATION_NAMES[index]
         return None
 
-    def read(self, parser) -> 'AFMove':
+    def read(self, parser) -> "AFMove":
         super(AFMove, self).read(parser)
         self.ai_opts = AIOptions(parser.get_uint16())
         self.pos_constraint = PositionConstraint(parser.get_uint16())
@@ -228,51 +233,54 @@ class AFMove(Animation):
         parser.put_var_str(self.enemy_string, size_includes_zero=True)
 
     def serialize(self) -> dict:
-        return {**super(AFMove, self).serialize(), **{
-            'ai_opts': self.ai_opts.value,
-            'pos_constraint': self.pos_constraint.value,
-            'unknown_4': self.unknown_4,
-            'unknown_5': self.unknown_5,
-            'unknown_6': self.unknown_6,
-            'unknown_7': self.unknown_7,
-            'unknown_8': self.unknown_8,
-            'unknown_9': self.unknown_9,
-            'unknown_10': self.unknown_10,
-            'unknown_11': self.unknown_11,
-            'next_animation_id': self.next_animation_id,
-            'category': self.category.value,
-            'unknown_14': self.unknown_14,
-            'scrap_amount': self.scrap_amount,
-            'successor_id': self.successor_id,
-            'damage_amount': self.damage_amount,
-            'collision_opts': self.collision_opts.value,
-            'extra_string_selector': self.extra_string_selector,
-            'points': self.points,
-            'move_string': self.move_string,
-            'enemy_string': self.enemy_string
-        }}
+        return {
+            **super(AFMove, self).serialize(),
+            **{
+                "ai_opts": self.ai_opts.value,
+                "pos_constraint": self.pos_constraint.value,
+                "unknown_4": self.unknown_4,
+                "unknown_5": self.unknown_5,
+                "unknown_6": self.unknown_6,
+                "unknown_7": self.unknown_7,
+                "unknown_8": self.unknown_8,
+                "unknown_9": self.unknown_9,
+                "unknown_10": self.unknown_10,
+                "unknown_11": self.unknown_11,
+                "next_animation_id": self.next_animation_id,
+                "category": self.category.value,
+                "unknown_14": self.unknown_14,
+                "scrap_amount": self.scrap_amount,
+                "successor_id": self.successor_id,
+                "damage_amount": self.damage_amount,
+                "collision_opts": self.collision_opts.value,
+                "extra_string_selector": self.extra_string_selector,
+                "points": self.points,
+                "move_string": self.move_string,
+                "enemy_string": self.enemy_string,
+            },
+        }
 
-    def unserialize(self, data: dict) -> 'AFMove':
+    def unserialize(self, data: dict) -> "AFMove":
         super(AFMove, self).unserialize(data)
-        self.ai_opts = AIOptions(data['ai_opts'])
-        self.pos_constraint = PositionConstraint(data['pos_constraint'])
-        self.unknown_4 = data['unknown_4']
-        self.unknown_5 = data['unknown_5']
-        self.unknown_6 = data['unknown_6']
-        self.unknown_7 = data['unknown_7']
-        self.unknown_8 = data['unknown_8']
-        self.unknown_9 = data['unknown_9']
-        self.unknown_10 = data['unknown_10']
-        self.unknown_11 = data['unknown_11']
-        self.next_animation_id = data['next_animation_id']
-        self.category = MoveCategory(data['category'])
-        self.unknown_14 = data['unknown_14']
-        self.scrap_amount = data['scrap_amount']
-        self.successor_id = data['successor_id']
-        self.damage_amount = data['damage_amount']
-        self.collision_opts = CollisionOpts(data['collision_opts'])
-        self.extra_string_selector = data['extra_string_selector']
-        self.points = data['points']
-        self.move_string = data['move_string']
-        self.enemy_string = data['enemy_string']
+        self.ai_opts = AIOptions(data["ai_opts"])
+        self.pos_constraint = PositionConstraint(data["pos_constraint"])
+        self.unknown_4 = data["unknown_4"]
+        self.unknown_5 = data["unknown_5"]
+        self.unknown_6 = data["unknown_6"]
+        self.unknown_7 = data["unknown_7"]
+        self.unknown_8 = data["unknown_8"]
+        self.unknown_9 = data["unknown_9"]
+        self.unknown_10 = data["unknown_10"]
+        self.unknown_11 = data["unknown_11"]
+        self.next_animation_id = data["next_animation_id"]
+        self.category = MoveCategory(data["category"])
+        self.unknown_14 = data["unknown_14"]
+        self.scrap_amount = data["scrap_amount"]
+        self.successor_id = data["successor_id"]
+        self.damage_amount = data["damage_amount"]
+        self.collision_opts = CollisionOpts(data["collision_opts"])
+        self.extra_string_selector = data["extra_string_selector"]
+        self.points = data["points"]
+        self.move_string = data["move_string"]
+        self.enemy_string = data["enemy_string"]
         return self
