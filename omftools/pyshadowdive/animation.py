@@ -45,7 +45,7 @@ class Animation(DataObject):
         self.base_string: str = ""
         self.extra_strings: typing.List[str] = []
 
-    def read(self, parser) -> "Animation":
+    def read(self, parser):
         self.start_x = parser.get_int16()
         self.start_y = parser.get_int16()
         assert parser.get_uint32() == 0
@@ -115,7 +115,7 @@ class Animation(DataObject):
             "extra_strings": self.extra_strings,
         }
 
-    def unserialize(self, data) -> "Animation":
+    def unserialize(self, data):
         self.start_x = data["start_x"]
         self.start_y = data["start_y"]
         self.hit_coords = data["hit_coords"]

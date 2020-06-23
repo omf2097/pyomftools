@@ -19,7 +19,7 @@ class LanguageFile(Entrypoint):
             "strings": self.strings,
         }
 
-    def read(self, parser) -> "LanguageFile":
+    def read(self, parser):
         file_size = parser.get_file_size()
 
         # Read titles and offsets

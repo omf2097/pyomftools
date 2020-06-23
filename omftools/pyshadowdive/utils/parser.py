@@ -1,5 +1,5 @@
 import struct
-import typing
+from typing import BinaryIO, Optional
 import os
 
 from .exceptions import OMFInvalidDataException
@@ -11,9 +11,9 @@ class BinaryParser:
         "xor_key",
     )
 
-    def __init__(self, handle: typing.BinaryIO) -> None:
+    def __init__(self, handle: BinaryIO) -> None:
         self.handle = handle
-        self.xor_key: int = None
+        self.xor_key: Optional[int] = None
 
     def get_file_size(self) -> int:
         pos = self.get_pos()
@@ -23,6 +23,7 @@ class BinaryParser:
         return size
 
     def xor_data(self, data: bytes) -> bytearray:
+        assert self.xor_key is None or 0 <= self.xor_key <= 255
         c = bytearray(data)
         for m in range(len(c)):
             c[m] = self.xor_key ^ c[m]
@@ -45,7 +46,7 @@ class BinaryParser:
         else:
             return data
 
-    def set_xor_key(self, key: typing.Optional[int] = None):
+    def set_xor_key(self, key: Optional[int] = None):
         assert key is None or 0 <= key <= 255
         self.xor_key = key
 

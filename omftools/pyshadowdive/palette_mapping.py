@@ -13,13 +13,13 @@ class PaletteMapping(DataObject):
         "remaps",
     )
 
-    schema = Dict({"colors": Palette.schema, "remaps": List(List(UInt8)),})
+    schema = Dict({"colors": Palette.schema, "remaps": List(List(UInt8))})
 
     def __init__(self):
         self.colors: Palette = Palette()
         self.remaps: Remappings = []
 
-    def read(self, parser: BinaryParser) -> "PaletteMapping":
+    def read(self, parser: BinaryParser):
         self.colors = Palette().read(parser)
         for k in range(0, 19):
             remap: Remapping = []
@@ -37,7 +37,7 @@ class PaletteMapping(DataObject):
     def serialize(self) -> dict:
         return {"colors": self.colors.serialize(), "remaps": self.remaps}
 
-    def unserialize(self, data: dict) -> "PaletteMapping":
+    def unserialize(self, data: dict):
         self.colors = Palette().unserialize(data["colors"])
         self.remaps = data["remaps"]
         return self

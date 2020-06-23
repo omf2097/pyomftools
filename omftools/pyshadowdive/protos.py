@@ -1,8 +1,9 @@
 import json
 import typing
 from enum import Enum
-from abc import ABCMeta
-from validx import exc, Dict, Validator
+from abc import ABCMeta, abstractmethod
+import validx
+import validx.exc
 
 from .utils.parser import BinaryParser
 from .utils.exceptions import OMFInvalidDataException
@@ -13,17 +14,21 @@ PropertyDict = typing.List[
     ]
 ]
 
+DataObjectType = typing.TypeVar('DataObjectType', bound='DataObject')
+EntrypointType = typing.TypeVar('EntrypointType', bound='Entrypoint')
+
 
 class DataObject(metaclass=ABCMeta):
     __slots__ = ()
 
-    def read(self, parser: BinaryParser) -> "DataObject":
+    @abstractmethod
+    def read(self, parser: BinaryParser) -> DataObjectType:
         raise NotImplementedError()
 
     def write(self, parser: BinaryParser) -> None:
         raise NotImplementedError()
 
-    def unserialize(self, data: dict) -> "DataObject":
+    def unserialize(self, data: dict) -> DataObjectType:
         raise NotImplementedError()
 
     def serialize(self) -> dict:
@@ -48,13 +53,13 @@ class DataObject(metaclass=ABCMeta):
         return content
 
 
-class Entrypoint(DataObject):
+class Entrypoint(DataObject, metaclass=ABCMeta):
     __slots__ = ()
 
-    schema: Validator = Dict()
+    schema: typing.ClassVar[validx.Validator] = validx.Dict()
 
     @classmethod
-    def load_native(cls, filename: str) -> "Entrypoint":
+    def load_native(cls: typing.Type[EntrypointType], filename: str) -> EntrypointType:
         obj = cls()
         with open(filename, "rb", buffering=8192) as handle:
             obj.read(BinaryParser(handle))
@@ -65,7 +70,7 @@ class Entrypoint(DataObject):
             self.write(BinaryParser(handle))
 
     @classmethod
-    def load_json(cls, filename: str) -> "Entrypoint":
+    def load_json(cls: typing.Type[EntrypointType], filename: str) -> EntrypointType:
         obj = cls()
         with open(filename, "rb", buffering=8192) as handle:
             obj.from_json(handle.read().decode())
@@ -79,15 +84,15 @@ class Entrypoint(DataObject):
         return json.dumps(self.serialize(), **kwargs)
 
     @classmethod
-    def from_json(cls, data: str) -> "Entrypoint":
+    def from_json(cls: typing.Type[EntrypointType], data: str) -> EntrypointType:
         obj = cls()
         decoded_data = json.loads(data)
 
         try:
             obj.schema(decoded_data)
-        except exc.ValidationError as e:
+        except validx.exc.ValidationError as e:
             e.sort()
-            rows = [f"{c}: {m}" for c, m in exc.format_error(e)]
+            rows = [f"{c}: {m}" for c, m in validx.exc.format_error(e)]
             raise OMFInvalidDataException("\n".join(rows))
 
         return obj.unserialize(decoded_data)

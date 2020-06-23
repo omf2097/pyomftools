@@ -155,8 +155,8 @@ class AFMove(Animation):
 
     def __init__(self):
         super(AFMove, self).__init__()
-        self.ai_opts: AIOptions = 0
-        self.pos_constraint: PositionConstraint = 0
+        self.ai_opts: AIOptions = AIOptions.NONE
+        self.pos_constraint: PositionConstraint = PositionConstraint.NONE
         self.unknown_4: int = 0
         self.unknown_5: int = 0
         self.unknown_6: int = 0
@@ -166,12 +166,12 @@ class AFMove(Animation):
         self.unknown_10: int = 0
         self.unknown_11: int = 0
         self.next_animation_id: int = 0
-        self.category: MoveCategory = 0
+        self.category: MoveCategory = MoveCategory.MISCELLANEOUS
         self.unknown_14: int = 0
         self.scrap_amount: int = 0
         self.successor_id: int = 0
         self.damage_amount: int = 0
-        self.collision_opts: CollisionOpts = 0
+        self.collision_opts: CollisionOpts = CollisionOpts.NONE
         self.extra_string_selector: int = 0
         self.points: int = 0
         self.move_string: str = ""
@@ -183,7 +183,7 @@ class AFMove(Animation):
             return AF_ANIMATION_NAMES[index]
         return None
 
-    def read(self, parser) -> "AFMove":
+    def read(self, parser):
         super(AFMove, self).read(parser)
         self.ai_opts = AIOptions(parser.get_uint16())
         self.pos_constraint = PositionConstraint(parser.get_uint16())
@@ -232,7 +232,7 @@ class AFMove(Animation):
         parser.put_null_padded_str(self.move_string, 21)
         parser.put_var_str(self.enemy_string, size_includes_zero=True)
 
-    def serialize(self) -> dict:
+    def serialize(self):
         return {
             **super(AFMove, self).serialize(),
             **{
@@ -260,7 +260,7 @@ class AFMove(Animation):
             },
         }
 
-    def unserialize(self, data: dict) -> "AFMove":
+    def unserialize(self, data: dict):
         super(AFMove, self).unserialize(data)
         self.ai_opts = AIOptions(data["ai_opts"])
         self.pos_constraint = PositionConstraint(data["pos_constraint"])

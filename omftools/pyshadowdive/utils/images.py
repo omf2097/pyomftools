@@ -1,11 +1,12 @@
 from PIL import Image
+from typing import List
 
 from .types import RawImage
 from ..palette import Palette
 
 
 def generate_png(data: RawImage, w: int, h: int, palette: Palette) -> Image:
-    n_pal = []
+    n_pal: List[int] = []
     for triplet in palette.data:
         n_pal.extend(triplet)
     img = Image.new("P", (w, h), color=0)

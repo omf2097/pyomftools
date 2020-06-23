@@ -62,7 +62,7 @@ class BKAnimation(Animation):
             return BK_ANIMATION_NAMES[index]
         return None
 
-    def read(self, parser) -> "BKAnimation":
+    def read(self, parser):
         self.null = parser.get_uint8()
         self.chain_hit = parser.get_uint8()
         self.chain_no_hit = parser.get_uint8()
@@ -97,7 +97,7 @@ class BKAnimation(Animation):
             },
         }
 
-    def unserialize(self, data) -> "BKAnimation":
+    def unserialize(self, data):
         super(BKAnimation, self).unserialize(data)
         self.null = data["null"]
         self.chain_hit = data["chain_hit"]

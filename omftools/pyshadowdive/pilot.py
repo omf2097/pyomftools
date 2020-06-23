@@ -271,8 +271,8 @@ class Pilot(DataObject):
         self.pref_fwd: int = 0  # int16_t
         self.pref_back: int = 0  # int16_t
         self.unknown_e: int = 0  # uint32_t
-        self.learning: int = 0  # float
-        self.forget: int = 0  # float
+        self.learning: float = 0.0  # float
+        self.forget: float = 0.0  # float
         self.unk_block_f: typing.List[int] = []  # char
         self.enemies_inc_unranked: int = 0  # uint16_t
         self.enemies_ex_unranked: int = 0  # uint16_t
@@ -478,7 +478,7 @@ class Pilot(DataObject):
         self.unk_block_i = parser.get_uint16()
         self.photo_id = parser.get_uint16() & 0x3FF
 
-    def read(self, parser: BinaryParser) -> "Pilot":
+    def read(self, parser: BinaryParser):
         parser.set_xor_key(self.PILOT_BLOCK_LENGTH & 0xFF)
         self.unknown_a = parser.get_uint32()
         self.read_player_block(parser)

@@ -42,7 +42,7 @@ class Sprite(DataObject):
         self.height: int = 0
         self.image: EncodedImage = []
 
-    def read(self, parser) -> "Sprite":
+    def read(self, parser):
         image_len = parser.get_uint16()
         self.pos_x = parser.get_int16()
         self.pos_y = parser.get_int16()
@@ -128,7 +128,7 @@ class Sprite(DataObject):
             "image": self.image,
         }
 
-    def unserialize(self, data) -> "Sprite":
+    def unserialize(self, data):
         self.pos_x = data["pos_x"]
         self.pos_y = data["pos_y"]
         self.width = data["width"]

@@ -22,7 +22,7 @@ class Photo(DataObject):
 
     def __init__(self):
         self.is_player: bool = False
-        self.sex: Sex = 0
+        self.sex: Sex = Sex.MALE
         self.palette: Palette = Palette()
         self.unknown: int = 0
         self.sprite: Sprite = Sprite()
@@ -36,7 +36,7 @@ class Photo(DataObject):
             "sprite": self.sprite.serialize(),
         }
 
-    def read(self, parser) -> "Photo":
+    def read(self, parser):
         self.is_player = parser.get_uint8() > 0
         self.sex = Sex(parser.get_uint16())
         self.palette = Palette().read_range(parser, 0, 48)
@@ -58,7 +58,7 @@ class PicFile(Entrypoint):
             "photos": [p.serialize() for p in self.photos],
         }
 
-    def read(self, parser) -> "PicFile":
+    def read(self, parser):
         photo_count = parser.get_uint32()
         assert 0 <= photo_count <= 256
 
