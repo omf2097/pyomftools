@@ -24,6 +24,9 @@ class AIOptions(Flag):
     FLAG_15 = 0x4000
     FLAG_16 = 0x8000
 
+    def __str__(self):
+        return "{} ({})".format(super(AIOptions, self).__str__(), self.value)
+
 
 class PositionConstraint(Flag):
     NONE = 0
@@ -33,6 +36,24 @@ class PositionConstraint(Flag):
     SOMETHING_1 = 0x40
     SOMETHING_2 = 0x2000
     SOMETHING_3 = 0x4000
+
+    def __str__(self):
+        return "{} ({})".format(super(PositionConstraint, self).__str__(), self.value)
+
+
+class CollisionOpts(Flag):
+    NONE = 0
+    UNKNOWN_1 = 0x1
+    UNKNOWN_2 = 0x2
+    UNKNOWN_4 = 0x4
+    UNKNOWN_8 = 0x8
+    UNKNOWN_10 = 0x10
+    MOVE_BACK = 0x20
+    UNKNOWN_40 = 0x40
+    UNKNOWN_80 = 0x80
+
+    def __str__(self):
+        return "{} ({})".format(super(CollisionOpts, self).__str__(), self.value)
 
 
 class MoveCategory(IntEnum):
@@ -50,6 +71,9 @@ class MoveCategory(IntEnum):
     UNKNOWN_C = 11
     SCRAP = 12
     DESTRUCTION = 13
+
+    def __str__(self):
+        return "{} ({})".format(super(MoveCategory, self).__str__(), self.value)
 
 
 AF_ANIMATION_NAMES = {
@@ -142,7 +166,7 @@ class AFMove(Animation):
         self.scrap_amount: int = 0
         self.successor_id: int = 0
         self.damage_amount: int = 0
-        self.collision_opts: int = 0
+        self.collision_opts: CollisionOpts = 0
         self.extra_string_selector: int = 0
         self.points: int = 0
         self.move_string: str = ""
@@ -172,7 +196,7 @@ class AFMove(Animation):
         self.scrap_amount = parser.get_uint8()
         self.successor_id = parser.get_uint8()
         self.damage_amount = parser.get_uint8()
-        self.collision_opts = parser.get_uint8()
+        self.collision_opts = CollisionOpts(parser.get_uint8())
         self.extra_string_selector = parser.get_uint8()
         self.points = parser.get_uint8()
         self.move_string = parser.get_null_padded_str(21)
@@ -197,7 +221,7 @@ class AFMove(Animation):
         parser.put_uint8(self.scrap_amount)
         parser.put_uint8(self.successor_id)
         parser.put_uint8(self.damage_amount)
-        parser.put_uint8(self.collision_opts)
+        parser.put_uint8(self.collision_opts.value)
         parser.put_uint8(self.extra_string_selector)
         parser.put_uint8(self.points)
         parser.put_null_padded_str(self.move_string, 21)
@@ -221,7 +245,7 @@ class AFMove(Animation):
             'scrap_amount': self.scrap_amount,
             'successor_id': self.successor_id,
             'damage_amount': self.damage_amount,
-            'collision_opts': self.collision_opts,
+            'collision_opts': self.collision_opts.value,
             'extra_string_selector': self.extra_string_selector,
             'points': self.points,
             'move_string': self.move_string,
@@ -246,7 +270,7 @@ class AFMove(Animation):
         self.scrap_amount = data['scrap_amount']
         self.successor_id = data['successor_id']
         self.damage_amount = data['damage_amount']
-        self.collision_opts = data['collision_opts']
+        self.collision_opts = CollisionOpts(data['collision_opts'])
         self.extra_string_selector = data['extra_string_selector']
         self.points = data['points']
         self.move_string = data['move_string']
