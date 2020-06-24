@@ -38,7 +38,7 @@ class DataObject(metaclass=ABCMeta):
         content: PropertyDict = []
         for attr in prop_names:
             content.append(
-                (attr, getattr(self, attr, None), getattr(self, f"real_{attr}", None),)
+                (attr, getattr(self, attr, None), getattr(self, f"real_{attr}", None))
             )
         return content
 

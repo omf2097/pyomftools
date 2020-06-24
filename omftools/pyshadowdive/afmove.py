@@ -1,11 +1,11 @@
 from validx import Dict, Str
-from enum import Flag, IntEnum
+from enum import IntFlag, IntEnum
 
 from .animation import Animation
 from .utils.validator import UInt8, UInt16
 
 
-class AIOptions(Flag):
+class AIOptions(IntFlag):
     NONE = 0
     FLAG_1 = 0x1
     FLAG_2 = 0x2
@@ -28,7 +28,7 @@ class AIOptions(Flag):
         return "{} ({})".format(super(AIOptions, self).__str__(), self.value)
 
 
-class PositionConstraint(Flag):
+class PositionConstraint(IntFlag):
     NONE = 0
     WALL = 1
     AIRBORNE = 2
@@ -41,7 +41,7 @@ class PositionConstraint(Flag):
         return "{} ({})".format(super(PositionConstraint, self).__str__(), self.value)
 
 
-class CollisionOpts(Flag):
+class CollisionOpts(IntFlag):
     NONE = 0
     UNKNOWN_1 = 0x1
     UNKNOWN_2 = 0x2

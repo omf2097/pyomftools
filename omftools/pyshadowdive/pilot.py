@@ -210,7 +210,7 @@ class Pilot(DataObject):
         self.wins: int = 0  # uint16_t
         self.losses: int = 0  # uint16_t
         self.rank: int = 0  # uint8_t
-        self.har_id: Har = 0  # uint8_t
+        self.har_id: Har = Har.JAGUAR  # uint8_t
         self.arm_power: int = 0  # uint8_t
         self.leg_power: int = 0  # uint8_t
         self.arm_speed: int = 0  # uint8_t
@@ -235,7 +235,7 @@ class Pilot(DataObject):
         self.pilot_id: int = 0  # uint8_t
         self.unknown_k: int = 0  # uint8_t
         self.force_arena: int = 0  # uint16_t
-        self.difficulty: Difficulty = 0  # uint8_t
+        self.difficulty: Difficulty = Difficulty.ALUMINUM  # uint8_t
         self.unk_block_b: typing.List[int] = []  # char
         self.movement: int = 0  # uint8_t
         self.unk_block_c: typing.List[int] = []  # uint16_t
