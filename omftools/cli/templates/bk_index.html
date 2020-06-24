@@ -1,16 +1,6 @@
 {% extends "base.html" %}
 {% import "macros/dump_table.html" as tables %}
 
-
-{% block jsvars %}
-    <script type="text/javascript">
-        var remappings = {
-            {% for palette in bk.palettes %}'{{ loop.index }}': {{ palette.remaps|tojson|safe }},
-            {% endfor %}
-        };
-    </script>
-{% endblock %}
-
 {% block body %}
 <div class="row">
     <div class="col-lg-2">
@@ -60,35 +50,54 @@
         <h2>Palettes</h2>
     </div>
 </div>
-<div class="row">
 {% for palette in bk.palettes %}
-    <div class="palette-block m-3">
+<div class="row">
+    {% set k = loop.index %}
+    <div class="col-sm m-3">
         <div class="card">
             <div class="card-header text-white">
-                <div class="float-left m-1">Palette {{ loop.index }}</div>
-                <div class="dropdown float-right">
-                    <button class="btn btn-sm btn-secondary dropdown-toggle remapping"
-                            type="button"
-                            id="remapping_{{ loop.index }}"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false">
-                        No remapping
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        {% for m in range(1, 20) %}
-                            <a class="dropdown-item" href="#" id="remap_{{ loop.index }}_{{ m }}">Remapping {{ m }}</a>
-                        {% endfor %}
-                    </div>
-                </div>
+                <div class="float-left m-1">Palette {{ k }}</div>
             </div>
             <div class="card-body text-white">
-                {{ tables.print_palette(palette.colors.data) }}
+                <ul class="nav nav-tabs" id="pal_{{ k }}_nav" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                           id="pal_{{ k }}_base_tab"
+                           data-toggle="tab"
+                           href="#pal_{{ k }}_base"
+                           role="tab"
+                           aria-controls="home"
+                           aria-selected="true">Base</a>
+                    </li>
+                    {% for m in range(1, 20) %}
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           data-toggle="tab"
+                           id="pal_{{ k }}_remap_{{ m }}_tab"
+                           href="#pal_{{ k }}_remap_{{ m }}"
+                           role="tab"
+                           aria-controls="profile"
+                           aria-selected="false">{{ m }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="tab-content m-4" id="pal_{{ k }}_content">
+                    <div class="tab-pane show active"
+                         id="pal_{{ k }}_base"
+                         role="tabpanel"
+                         aria-labelledby="pal_{{ k }}_base_tab">{{ tables.print_palette(palette.colors.data) }}</div>
+                    {% for m in range(1, 20) %}
+                        <div class="tab-pane"
+                             id="pal_{{ k }}_remap_{{ m }}"
+                             role="tabpanel"
+                             aria-labelledby="pal_{{ k }}_remap_{{ m }}_tab">{{ tables.print_palette(palette.remap(m-1).data) }}</div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
-{% endfor %}
 </div>
+{% endfor %}
 
 {% for key, animation in bk.animations.items() %}
 <div class="row">

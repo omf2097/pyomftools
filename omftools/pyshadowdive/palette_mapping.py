@@ -1,4 +1,4 @@
-from validx import Dict, List, Tuple
+from validx import Dict, List
 
 from .protos import DataObject
 from .palette import Palette
@@ -18,6 +18,9 @@ class PaletteMapping(DataObject):
     def __init__(self):
         self.colors: Palette = Palette()
         self.remaps: Remappings = []
+
+    def remap(self, remap_id: int) -> Palette:
+        return self.colors.remap(self.remaps[remap_id])
 
     def read(self, parser: BinaryParser):
         self.colors = Palette().read(parser)

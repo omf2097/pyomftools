@@ -3,16 +3,21 @@ import typing
 
 from .protos import DataObject
 from .utils.validator import UInt8
-from .utils.types import Color
+from .utils.types import Color, Remapping
 
 
 class Palette(DataObject):
     __slots__ = ("data",)
 
-    schema = Dict({"data": List(Tuple(UInt8, UInt8, UInt8,))})
+    schema = Dict({"data": List(Tuple(UInt8, UInt8, UInt8))})
 
     def __init__(self):
         self.data: typing.List[Color] = [(0, 0, 0) for _ in range(256)]
+
+    def remap(self, remapping: Remapping) -> "Palette":
+        pal = Palette()
+        pal.data = [self.data[r] for r in remapping]
+        return pal
 
     @staticmethod
     def _read_one(parser) -> Color:

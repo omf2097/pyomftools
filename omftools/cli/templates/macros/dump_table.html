@@ -90,8 +90,7 @@
         <tr>
             <th scope="col">X</th>
             <th scope="col">Y</th>
-            <th scope="col">Null</th>
-            <th scope="col">Frame ID</th>
+            <th scope="col">Frame</th>
         </tr>
     </thead>
     <tbody>
@@ -99,7 +98,6 @@
         <tr>
             <td>{{ c.x }}</td>
             <td>{{ c.y }}</td>
-            <td>{{ c.null }}</td>
             <td>{{ c.frame_id }}</td>
         </tr>
     {% endfor %}
@@ -129,7 +127,7 @@
 
 
 {% macro print_palette(p, groups=16) -%}
-<table class="table table-borderless table-hover table-sm">
+<table class="table table-borderless table-hover table-sm palette-block">
     <tbody>
     {% for y in range(groups) %}
         <tr>
