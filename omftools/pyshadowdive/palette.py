@@ -40,12 +40,19 @@ class Palette(DataObject):
             self.data.append(self._read_one(parser))
         return self
 
+    @staticmethod
+    def _write_one(parser, c: Color) -> None:
+        parser.put_uint8((c[0] & 0xFF) >> 2)
+        parser.put_uint8((c[1] & 0xFF) >> 2)
+        parser.put_uint8((c[2] & 0xFF) >> 2)
+
+    def write_range(self, parser, start: int, length: int):
+        for m in range(start, start + length):
+            self._write_one(parser, self.data[m])
+
     def write(self, parser):
         for m in range(0, 256):
-            c = self.data[m]
-            parser.put_uint8((c[0] & 0xFF) >> 2)
-            parser.put_uint8((c[1] & 0xFF) >> 2)
-            parser.put_uint8((c[2] & 0xFF) >> 2)
+            self._write_one(parser, self.data[m])
 
     def serialize(self) -> dict:
         return {

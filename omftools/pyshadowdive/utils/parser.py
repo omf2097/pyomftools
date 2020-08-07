@@ -131,6 +131,10 @@ class BinaryParser:
         for _ in range(left):
             self.write(b"\0")
 
+    def put_padding(self, length: int) -> None:
+        for m in range(length):
+            self.put_uint8(0)
+
     def put_str(self, data: str) -> None:
         self.write(data.encode("cp437"))
 
