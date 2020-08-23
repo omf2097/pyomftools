@@ -7,7 +7,8 @@ re_non_alphanumeric = re.compile(r'[\W]+')
 
 
 def txt(text: str) -> str:
-    o = text.replace(' ', '_')
+    o = text.strip()
+    o = o.replace(' ', '_')
     o = re.sub(re_non_alphanumeric, '', o)
     o = o.upper()
     return o
@@ -24,8 +25,10 @@ def generate_enum(in_file: str, out_file: str):
         for index, pair in enumerate(pairs, start=1):
             title, text = pair
             title = txt(title) if title else 'NONE'
-            text = txt(text) if text else f'NONE_{index}'
-            fd.write(f"    TXT__{title}__{text[:24]} = {index};\n".encode())
+            text = txt(text) if text else f'NONE'
+
+            name = f"TXT_{index}__{title[:20]}__{text[:24]}"
+            fd.write(f"    {name} = {index},\n".encode())
 
         fd.write("};\n".encode())
 
