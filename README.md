@@ -7,4 +7,4 @@ and back to help with poking at the binary.
 
 1. Install Python 3.6
 2. pip install -r requirements.txt
-3. Run! eg. python -m omftools.af_compile -h
+3. Run! eg. python -m omftools.cli.af_compile -h
