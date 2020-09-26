@@ -1,3 +1,4 @@
+dataclasses==0.7
 pillow==7.2.0
 validx==0.6.1
 jinja2==2.11.2
