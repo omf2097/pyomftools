@@ -1,6 +1,6 @@
 pillow==8.1.1
 validx==0.6.1
-jinja2==2.11.2
+jinja2==2.11.3
 
 # Testing
 mypy==0.782
