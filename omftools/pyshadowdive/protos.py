@@ -10,12 +10,14 @@ from .utils.exceptions import OMFInvalidDataException
 
 PropertyDict = typing.List[
     typing.Tuple[
-        str, typing.Union[str, float, int], typing.Union[str, float, int, None],
+        str,
+        typing.Union[str, float, int],
+        typing.Union[str, float, int, None],
     ]
 ]
 
-DataObjectType = typing.TypeVar('DataObjectType', bound='DataObject')
-EntrypointType = typing.TypeVar('EntrypointType', bound='Entrypoint')
+DataObjectType = typing.TypeVar("DataObjectType", bound="DataObject")
+EntrypointType = typing.TypeVar("EntrypointType", bound="Entrypoint")
 
 
 class DataObject(metaclass=ABCMeta):

@@ -5,7 +5,7 @@ from .types import RawImage
 from ..palette import Palette
 
 
-def generate_png(data: RawImage, w: int, h: int, palette: Palette) -> Image:
+def generate_png(data: RawImage, w: int, h: int, palette: Palette) -> Image.Image:
     n_pal: List[int] = []
     for triplet in palette.data:
         n_pal.extend(triplet)
@@ -15,6 +15,6 @@ def generate_png(data: RawImage, w: int, h: int, palette: Palette) -> Image:
     return img
 
 
-def save_png(img: Image, filename: str, transparency=None):
+def save_png(img: Image.Image, filename: str, transparency=None):
     with open(filename, "wb") as fd:
         img.save(fd, "png", transparency=transparency)
