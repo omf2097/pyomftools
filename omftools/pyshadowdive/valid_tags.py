@@ -171,9 +171,9 @@ def describe_tag(tag: str) -> str:
     return VALID_TAGS[tag][1]
 
 
-def is_tag(tag: str) -> bool:
+def is_valid_tag(tag: str) -> bool:
     return tag in VALID_TAGS.keys()
 
 
-def has_arg(tag: str) -> bool:
+def tag_has_arg(tag: str) -> bool:
     return VALID_TAGS[tag][0]
