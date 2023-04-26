@@ -23,12 +23,10 @@ class BinaryParser:
         return size
 
     def xor_data(self, data: bytes) -> bytearray:
-        assert self.xor_key
         assert 0 <= self.xor_key <= 255
         c = bytearray(data)
         for m in range(len(c)):
             c[m] = self.xor_key ^ c[m]
-
             self.xor_key += 1
             if self.xor_key > 255:
                 self.xor_key = 0
