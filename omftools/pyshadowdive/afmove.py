@@ -178,12 +178,14 @@ class AFMove(Animation):
         self.enemy_string: str = ""
 
     @staticmethod
-    def get_name(index: int):
-        if index in AF_ANIMATION_NAMES:
-            return AF_ANIMATION_NAMES[index]
-        return None
+    def get_name(index: int) -> str | None:
+        return AF_ANIMATION_NAMES.get(index)
 
-    def read(self, parser):
+    @property
+    def has_move_string(self):
+        return self.move_string not in ['"!"', "!", "0"]
+
+    def read(self, parser: BinaryParser) -> AFMove:
         super(AFMove, self).read(parser)
         self.ai_opts = AIOptions(parser.get_uint16())
         self.pos_constraint = PositionConstraint(parser.get_uint16())

@@ -11,7 +11,12 @@
                 {% for key, move in af.moves.items() %}
                     <li>
                         <a href="#animation_{{ key }}">
-                            Move {{ key }}{% if move.get_name(key) %}: {{ move.get_name(key) }}{% endif %}
+                            Move {{ key }}
+                            {% if move.has_move_string %}
+                                : {{ move.move_string }}
+                            {% elif move.get_name(key) %}
+                                : {{ move.get_name(key) }}
+                            {% endif %}
                         </a>
                     </li>
                 {% endfor %}
@@ -41,7 +46,14 @@
 {% for key, move in af.moves.items() %}
 <div class="row">
     <div class="col-sm">
-        <h2 id="animation_{{ key }}">Move {{ key }}{% if move.get_name(key) %}: {{ move.get_name(key) }}{% endif %}</h2>
+        <h2 id="animation_{{ key }}">
+            Move {{ key }}
+            {% if move.has_move_string %}
+                : {{ move.move_string }}
+            {% elif move.get_name(key) %}
+                : {{ move.get_name(key) }}
+            {% endif %}
+        </h2>
     </div>
 </div>
 <div class="row">
