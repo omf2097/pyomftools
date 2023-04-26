@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "pyomftools"
+version = "0.1.0"
+description = "File format library for omf2097 data files"
+authors = ["Tuomas Virtanen <katajakasa@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pillow = "^9.5.0"
+validx = "^0.7"
+jinja2 = "^3.1.2"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.2.0"
+flake8 = "^6.0.0"
+black = "^23.3.0"
+types-pillow = "^9.5.0.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
