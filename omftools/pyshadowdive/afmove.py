@@ -1,7 +1,10 @@
+from __future__ import annotations
+import typing
 from validx import Dict, Str
 from enum import IntFlag, IntEnum
 
 from .animation import Animation
+from .utils.parser import BinaryParser
 from .utils.validator import UInt8, UInt16
 
 
@@ -76,7 +79,7 @@ class MoveCategory(IntEnum):
         return "{} ({})".format(self.name, self.value)
 
 
-AF_ANIMATION_NAMES = {
+AF_ANIMATION_NAMES: typing.Final[dict[int, str]] = {
     1: "Jumping",
     2: "Getting up",
     3: "Stunned",
@@ -126,7 +129,7 @@ class AFMove(Animation):
 
     schema = Dict(
         {
-            **Animation.schema.schema,
+            **Animation.schema.schema,  # type: ignore
             **{
                 "ai_opts": UInt16,
                 "pos_constraint": UInt16,
@@ -153,7 +156,7 @@ class AFMove(Animation):
         }
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(AFMove, self).__init__()
         self.ai_opts: AIOptions = AIOptions.NONE
         self.pos_constraint: PositionConstraint = PositionConstraint.NONE
@@ -210,10 +213,10 @@ class AFMove(Animation):
         self.enemy_string = parser.get_var_str(size_includes_zero=True)
         return self
 
-    def write(self, parser):
+    def write(self, parser: BinaryParser) -> None:
         super(AFMove, self).write(parser)
-        parser.put_uint16(self.ai_opts.value)
-        parser.put_uint16(self.pos_constraint.value)
+        parser.put_uint16(self.ai_opts)
+        parser.put_uint16(self.pos_constraint)
         parser.put_uint8(self.unknown_4)
         parser.put_uint8(self.unknown_5)
         parser.put_uint8(self.unknown_6)
@@ -228,13 +231,13 @@ class AFMove(Animation):
         parser.put_uint8(self.scrap_amount)
         parser.put_uint8(self.successor_id)
         parser.put_uint8(self.damage_amount)
-        parser.put_uint8(self.collision_opts.value)
+        parser.put_uint8(self.collision_opts)
         parser.put_uint8(self.extra_string_selector)
         parser.put_uint8(self.points)
         parser.put_null_padded_str(self.move_string, 21)
         parser.put_var_str(self.enemy_string, size_includes_zero=True)
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             **super(AFMove, self).serialize(),
             **{
@@ -262,7 +265,7 @@ class AFMove(Animation):
             },
         }
 
-    def unserialize(self, data: dict):
+    def unserialize(self, data: dict) -> AFMove:
         super(AFMove, self).unserialize(data)
         self.ai_opts = AIOptions(data["ai_opts"])
         self.pos_constraint = PositionConstraint(data["pos_constraint"])

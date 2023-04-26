@@ -1,7 +1,9 @@
+from __future__ import annotations
 from validx import Dict, Bool, List
 
 from .protos import DataObject
 from .palette import Palette
+from .utils.parser import BinaryParser
 from .utils.validator import UInt16, Int16, UInt8
 from .utils.types import EncodedImage, RawImage
 from .utils.exceptions import OMFInvalidDataException
@@ -33,7 +35,7 @@ class Sprite(DataObject):
         }
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.pos_x: int = 0
         self.pos_y: int = 0
         self.index: int = 0
@@ -42,7 +44,7 @@ class Sprite(DataObject):
         self.height: int = 0
         self.image: EncodedImage = []
 
-    def read(self, parser):
+    def read(self, parser: BinaryParser) -> Sprite:
         image_len = parser.get_uint16()
         self.pos_x = parser.get_int16()
         self.pos_y = parser.get_int16()
@@ -91,7 +93,7 @@ class Sprite(DataObject):
 
         return out
 
-    def save_png(self, filename: str, palette: Palette):
+    def save_png(self, filename: str, palette: Palette) -> None:
         dec_data = self.decode_image()
         if not dec_data:
             raise OMFInvalidDataException(
@@ -103,7 +105,7 @@ class Sprite(DataObject):
             transparency=self.TRANSPARENCY_INDEX,
         )
 
-    def write(self, parser):
+    def write(self, parser: BinaryParser) -> None:
         image_len = len(self.image)
         parser.put_uint16(image_len if image_len and not self.missing else 0)
         parser.put_int16(self.pos_x)
@@ -117,7 +119,7 @@ class Sprite(DataObject):
             for m in range(image_len):
                 parser.put_uint8(self.image[m])
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             "pos_x": self.pos_x,
             "pos_y": self.pos_y,
@@ -128,7 +130,7 @@ class Sprite(DataObject):
             "image": self.image,
         }
 
-    def unserialize(self, data):
+    def unserialize(self, data: dict) -> Sprite:
         self.pos_x = data["pos_x"]
         self.pos_y = data["pos_y"]
         self.width = data["width"]

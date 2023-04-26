@@ -2,7 +2,7 @@ import wave
 import typing
 
 
-def save_wav(data: typing.List[int], filename: str):
+def save_wav(data: list[int], filename: str):
     with wave.open(filename, "wb") as fd:
         fd.setnchannels(1)
         fd.setsampwidth(1)

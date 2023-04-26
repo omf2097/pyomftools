@@ -1,23 +1,24 @@
-import typing
+from __future__ import annotations
 
 from .protos import Entrypoint, DataObject
 from .utils.audio import save_wav
+from .utils.parser import BinaryParser
 
 
 class Sound(DataObject):
     __slots__ = ("data", "unknown")
 
-    def __init__(self):
-        self.data: typing.List[int] = []
+    def __init__(self) -> None:
+        self.data: list[int] = []
         self.unknown: int = 0
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             "unknown": self.unknown,
             "data": self.data,
         }
 
-    def read(self, parser):
+    def read(self, parser: BinaryParser) -> Sound:
         length = parser.get_uint16()
         if length > 0:
             self.unknown = parser.get_uint8()
@@ -35,15 +36,15 @@ class Sound(DataObject):
 class SoundFile(Entrypoint):
     __slots__ = ("sounds",)
 
-    def __init__(self):
-        self.sounds: typing.List[Sound] = []
+    def __init__(self) -> None:
+        self.sounds: list[Sound] = []
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             "sounds": [s.serialize() for s in self.sounds],
         }
 
-    def read(self, parser):
+    def read(self, parser: BinaryParser) -> SoundFile:
         first = parser.get_uint32()
         assert first == 0
 

@@ -1,10 +1,13 @@
+from __future__ import annotations
+import typing
 from validx import Str, Dict
 
 from .animation import Animation
+from .utils.parser import BinaryParser
 from .utils.validator import UInt8, UInt16
 
 
-BK_ANIMATION_NAMES = {
+BK_ANIMATION_NAMES: typing.Final[dict[int, str]] = {
     6: "Round",
     7: "Number",
     8: "You lose",
@@ -33,7 +36,7 @@ class BKAnimation(Animation):
 
     schema = Dict(
         {
-            **Animation.schema.schema,
+            **Animation.schema.schema,  # type: ignore
             **{
                 "null": UInt8,
                 "chain_hit": UInt8,
@@ -46,7 +49,7 @@ class BKAnimation(Animation):
         }
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(BKAnimation, self).__init__()
         self.null: int = 0
         self.chain_hit: int = 0
@@ -57,12 +60,12 @@ class BKAnimation(Animation):
         self.footer_string: str = ""
 
     @staticmethod
-    def get_name(index: int):
+    def get_name(index: int) -> str | None:
         if index in BK_ANIMATION_NAMES:
             return BK_ANIMATION_NAMES[index]
         return None
 
-    def read(self, parser):
+    def read(self, parser: BinaryParser) -> BKAnimation:
         self.null = parser.get_uint8()
         self.chain_hit = parser.get_uint8()
         self.chain_no_hit = parser.get_uint8()
@@ -73,7 +76,7 @@ class BKAnimation(Animation):
         super(BKAnimation, self).read(parser)
         return self
 
-    def write(self, parser):
+    def write(self, parser: BinaryParser) -> None:
         parser.put_uint8(self.null)
         parser.put_uint8(self.chain_hit)
         parser.put_uint8(self.chain_no_hit)
@@ -83,7 +86,7 @@ class BKAnimation(Animation):
         parser.put_var_str(self.footer_string, size_includes_zero=True)
         super(BKAnimation, self).write(parser)
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             **super(BKAnimation, self).serialize(),
             **{
@@ -97,7 +100,7 @@ class BKAnimation(Animation):
             },
         }
 
-    def unserialize(self, data):
+    def unserialize(self, data: dict) -> BKAnimation:
         super(BKAnimation, self).unserialize(data)
         self.null = data["null"]
         self.chain_hit = data["chain_hit"]

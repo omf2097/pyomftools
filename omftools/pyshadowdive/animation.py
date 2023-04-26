@@ -1,8 +1,9 @@
-import typing
+from __future__ import annotations
 from validx import Dict, Int, List, Str
 
 from .protos import DataObject
 from .sprite import Sprite
+from .utils.parser import BinaryParser
 from .utils.validator import Int16
 from .utils.types import HitCoordinate
 
@@ -37,15 +38,15 @@ class Animation(DataObject):
         }
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.start_x: int = 0
         self.start_y: int = 0
-        self.hit_coords: typing.List[HitCoordinate] = []
-        self.sprites: typing.List[Sprite] = []
+        self.hit_coords: list[HitCoordinate] = []
+        self.sprites: list[Sprite] = []
         self.base_string: str = ""
-        self.extra_strings: typing.List[str] = []
+        self.extra_strings: list[str] = []
 
-    def read(self, parser):
+    def read(self, parser: BinaryParser) -> Animation:
         self.start_x = parser.get_int16()
         self.start_y = parser.get_int16()
         assert parser.get_uint32() == 0
@@ -75,7 +76,7 @@ class Animation(DataObject):
 
         return self
 
-    def write(self, parser):
+    def write(self, parser: BinaryParser) -> None:
         parser.put_int16(self.start_x)
         parser.put_int16(self.start_y)
         parser.put_uint32(0)
@@ -105,7 +106,7 @@ class Animation(DataObject):
         for sprite in self.sprites:
             sprite.write(parser)
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             "start_x": self.start_x,
             "start_y": self.start_y,
@@ -115,7 +116,7 @@ class Animation(DataObject):
             "extra_strings": self.extra_strings,
         }
 
-    def unserialize(self, data):
+    def unserialize(self, data: dict) -> Animation:
         self.start_x = data["start_x"]
         self.start_y = data["start_y"]
         self.hit_coords = data["hit_coords"]

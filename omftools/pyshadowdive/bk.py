@@ -1,3 +1,4 @@
+from __future__ import annotations
 import typing
 from validx import Dict, List, Str
 import io
@@ -13,7 +14,7 @@ from .utils.images import generate_png, save_png
 
 
 class BKFile(Entrypoint):
-    ANIMATION_MAX_NUMBER = 50
+    ANIMATION_MAX_NUMBER: typing.Final[int] = 50
 
     __slots__ = (
         "file_id",
@@ -39,17 +40,17 @@ class BKFile(Entrypoint):
         }
     )
 
-    def __init__(self):
-        self.file_id = 0
-        self.unknown_a = 0
-        self.background_width = 0
-        self.background_height = 0
-        self.animations: typing.Dict[int, BKAnimation] = {}
-        self.palettes: typing.List[PaletteMapping] = []
-        self.sound_table: typing.List[int] = []
+    def __init__(self) -> None:
+        self.file_id: int = 0
+        self.unknown_a: int = 0
+        self.background_width: int = 0
+        self.background_height: int = 0
+        self.animations: dict[int, BKAnimation] = {}
+        self.palettes: list[PaletteMapping] = []
+        self.sound_table: list[int] = []
         self.background_image: EncodedImage = []
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             "file_id": self.file_id,
             "unknown_a": self.unknown_a,
@@ -61,7 +62,7 @@ class BKFile(Entrypoint):
             "sound_table": self.sound_table,
         }
 
-    def unserialize(self, data):
+    def unserialize(self, data: dict) -> BKFile:
         self.file_id = data["file_id"]
         self.unknown_a = data["unknown_a"]
         self.background_width = data["background_width"]
@@ -74,7 +75,7 @@ class BKFile(Entrypoint):
         }
         return self
 
-    def read(self, parser):
+    def read(self, parser: BinaryParser) -> BKFile:
         self.file_id = parser.get_uint32()
         self.unknown_a = parser.get_uint8()
         self.background_width = parser.get_uint16()
@@ -101,7 +102,7 @@ class BKFile(Entrypoint):
 
         return self
 
-    def write(self, parser):
+    def write(self, parser: BinaryParser) -> None:
         parser.put_uint32(self.file_id)
         parser.put_uint8(self.unknown_a)
         parser.put_uint16(self.background_width)
@@ -138,7 +139,7 @@ class BKFile(Entrypoint):
         for sound in self.sound_table:
             parser.put_uint8(sound)
 
-    def save_background(self, filename: str):
+    def save_background(self, filename: str) -> None:
         save_png(
             generate_png(
                 self.background_image,

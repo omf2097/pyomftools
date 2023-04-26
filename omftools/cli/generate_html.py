@@ -25,10 +25,10 @@ env = Environment(
 
 @dataclass
 class Filenames:
-    af: typing.List[str]
-    bk: typing.List[str]
-    trn: typing.List[str]
-    pic: typing.List[str]
+    af: list[str]
+    bk: list[str]
+    trn: list[str]
+    pic: list[str]
     alt_pals: str
     sounds: str
     english: str

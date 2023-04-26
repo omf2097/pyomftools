@@ -21,7 +21,9 @@ def get_total_frames_duration(frames: List[Frame]) -> int:
     return sum(frame.duration for frame in frames)
 
 
-def get_frame_at_time_offset(frames: List[Frame], offset: int) -> Tuple[Optional[int], Optional[Frame]]:
+def get_frame_at_time_offset(
+    frames: List[Frame], offset: int
+) -> Tuple[Optional[int], Optional[Frame]]:
     current_start: int = 0
     for pos, frame in enumerate(frames):
         current_end = current_start + frame.duration
@@ -41,7 +43,7 @@ def _read_next_int(in_str: str, start_pos: int) -> Tuple[Optional[int], int]:
 
 def _read_next_tag(in_str: str, start_pos: int) -> Tuple[str, Optional[int], int]:
     for test in range(3, 0, -1):
-        end_pos = start_pos+test
+        end_pos = start_pos + test
         possible_tag: str = in_str[start_pos:end_pos]
         possible_arg: Optional[int] = None
         if not is_valid_tag(possible_tag):
@@ -76,7 +78,9 @@ def parse_string(animation_string: str) -> List[Frame]:
             current_tags = dict()
         elif ch.islower():  # Attempt to read a tag
             tag_name, tag_value, pos = _read_next_tag(animation_string, pos)
-            assert tag_name not in current_tags, "Tag value is already set -- duplicate tag ?"
+            assert (
+                tag_name not in current_tags
+            ), "Tag value is already set -- duplicate tag ?"
             current_tags[tag_name] = tag_value
         elif ch == "-":  # Skip frame separator
             pos += 1

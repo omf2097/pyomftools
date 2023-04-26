@@ -1,9 +1,11 @@
+from __future__ import annotations
 import typing
 from validx import Dict, List, Str
 
 from .protos import Entrypoint
 from .afmove import AFMove
 from .sprite import Sprite
+from .utils.parser import BinaryParser
 
 from .utils.validator import UInt8, UInt16, UInt32, Int32
 
@@ -45,7 +47,7 @@ class AFFile(Entrypoint):
         }
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.file_id: int = 0
         self.exec_window: int = 0
         self.endurance: int = 0
@@ -57,10 +59,10 @@ class AFFile(Entrypoint):
         self.fall_speed: int = 0
         self.unknown_c: int = 0
         self.unknown_d: int = 0
-        self.moves: typing.Dict[int, AFMove] = {}
-        self.sound_table: typing.List[int] = []
+        self.moves: dict[int, AFMove] = {}
+        self.sound_table: list[int] = []
 
-    def serialize(self):
+    def serialize(self) -> dict[str, typing.Any]:
         return {
             "file_id": self.file_id,
             "exec_window": self.exec_window,
@@ -77,7 +79,7 @@ class AFFile(Entrypoint):
             "sound_table": self.sound_table,
         }
 
-    def unserialize(self, data):
+    def unserialize(self, data: dict) -> AFFile:
         self.file_id = data["file_id"]
         self.exec_window = data["exec_window"]
         self.endurance = data["endurance"]
@@ -93,7 +95,7 @@ class AFFile(Entrypoint):
         self.sound_table = data["sound_table"]
         return self
 
-    def read(self, parser):
+    def read(self, parser: BinaryParser) -> AFFile:
         self.file_id = parser.get_uint16()
         self.exec_window = parser.get_uint16()
         self.endurance = parser.get_uint32()
@@ -124,13 +126,12 @@ class AFFile(Entrypoint):
                     index_table[sprite.index] = sprite
 
         # Read sound table
-        for m in range(0, 30):
-            sound = parser.get_uint8()
-            self.sound_table.append(sound)
+        for _ in range(0, 30):
+            self.sound_table.append(parser.get_uint8())
 
         return self
 
-    def write(self, parser):
+    def write(self, parser: BinaryParser) -> None:
         parser.put_uint16(self.file_id)
         parser.put_uint16(self.exec_window)
         parser.put_uint32(self.endurance)
@@ -156,41 +157,41 @@ class AFFile(Entrypoint):
             parser.put_uint8(sound)
 
     @property
-    def real_endurance(self):
+    def real_endurance(self) -> float:
         return self.endurance / 256.0
 
     @real_endurance.setter
-    def real_endurance(self, value):
+    def real_endurance(self, value: float) -> None:
         self.endurance = int(value * 256.0)
 
     @property
-    def real_forward_speed(self):
+    def real_forward_speed(self) -> float:
         return self.forward_speed / 256.0
 
     @real_forward_speed.setter
-    def real_forward_speed(self, value):
+    def real_forward_speed(self, value: float) -> None:
         self.forward_speed = int(value * 256.0)
 
     @property
-    def real_reverse_speed(self):
+    def real_reverse_speed(self) -> float:
         return self.reverse_speed / 256.0
 
     @real_reverse_speed.setter
-    def real_reverse_speed(self, value):
+    def real_reverse_speed(self, value: float) -> None:
         self.reverse_speed = int(value * 256.0)
 
     @property
-    def real_jump_speed(self):
+    def real_jump_speed(self) -> float:
         return self.jump_speed / 256.0
 
     @real_jump_speed.setter
-    def real_jump_speed(self, value):
+    def real_jump_speed(self, value: float) -> None:
         self.jump_speed = int(value * 256.0)
 
     @property
-    def real_fall_speed(self):
+    def real_fall_speed(self) -> float:
         return self.fall_speed / 256.0
 
     @real_fall_speed.setter
-    def real_fall_speed(self, value):
+    def real_fall_speed(self, value: float) -> None:
         self.fall_speed = int(value * 256.0)

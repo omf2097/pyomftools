@@ -8,7 +8,7 @@ import validx.exc
 from .utils.parser import BinaryParser
 from .utils.exceptions import OMFInvalidDataException
 
-PropertyDict = typing.List[
+PropertyDict = list[
     typing.Tuple[
         str,
         typing.Union[str, float, int],
@@ -16,7 +16,6 @@ PropertyDict = typing.List[
     ]
 ]
 
-DataObjectType = typing.TypeVar("DataObjectType", bound="DataObject")
 EntrypointType = typing.TypeVar("EntrypointType", bound="Entrypoint")
 
 
@@ -24,23 +23,23 @@ class DataObject(metaclass=ABCMeta):
     __slots__ = ()
 
     @abstractmethod
-    def read(self, parser: BinaryParser) -> DataObjectType:
+    def read(self, parser: BinaryParser):
         raise NotImplementedError()
 
     def write(self, parser: BinaryParser) -> None:
         raise NotImplementedError()
 
-    def unserialize(self, data: dict) -> DataObjectType:
+    def unserialize(self, data: dict):
         raise NotImplementedError()
 
     def serialize(self) -> dict:
         raise NotImplementedError()
 
-    def get_selected_props(self, prop_names: typing.List[str]) -> PropertyDict:
+    def get_selected_props(self, prop_names: list[str]) -> PropertyDict:
         content: PropertyDict = []
         for attr in prop_names:
             content.append(
-                (attr, getattr(self, attr, None), getattr(self, f"real_{attr}", None))
+                (attr, getattr(self, attr), getattr(self, f"real_{attr}", None))
             )
         return content
 
@@ -48,7 +47,7 @@ class DataObject(metaclass=ABCMeta):
         content: PropertyDict = []
         for slots in [getattr(cls, "__slots__", []) for cls in type(self).__mro__]:
             for attr in slots:
-                var = getattr(self, attr, None)
+                var = getattr(self, attr)
                 if type(var) in [float, int, str] or issubclass(type(var), Enum):
                     dec_var = getattr(self, f"real_{attr}", None)
                     content.append((attr, var, dec_var))

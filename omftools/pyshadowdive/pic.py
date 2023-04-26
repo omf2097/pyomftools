@@ -1,3 +1,4 @@
+from __future__ import annotations
 import typing
 from enum import IntEnum
 from copy import deepcopy
@@ -5,6 +6,7 @@ from copy import deepcopy
 from .protos import Entrypoint, DataObject
 from .sprite import Sprite
 from .palette import Palette
+from .utils.parser import BinaryParser
 
 
 class Sex(IntEnum):
@@ -21,14 +23,14 @@ class Photo(DataObject):
         "sprite",
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.is_player: bool = False
         self.sex: Sex = Sex.MALE
         self.palette: Palette = Palette()
         self.has_photo: bool = True
         self.sprite: Sprite = Sprite()
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             "is_player": self.is_player,
             "sex": self.sex.value,
@@ -37,7 +39,7 @@ class Photo(DataObject):
             "sprite": self.sprite.serialize(),
         }
 
-    def read(self, parser):
+    def read(self, parser: BinaryParser) -> Photo:
         self.is_player = parser.get_uint8() > 0
         self.sex = Sex(parser.get_uint16())
         self.palette = Palette().read_range(parser, 0, 48)
@@ -48,7 +50,7 @@ class Photo(DataObject):
             self.sprite.height += 1  # Fix bug
         return self
 
-    def write(self, parser):
+    def write(self, parser: BinaryParser) -> None:
         parser.put_uint8(self.is_player)
         parser.put_uint16(self.sex.value)
         self.palette.write_range(parser, 0, 48)
@@ -63,15 +65,15 @@ class Photo(DataObject):
 class PicFile(Entrypoint):
     __slots__ = ("photos",)
 
-    def __init__(self):
-        self.photos: typing.List[Photo] = []
+    def __init__(self) -> None:
+        self.photos: list[Photo] = []
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             "photos": [p.serialize() for p in self.photos],
         }
 
-    def read(self, parser):
+    def read(self, parser: BinaryParser) -> PicFile:
         photo_count = parser.get_uint32()
         assert 0 <= photo_count <= 256
 
@@ -85,7 +87,7 @@ class PicFile(Entrypoint):
 
         return self
 
-    def write(self, parser):
+    def write(self, parser: BinaryParser) -> None:
         photos_count = len(self.photos)
         catalog_offset = 200
 

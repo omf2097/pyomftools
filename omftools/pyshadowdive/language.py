@@ -1,6 +1,8 @@
+from __future__ import annotations
 import typing
 
 from .protos import Entrypoint
+from .utils.parser import BinaryParser
 
 
 class LanguageFile(Entrypoint):
@@ -9,21 +11,21 @@ class LanguageFile(Entrypoint):
         "strings",
     )
 
-    def __init__(self):
-        self.titles: typing.List[str] = []
-        self.strings: typing.List[str] = []
+    def __init__(self) -> None:
+        self.titles: list[str] = []
+        self.strings: list[str] = []
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             "titles": self.titles,
             "strings": self.strings,
         }
 
-    def read(self, parser):
+    def read(self, parser: BinaryParser) -> LanguageFile:
         file_size = parser.get_file_size()
 
         # Read titles and offsets
-        offsets: typing.List[int] = []
+        offsets: list[int] = []
         while True:
             offset = parser.get_uint32()
             if offset >= file_size:

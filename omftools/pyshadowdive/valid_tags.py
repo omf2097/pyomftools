@@ -1,5 +1,7 @@
+from typing import Final
+
 # Tag: (has_argument, description)
-VALID_TAGS = {
+VALID_TAGS: Final[dict[str, tuple[bool, str]]] = {
     "aa": (False, ""),
     "ab": (False, ""),
     "ac": (False, "Turn the HAR to face the center of the arena"),
@@ -53,7 +55,7 @@ VALID_TAGS = {
     "bt": (False, "Dark tint, used by shadow HAR"),
     "by": (False, ""),
     "cf": (
-        0,
+        False,
         "Only used by shadow scrap, works with 'bm' tag to walk to far corner of arena",
     ),
     "cg": (False, ""),
@@ -71,7 +73,7 @@ VALID_TAGS = {
     "jf2": (False, "Allow chaining to destruction"),
     "jf": (False, "Allow chaining to scrap"),
     "jg": (
-        0,
+        False,
         "Every HAR uses this in the 'getup' animation, purpose unknown, might be 'grab' (like standing throw)?",
     ),
     "jh": (False, "Allow chaining to 'high' moves"),
@@ -84,7 +86,7 @@ VALID_TAGS = {
     "k": (True, "Knockback on hit"),
     "l": (True, "Sound loudness"),
     "ma": (
-        1,
+        True,
         "Sets angle of new object in degrees. Velocity is then x=cos(ma), y=sin(ma).",
     ),
     "mc": (False, ""),

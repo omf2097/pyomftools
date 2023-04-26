@@ -15,7 +15,7 @@ class PaletteMapping(DataObject):
 
     schema = Dict({"colors": Palette.schema, "remaps": List(List(UInt8))})
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.colors: Palette = Palette()
         self.remaps: Remappings = []
 

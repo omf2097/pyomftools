@@ -1,7 +1,8 @@
+from __future__ import annotations
 from validx import Dict, List, Tuple
-import typing
 
 from .protos import DataObject
+from .utils.parser import BinaryParser
 from .utils.validator import UInt8
 from .utils.types import Color, Remapping
 
@@ -11,10 +12,10 @@ class Palette(DataObject):
 
     schema = Dict({"data": List(Tuple(UInt8, UInt8, UInt8))})
 
-    def __init__(self):
-        self.data: typing.List[Color] = [(0, 0, 0) for _ in range(256)]
+    def __init__(self) -> None:
+        self.data: list[Color] = [(0, 0, 0) for _ in range(256)]
 
-    def remap(self, remapping: Remapping) -> "Palette":
+    def remap(self, remapping: Remapping) -> Palette:
         pal = Palette()
         pal.data = [self.data[r] for r in remapping]
         return pal
@@ -29,28 +30,28 @@ class Palette(DataObject):
         b_8 = int((b * 255) / 63.0)
         return r_8, g_8, b_8
 
-    def read_range(self, parser, start: int, length: int):
+    def read_range(self, parser: BinaryParser, start: int, length: int) -> Palette:
         for m in range(start, start + length):
             self.data[m] = self._read_one(parser)
         return self
 
-    def read(self, parser):
+    def read(self, parser: BinaryParser) -> Palette:
         self.data.clear()
         for m in range(0, 256):
             self.data.append(self._read_one(parser))
         return self
 
     @staticmethod
-    def _write_one(parser, c: Color) -> None:
+    def _write_one(parser: BinaryParser, c: Color) -> None:
         parser.put_uint8((c[0] & 0xFF) >> 2)
         parser.put_uint8((c[1] & 0xFF) >> 2)
         parser.put_uint8((c[2] & 0xFF) >> 2)
 
-    def write_range(self, parser, start: int, length: int):
+    def write_range(self, parser: BinaryParser, start: int, length: int) -> None:
         for m in range(start, start + length):
             self._write_one(parser, self.data[m])
 
-    def write(self, parser):
+    def write(self, parser: BinaryParser) -> None:
         for m in range(0, 256):
             self._write_one(parser, self.data[m])
 
@@ -59,6 +60,6 @@ class Palette(DataObject):
             "data": self.data,
         }
 
-    def unserialize(self, data: dict):
+    def unserialize(self, data: dict) -> Palette:
         self.data = data["data"]
         return self

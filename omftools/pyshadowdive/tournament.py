@@ -1,14 +1,16 @@
+from __future__ import annotations
 import typing
 
 from .protos import Entrypoint
 from .sprite import Sprite
 from .palette import Palette
 from .pilot import Pilot
+from .utils.parser import BinaryParser
 
 
 class TournamentFile(Entrypoint):
-    MAX_ENEMIES = 256
-    MAX_LOCALES = 10
+    MAX_ENEMIES: typing.Final[int] = 256
+    MAX_LOCALES: typing.Final[int] = 10
 
     __slots__ = (
         "bk_name",
@@ -26,7 +28,7 @@ class TournamentFile(Entrypoint):
         "pilots",
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.bk_name: str = ""
         self.winnings_multiplier: float = 0.0
         self.unknown_a: int = 0
@@ -35,13 +37,13 @@ class TournamentFile(Entrypoint):
         self.tournament_id: int = 0
         self.pic_filename: str = ""
         self.palette: Palette = Palette()
-        self.locale_logos: typing.List[Sprite] = []
-        self.locale_descriptions: typing.List[str] = []
-        self.locale_titles: typing.List[str] = []
-        self.locale_end_texts: typing.List[typing.List[typing.List[str]]] = []
-        self.pilots: typing.List[Pilot] = []
+        self.locale_logos: list[Sprite] = []
+        self.locale_descriptions: list[str] = []
+        self.locale_titles: list[str] = []
+        self.locale_end_texts: list[list[list[str]]] = []
+        self.pilots: list[Pilot] = []
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             "bk_name": self.bk_name,
             "winnings_multiplier": self.winnings_multiplier,
@@ -58,7 +60,7 @@ class TournamentFile(Entrypoint):
             "pilots": [p.serialize() for p in self.pilots],
         }
 
-    def read(self, parser):
+    def read(self, parser: BinaryParser) -> TournamentFile:
         enemy_count = parser.get_uint32()
         victory_text_offset = parser.get_uint32()
 
@@ -82,9 +84,7 @@ class TournamentFile(Entrypoint):
         parser.set_pos(offsets[enemy_count])
 
         # Load logo sprites
-        self.locale_logos: typing.List[Sprite] = [
-            Sprite().read(parser) for _ in range(self.MAX_LOCALES)
-        ]
+        self.locale_logos = [Sprite().read(parser) for _ in range(self.MAX_LOCALES)]
 
         # Tournament palette
         self.palette = Palette().read_range(parser, 128, 40)

@@ -1,3 +1,4 @@
+from __future__ import annotations
 import typing
 from enum import IntEnum
 
@@ -29,9 +30,9 @@ class Difficulty(IntEnum):
 
 
 class Pilot(DataObject):
-    PILOT_BLOCK_LENGTH = 428
+    PILOT_BLOCK_LENGTH: typing.Final[int] = 428
 
-    PILOT_GROUP = (
+    PILOT_GROUP: typing.Final[tuple] = (
         "unknown_a",
         "name",
         "wins",
@@ -55,7 +56,7 @@ class Pilot(DataObject):
         "color_3",
     )
 
-    TOURNAMENT_GROUP = (
+    TOURNAMENT_GROUP: typing.Final[tuple] = (
         "trn_name",
         "trn_desc",
         "trn_image",
@@ -70,9 +71,9 @@ class Pilot(DataObject):
         "unk_block_c",
     )
 
-    ENHANCEMENTS_GROUP = ("enhancements",)
+    ENHANCEMENTS_GROUP: typing.Final[tuple] = ("enhancements",)
 
-    REQUIREMENTS_GROUP = (
+    REQUIREMENTS_GROUP: typing.Final[tuple] = (
         "secret",
         "only_fight_once",
         "req_enemy",
@@ -87,7 +88,7 @@ class Pilot(DataObject):
         "req_destroy",
     )
 
-    AI_OPTS_GROUP = (
+    AI_OPTS_GROUP: typing.Final[tuple] = (
         "att_normal",
         "att_hyper",
         "att_jump",
@@ -108,7 +109,7 @@ class Pilot(DataObject):
         "forget",
     )
 
-    OTHER_GROUP = (
+    OTHER_GROUP: typing.Final[tuple] = (
         "unk_block_f",
         "enemies_inc_unranked",
         "enemies_ex_unranked",
@@ -122,7 +123,7 @@ class Pilot(DataObject):
         "photo_id",
     )
 
-    QUOTES_BLOCK = ("quotes",)
+    QUOTES_BLOCK: typing.Final[tuple] = ("quotes",)
 
     __slots__ = (
         "unknown_a",
@@ -204,7 +205,7 @@ class Pilot(DataObject):
         "quotes",
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.unknown_a: int = 0  # uint32_t
         self.name: str = ""  # char
         self.wins: int = 0  # uint16_t
@@ -236,10 +237,10 @@ class Pilot(DataObject):
         self.unknown_k: int = 0  # uint8_t
         self.force_arena: int = 0  # uint16_t
         self.difficulty: Difficulty = Difficulty.ALUMINUM  # uint8_t
-        self.unk_block_b: typing.List[int] = []  # char
+        self.unk_block_b: list[int] = []  # char
         self.movement: int = 0  # uint8_t
-        self.unk_block_c: typing.List[int] = []  # uint16_t
-        self.enhancements: typing.List[int] = []  # char
+        self.unk_block_c: list[int] = []  # uint16_t
+        self.enhancements: list[int] = []  # char
 
         self.secret: int = 0  # uint8_t
         self.only_fight_once: int = 0  # uint8_t
@@ -260,7 +261,7 @@ class Pilot(DataObject):
         self.att_def: int = 0  # uint8_t
         self.att_sniper: int = 0  # uint8_t
 
-        self.unk_block_d: typing.List[int] = []  # uint16_t
+        self.unk_block_d: list[int] = []  # uint16_t
         self.ap_throw: int = 0  # int16_t
         self.ap_special: int = 0  # int16_t
         self.ap_jump: int = 0  # int16_t
@@ -273,7 +274,7 @@ class Pilot(DataObject):
         self.unknown_e: int = 0  # uint32_t
         self.learning: float = 0.0  # float
         self.forget: float = 0.0  # float
-        self.unk_block_f: typing.List[int] = []  # char
+        self.unk_block_f: list[int] = []  # char
         self.enemies_inc_unranked: int = 0  # uint16_t
         self.enemies_ex_unranked: int = 0  # uint16_t
 
@@ -288,7 +289,7 @@ class Pilot(DataObject):
         self.unk_block_i: int = 0  # uint16_t
         self.photo_id: int = 0  # uint16_t
 
-        self.quotes: typing.List[str] = []
+        self.quotes: list[str] = []
 
     def serialize(self) -> dict:
         return {
@@ -371,7 +372,7 @@ class Pilot(DataObject):
             "quotes": self.quotes,
         }
 
-    def read_player_block(self, parser: BinaryParser):
+    def read_player_block(self, parser: BinaryParser) -> None:
         self.name = parser.get_null_padded_str(18)
         self.wins = parser.get_uint16()
         self.losses = parser.get_uint16()
@@ -401,7 +402,7 @@ class Pilot(DataObject):
         self.color_2 = parser.get_uint8()
         self.color_3 = parser.get_uint8()
 
-    def read_pilot_block(self, parser: BinaryParser):
+    def read_pilot_block(self, parser: BinaryParser) -> None:
         self.trn_name = parser.get_null_padded_str(13)
         self.trn_desc = parser.get_null_padded_str(31)
         self.trn_image = parser.get_null_padded_str(13)
@@ -478,7 +479,7 @@ class Pilot(DataObject):
         self.unk_block_i = parser.get_uint16()
         self.photo_id = parser.get_uint16() & 0x3FF
 
-    def read(self, parser: BinaryParser):
+    def read(self, parser: BinaryParser) -> Pilot:
         parser.set_xor_key(self.PILOT_BLOCK_LENGTH & 0xFF)
         self.unknown_a = parser.get_uint32()
         self.read_player_block(parser)
