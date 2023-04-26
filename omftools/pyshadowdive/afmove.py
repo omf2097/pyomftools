@@ -24,8 +24,8 @@ class AIOptions(IntFlag):
     FLAG_15 = 0x4000
     FLAG_16 = 0x8000
 
-    def __str__(self):
-        return "{} ({})".format(super(AIOptions, self).__str__(), self.value)
+    def __str__(self) -> str:
+        return "{} ({})".format(self.name, self.value)
 
 
 class PositionConstraint(IntFlag):
@@ -37,8 +37,8 @@ class PositionConstraint(IntFlag):
     SOMETHING_2 = 0x2000
     SOMETHING_3 = 0x4000
 
-    def __str__(self):
-        return "{} ({})".format(super(PositionConstraint, self).__str__(), self.value)
+    def __str__(self) -> str:
+        return "{} ({})".format(self.name, self.value)
 
 
 class CollisionOpts(IntFlag):
@@ -52,8 +52,8 @@ class CollisionOpts(IntFlag):
     UNKNOWN_40 = 0x40
     UNKNOWN_80 = 0x80
 
-    def __str__(self):
-        return "{} ({})".format(super(CollisionOpts, self).__str__(), self.value)
+    def __str__(self) -> str:
+        return "{} ({})".format(self.name, self.value)
 
 
 class MoveCategory(IntEnum):
@@ -72,8 +72,8 @@ class MoveCategory(IntEnum):
     SCRAP = 12
     DESTRUCTION = 13
 
-    def __str__(self):
-        return "{} ({})".format(super(MoveCategory, self).__str__(), self.value)
+    def __str__(self) -> str:
+        return "{} ({})".format(self.name, self.value)
 
 
 AF_ANIMATION_NAMES = {
