@@ -118,20 +118,13 @@ def generate_trn(file: str, files: Filenames, output_dir: str):
         fd.write(content.encode())
 
 
-def generate_bk(file: str, files: Filenames, output_dir: str, alt_pals: AltPaletteFile):
+def generate_bk(file: str, files: Filenames, output_dir: str):
     filename = os.path.basename(file)
     bk = BKFile.load_native(file)
 
     bk.save_background(os.path.join(output_dir, f"{filename}-bg.png"))
 
     pal = copy.deepcopy(bk.palettes[0].colors)
-
-    names = ["ARENA", "WAR", "NORTH_AM", "WORLD", "KATUSHAI", "MELEE"]
-    if any([filename.startswith(t) for t in names]):
-        c1 = pal.data[0]
-        for m in range(48):
-            pal.data[m] = alt_pals.palettes[0].data[m]
-        pal.data[0] = c1
 
     for key, animation in bk.animations.items():
         for idx, sprite in enumerate(animation.sprites):
@@ -216,7 +209,7 @@ def main():
 
     for bk_file in bk_files:
         print(f"Generating {bk_file}")
-        generate_bk(bk_file, files, args.output_dir, alt_pals)
+        generate_bk(bk_file, files, args.output_dir)
 
     copyfile(
         os.path.join(args.output_dir, f"ARENA0.BK.html"),
