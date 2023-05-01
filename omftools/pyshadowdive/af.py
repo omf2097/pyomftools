@@ -23,8 +23,8 @@ class AFFile(Entrypoint):
         "reverse_speed",
         "jump_speed",
         "fall_speed",
-        "unknown_c",
-        "unknown_d",
+        "version_1",
+        "version_2",
         "sound_table",
         "moves",
     )
@@ -40,8 +40,8 @@ class AFFile(Entrypoint):
             "reverse_speed": Int32,
             "jump_speed": Int32,
             "fall_speed": Int32,
-            "unknown_c": UInt8,
-            "unknown_d": UInt8,
+            "version_1": UInt8,
+            "version_2": UInt8,
             "sound_table": List(UInt8, maxlen=30, minlen=30),
             "moves": Dict(extra=(Str(pattern=r"^[0-9]+$"), AFMove.schema)),
         }
@@ -57,8 +57,8 @@ class AFFile(Entrypoint):
         self.reverse_speed: int = 0
         self.jump_speed: int = 0
         self.fall_speed: int = 0
-        self.unknown_c: int = 0
-        self.unknown_d: int = 0
+        self.version_1: int = 0
+        self.version_2: int = 0
         self.moves: dict[int, AFMove] = {}
         self.sound_table: list[int] = []
 
@@ -73,8 +73,8 @@ class AFFile(Entrypoint):
             "reverse_speed": self.reverse_speed,
             "jump_speed": self.jump_speed,
             "fall_speed": self.fall_speed,
-            "unknown_c": self.unknown_c,
-            "unknown_d": self.unknown_d,
+            "version_1": self.version_1,
+            "version_2": self.version_2,
             "moves": {k: v.serialize() for k, v in self.moves.items()},
             "sound_table": self.sound_table,
         }
@@ -89,8 +89,8 @@ class AFFile(Entrypoint):
         self.reverse_speed = data["reverse_speed"]
         self.jump_speed = data["jump_speed"]
         self.fall_speed = data["fall_speed"]
-        self.unknown_c = data["unknown_c"]
-        self.unknown_d = data["unknown_d"]
+        self.version_1 = data["version_1"]
+        self.version_2 = data["version_2"]
         self.moves = {int(k): AFMove().unserialize(v) for k, v in data["moves"].items()}
         self.sound_table = data["sound_table"]
         return self
@@ -105,8 +105,8 @@ class AFFile(Entrypoint):
         self.reverse_speed = parser.get_int32()
         self.jump_speed = parser.get_int32()
         self.fall_speed = parser.get_int32()
-        self.unknown_c = parser.get_uint8()
-        self.unknown_d = parser.get_uint8()
+        self.version_1 = parser.get_uint8()
+        self.version_2 = parser.get_uint8()
 
         # Read all animations (up to max MOVE_MAX_NUMBER)
         while True:
@@ -141,8 +141,8 @@ class AFFile(Entrypoint):
         parser.put_int32(self.reverse_speed)
         parser.put_int32(self.jump_speed)
         parser.put_int32(self.fall_speed)
-        parser.put_uint8(self.unknown_c)
-        parser.put_uint8(self.unknown_d)
+        parser.put_uint8(self.version_1)
+        parser.put_uint8(self.version_2)
 
         # Write moves
         for key, move in self.moves.items():
