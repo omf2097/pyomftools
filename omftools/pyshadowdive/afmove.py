@@ -116,8 +116,8 @@ class AFMove(Animation):
         "unknown_11",
         "next_animation_id",
         "category",
-        "unknown_14",
-        "scrap_amount",
+        "block_damage",
+        "block_stun_and_scrap",
         "successor_id",
         "damage_amount",
         "collision_opts",
@@ -143,8 +143,8 @@ class AFMove(Animation):
                 "unknown_11": UInt8,
                 "next_animation_id": UInt8,
                 "category": UInt8,
-                "unknown_14": UInt8,
-                "scrap_amount": UInt8,
+                "block_damage": UInt8,
+                "block_stun_and_scrap": UInt8,
                 "successor_id": UInt8,
                 "damage_amount": UInt8,
                 "collision_opts": UInt8,
@@ -170,8 +170,8 @@ class AFMove(Animation):
         self.unknown_11: int = 0
         self.next_animation_id: int = 0
         self.category: MoveCategory = MoveCategory.MISCELLANEOUS
-        self.unknown_14: int = 0
-        self.scrap_amount: int = 0
+        self.block_damage: int = 0
+        self.block_stun_and_scrap: int = 0
         self.successor_id: int = 0
         self.damage_amount: int = 0
         self.collision_opts: CollisionOpts = CollisionOpts.NONE
@@ -202,8 +202,8 @@ class AFMove(Animation):
         self.unknown_11 = parser.get_uint8()
         self.next_animation_id = parser.get_uint8()
         self.category = MoveCategory(parser.get_uint8())
-        self.unknown_14 = parser.get_uint8()
-        self.scrap_amount = parser.get_uint8()
+        self.block_damage = parser.get_uint8()
+        self.block_stun_and_scrap = parser.get_uint8()
         self.successor_id = parser.get_uint8()
         self.damage_amount = parser.get_uint8()
         self.collision_opts = CollisionOpts(parser.get_uint8())
@@ -227,8 +227,8 @@ class AFMove(Animation):
         parser.put_uint8(self.unknown_11)
         parser.put_uint8(self.next_animation_id)
         parser.put_uint8(self.category.value)
-        parser.put_uint8(self.unknown_14)
-        parser.put_uint8(self.scrap_amount)
+        parser.put_uint8(self.block_damage)
+        parser.put_uint8(self.block_stun_and_scrap)
         parser.put_uint8(self.successor_id)
         parser.put_uint8(self.damage_amount)
         parser.put_uint8(self.collision_opts)
@@ -253,8 +253,8 @@ class AFMove(Animation):
                 "unknown_11": self.unknown_11,
                 "next_animation_id": self.next_animation_id,
                 "category": self.category.value,
-                "unknown_14": self.unknown_14,
-                "scrap_amount": self.scrap_amount,
+                "block_damage": self.block_damage,
+                "block_stun_and_scrap": self.block_stun_and_scrap,
                 "successor_id": self.successor_id,
                 "damage_amount": self.damage_amount,
                 "collision_opts": self.collision_opts.value,
@@ -279,8 +279,8 @@ class AFMove(Animation):
         self.unknown_11 = data["unknown_11"]
         self.next_animation_id = data["next_animation_id"]
         self.category = MoveCategory(data["category"])
-        self.unknown_14 = data["unknown_14"]
-        self.scrap_amount = data["scrap_amount"]
+        self.block_damage = data["block_damage"]
+        self.block_stun_and_scrap = data["block_stun_and_scrap"]
         self.successor_id = data["successor_id"]
         self.damage_amount = data["damage_amount"]
         self.collision_opts = CollisionOpts(data["collision_opts"])

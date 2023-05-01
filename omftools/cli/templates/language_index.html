@@ -14,7 +14,7 @@
             </thead>
             <tbody>
             {% for m in range(language.strings|length) %}
-                <tr>
+                <tr id="{{ loop.index0 }}">
                     <th scope="row">{{ loop.index0 }}</th>
                     <td>{{ language.titles[m] }}</td>
                     <td>{{ language.strings[m] }}</td>
