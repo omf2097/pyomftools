@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+from functools import cache
+
 from validx import Dict, Bool, List
 
 from .protos import DataObject
@@ -11,7 +14,7 @@ from .utils.images import save_png, generate_png
 
 
 class Sprite(DataObject):
-    TRANSPARENCY_INDEX = 50
+    TRANSPARENCY_INDEX = 256
 
     __slots__ = (
         "pos_x",
@@ -58,6 +61,36 @@ class Sprite(DataObject):
             self.image = [parser.get_uint8() for _ in range(image_len)]
 
         return self
+
+    @cache
+    def scan_image(self) -> tuple[int, int, list[int]]:
+        start_index: int = 255
+        end_index: int = 0
+        indexes: set[int] = set()
+
+        image = self.decode_image()
+        for index in image:
+            if index == self.TRANSPARENCY_INDEX:
+                continue
+            if index < start_index:
+                start_index = index
+            if index > end_index:
+                end_index = index
+            indexes.add(index)
+
+        return start_index, end_index, sorted(indexes)
+
+    @property
+    def pal_start_index(self):
+        return self.scan_image()[0]
+
+    @property
+    def pal_end_index(self):
+        return self.scan_image()[1]
+
+    @property
+    def pal_indexes(self):
+        return self.scan_image()[2]
 
     def decode_image(self) -> RawImage:
         if self.width == 0 or self.height == 0 or len(self.image) == 0:

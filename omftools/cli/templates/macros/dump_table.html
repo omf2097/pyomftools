@@ -76,7 +76,9 @@
             <td colspan="6">
                 <img srcset="{{ filename }}-{{ key }}-{{ loop.index0 }}.png 0.5x"
                      class="sprite"
-                     alt="Sprite for animation {{ key }} sprite {{ loop.index0 }}">
+                     alt="Sprite for animation {{ key }} sprite {{ loop.index0 }}"
+                     title="Palette range {{ '{:02X}'.format(s.pal_start_index) }} - {{ '{:02X}'.format(s.pal_end_index) }}, indexes: {% for index in s.pal_indexes %}{{ '{:02X}'.format(index) }}, {% endfor %}"
+                >
             </td>
         </tr>
     {% endfor %}
