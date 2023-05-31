@@ -71,7 +71,7 @@ class MoveCategory(IntEnum):
     PROJECTILE = 8
     BASIC = 9
     VICTORY_DEFEAT = 10
-    UNKNOWN_C = 11
+    FIRE_ICE = 11
     SCRAP = 12
     DESTRUCTION = 13
 
