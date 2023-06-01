@@ -25,9 +25,9 @@ class Palette(DataObject):
         r = parser.get_uint8()
         g = parser.get_uint8()
         b = parser.get_uint8()
-        r_8 = int((r * 255) / 63.0)
-        g_8 = int((g * 255) / 63.0)
-        b_8 = int((b * 255) / 63.0)
+        r_8 = int((r * 255.0) / 63.0)
+        g_8 = int((g * 255.0) / 63.0)
+        b_8 = int((b * 255.0) / 63.0)
         return r_8, g_8, b_8
 
     def read_range(self, parser: BinaryParser, start: int, length: int) -> Palette:
@@ -43,9 +43,9 @@ class Palette(DataObject):
 
     @staticmethod
     def _write_one(parser: BinaryParser, c: Color) -> None:
-        parser.put_uint8((c[0] & 0xFF) >> 2)
-        parser.put_uint8((c[1] & 0xFF) >> 2)
-        parser.put_uint8((c[2] & 0xFF) >> 2)
+        parser.put_uint8(int((c[0] * 63.0) / 255.0))
+        parser.put_uint8(int((c[1] * 63.0) / 255.0))
+        parser.put_uint8(int((c[2] * 63.0) / 255.0))
 
     def write_range(self, parser: BinaryParser, start: int, length: int) -> None:
         for m in range(start, start + length):
