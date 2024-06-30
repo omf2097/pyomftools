@@ -10,7 +10,7 @@ https://katajakasa.fi/projects/openomf/cards/
 
 ## Installation
 
-1. Make sure you have python 3.11 installed
-2. Create a virtualenv, eg. `poetry env use 3.11` and install deps `poetry install --no-root`.
+1. Make sure you have python 3.12 installed
+2. Create a virtualenv, eg. `poetry env use 3.12` and install deps `poetry install --no-root`.
 3. Activate the virtualenv, eg. `poetry shell`
 4. Run! eg. `python -m omftools.cli.af_compile -h`
