@@ -66,7 +66,7 @@ VALID_TAGS: Final[dict[str, tuple[bool, str]]] = {
     "cy": (True, ""),
     "d": (True, "Re-enter animation at N ticks"),
     "e": (False, "Set position to enemy position"),
-    "f": (False, "Flip sprite vertically"),
+    "f": (True, "Flip sprite vertically"),
     "g": (False, "Set position to ground and zero velocity"),
     "h": (False, "Set velocity to 0"),
     "i": (False, ""),
