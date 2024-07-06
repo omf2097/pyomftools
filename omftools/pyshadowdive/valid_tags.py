@@ -1,5 +1,7 @@
 from typing import Final
 
+INVALID_TAGS: Final[set[str]] = {"u", "c", "p", "o", "z"}
+
 # Tag: (has_argument, description)
 VALID_TAGS: Final[dict[str, tuple[bool, str]]] = {
     "aa": (False, ""),
@@ -168,14 +170,20 @@ VALID_TAGS: Final[dict[str, tuple[bool, str]]] = {
     "zz": (False, "Invulnerable to any attacks"),
 }
 
+VALID_TAG_KEYS: set[str] = set(VALID_TAGS.keys())
+
 
 def describe_tag(tag: str) -> str:
     return VALID_TAGS[tag][1]
 
 
-def is_valid_tag(tag: str) -> bool:
-    return tag in VALID_TAGS.keys()
-
-
 def tag_has_arg(tag: str) -> bool:
     return VALID_TAGS[tag][0]
+
+
+def is_valid_tag(tag: str) -> bool:
+    return tag in VALID_TAG_KEYS
+
+
+def is_invalid_tag(tag: str) -> bool:
+    return tag in INVALID_TAGS

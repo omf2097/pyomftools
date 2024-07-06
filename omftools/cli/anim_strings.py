@@ -9,7 +9,7 @@ from omftools.pyshadowdive.af import AFFile
 from omftools.pyshadowdive.afmove import AFMove
 from omftools.pyshadowdive.bk import BKFile
 from omftools.pyshadowdive.bkanim import BKAnimation
-from omftools.pyshadowdive.string_parser import parse_string
+from omftools.pyshadowdive.string_parser import Script
 
 
 @dataclass
@@ -22,9 +22,11 @@ class AnimString:
 
     def to_dict(self) -> dict:
         return dict(
-            data=list(map(lambda f: f.to_dict(), parse_string(self.data))),
+            data=list(map(lambda f: f.to_dict(), Script.decode(self.data).frames)),
             source_file=self.source_file,
             source_animation=self.source_animation,
+            original=self.data,
+            type=self.type,
         )
 
 
