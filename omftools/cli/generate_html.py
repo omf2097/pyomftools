@@ -32,6 +32,7 @@ class Filenames:
     alt_pals: str
     sounds: str
     english: str
+    german: str
 
 
 har_names = [
@@ -50,7 +51,7 @@ har_names = [
 
 
 def generate_language(file: str, files: Filenames, output_dir: str):
-    filename = "ENGLISH.DAT"
+    filename = os.path.basename(file)
     language = LanguageFile.load_native(file)
 
     with open(os.path.join(output_dir, f"{filename}.html"), "wb") as fd:
@@ -171,6 +172,7 @@ def main():
     alt_pals_file = os.path.join(args.input_dir, "ALTPALS.DAT")
     sounds_file = os.path.join(args.input_dir, "SOUNDS.DAT")
     english_file = os.path.join(args.input_dir, "ENGLISH.DAT")
+    german_file = os.path.join(args.input_dir, "GERMAN.DAT")
 
     files = Filenames(
         af=[os.path.basename(v) for v in af_files],
@@ -180,6 +182,7 @@ def main():
         alt_pals=os.path.basename(alt_pals_file),
         sounds=os.path.basename(sounds_file),
         english=os.path.basename(english_file),
+        german=os.path.basename(german_file),
     )
 
     # palettes file
@@ -194,6 +197,9 @@ def main():
 
     print("Generating ENGLISH.DAT")
     generate_language(english_file, files, args.output_dir)
+
+    print("Generating GERMAN.DAT")
+    generate_language(german_file, files, args.output_dir)
 
     for pic_file in pic_files:
         print(f"Generating {pic_file}")
