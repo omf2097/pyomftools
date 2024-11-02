@@ -74,11 +74,25 @@
         <tr>
             <td></td>
             <td colspan="6">
+                {% if s.width > 0 and s.height > 0 %}
                 <img srcset="{{ filename }}-{{ key }}-{{ loop.index0 }}.png 0.5x"
                      class="sprite"
                      alt="Sprite for animation {{ key }} sprite {{ loop.index0 }}"
                      title="Palette range {{ '{:02X}'.format(s.pal_start_index) }} - {{ '{:02X}'.format(s.pal_end_index) }}, indexes: {% for index in s.pal_indexes %}{{ '{:02X}'.format(index) }}, {% endfor %}"
                 >
+                {% else %}
+                    <table class="table table-borderless table-hover table-sm palette-block">
+                        <tbody>
+                        {% for y in range(16) %}
+                            <tr>
+                                {% for x in range(16) %}
+                                <td style="background-color: rgb({{ s.image[(x+y*16)*3 + 0] }},{{ s.image[(x+y*16)*3 + 1] }},{{ s.image[(x+y*16)*3 + 2] }})">{{ '{:02X}'.format(x+(y*16)) }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
             </td>
         </tr>
     {% endfor %}

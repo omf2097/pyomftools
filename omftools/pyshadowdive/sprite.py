@@ -81,16 +81,20 @@ class Sprite(DataObject):
         return start_index, end_index, sorted(indexes)
 
     @property
-    def pal_start_index(self):
+    def pal_start_index(self) -> int:
         return self.scan_image()[0]
 
     @property
-    def pal_end_index(self):
+    def pal_end_index(self) -> int:
         return self.scan_image()[1]
 
     @property
-    def pal_indexes(self):
+    def pal_indexes(self) -> list[int]:
         return self.scan_image()[2]
+
+    @property
+    def size(self) -> int:
+        return len(self.image)
 
     def decode_image(self) -> RawImage:
         if self.width == 0 or self.height == 0 or len(self.image) == 0:
