@@ -44,6 +44,15 @@ def process_af(af_file) -> list[AnimString]:
                     source_animation=animation_index,
                 )
             )
+        if move.enemy_string:
+            out.append(
+                AnimString(
+                    data=move.enemy_string,
+                    type="enemy_string",
+                    source_file=source_file,
+                    source_animation=animation_index,
+                )
+            )
         if move.extra_strings:
             for extra_index, extra_string in enumerate(
                 move.extra_strings
@@ -56,6 +65,7 @@ def process_af(af_file) -> list[AnimString]:
                         source_animation=animation_index,
                     )
                 )
+
     return out
 
 
