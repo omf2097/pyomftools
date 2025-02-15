@@ -59,6 +59,24 @@ class CollisionOpts(IntFlag):
         return "{} ({})".format(self.name, self.value)
 
 
+class ExtraStringSelector(IntEnum):
+    NONE = 0
+
+    # Select string by ARM speed or LEG speed value
+    ARM_SPEED = 1
+    LEG_SPEED = 2
+
+    # The string selector uses the enhancement level but the damage modifier uses arm/leg power
+    SPECIAL_ARM = 3
+    SPECIAL_LEG = 4
+
+    # We don't know.
+    UNKNOWN = 5
+
+    def __str__(self) -> str:
+        return "{} ({})".format(self.name, self.value)
+
+
 class MoveCategory(IntEnum):
     MISCELLANEOUS = 0
     UNKNOWN_A = 1
@@ -175,7 +193,7 @@ class AFMove(Animation):
         self.successor_id: int = 0
         self.damage_amount: int = 0
         self.collision_opts: CollisionOpts = CollisionOpts.NONE
-        self.extra_string_selector: int = 0
+        self.extra_string_selector: ExtraStringSelector = ExtraStringSelector.NONE
         self.points: int = 0
         self.move_string: str = ""
         self.enemy_string: str = ""
@@ -207,7 +225,7 @@ class AFMove(Animation):
         self.successor_id = parser.get_uint8()
         self.damage_amount = parser.get_uint8()
         self.collision_opts = CollisionOpts(parser.get_uint8())
-        self.extra_string_selector = parser.get_uint8()
+        self.extra_string_selector = ExtraStringSelector(parser.get_uint8())
         self.points = parser.get_uint8()
         self.move_string = parser.get_null_padded_str(21)
         self.enemy_string = parser.get_var_str(size_includes_zero=True)
@@ -232,7 +250,7 @@ class AFMove(Animation):
         parser.put_uint8(self.successor_id)
         parser.put_uint8(self.damage_amount)
         parser.put_uint8(self.collision_opts)
-        parser.put_uint8(self.extra_string_selector)
+        parser.put_uint8(self.extra_string_selector.value)
         parser.put_uint8(self.points)
         parser.put_null_padded_str(self.move_string, 21)
         parser.put_var_str(self.enemy_string, size_includes_zero=True)
