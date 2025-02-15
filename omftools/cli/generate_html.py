@@ -53,13 +53,17 @@ af_name_mappings = {f"FIGHTR{i}.AF": name for i, name in enumerate(har_names)}
 
 
 def render(tpl_name: str, files: Filenames, filename: str, **args) -> bytes:
-    return env.get_template(tpl_name).render(
-        files=files,
-        filename=filename,
-        har_names=har_names,
-        af_name_mappings=af_name_mappings,
-        **args
-    ).encode()
+    return (
+        env.get_template(tpl_name)
+        .render(
+            files=files,
+            filename=filename,
+            har_names=har_names,
+            af_name_mappings=af_name_mappings,
+            **args,
+        )
+        .encode()
+    )
 
 
 def generate_language(file: str, files: Filenames, output_dir: str) -> None:
@@ -82,7 +86,9 @@ def generate_sounds(file: str, files: Filenames, output_dir: str) -> None:
         fd.write(render("sounds_index.html", files, filename, sounds=sounds))
 
 
-def generate_pics(file: str, files: Filenames, output_dir: str, src_pal: Palette) -> None:
+def generate_pics(
+    file: str, files: Filenames, output_dir: str, src_pal: Palette
+) -> None:
     filename = os.path.basename(file)
     pic = PicFile.load_native(file)
 
@@ -97,7 +103,9 @@ def generate_pics(file: str, files: Filenames, output_dir: str, src_pal: Palette
         fd.write(render("pic_index.html", files, filename, pic=pic))
 
 
-def generate_altpals(alt_pals: AltPaletteFile, files: Filenames, output_dir: str) -> None:
+def generate_altpals(
+    alt_pals: AltPaletteFile, files: Filenames, output_dir: str
+) -> None:
     filename = "ALTPALS.DAT"
 
     with open(os.path.join(output_dir, f"{filename}.html"), "wb") as fd:
@@ -139,7 +147,9 @@ def generate_bk(file: str, files: Filenames, output_dir: str) -> None:
         fd.write(render("bk_index.html", files, filename, bk=bk))
 
 
-def generate_af(file: str, files: Filenames, output_dir: str, alt_pals: AltPaletteFile) -> None:
+def generate_af(
+    file: str, files: Filenames, output_dir: str, alt_pals: AltPaletteFile
+) -> None:
     filename = os.path.basename(file)
     af = AFFile.load_native(file)
 
