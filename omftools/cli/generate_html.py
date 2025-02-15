@@ -1,11 +1,11 @@
 import argparse
 import os
-import typing
 import copy
 from glob import glob
 from dataclasses import dataclass
 from shutil import copyfile
 
+from natsort import natsorted
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 from omftools.pyshadowdive.af import AFFile
@@ -49,18 +49,28 @@ har_names = [
     "Nova",
 ]
 
+af_name_mappings = {f"FIGHTR{i}.AF": name for i, name in enumerate(har_names)}
 
-def generate_language(file: str, files: Filenames, output_dir: str):
+
+def render(tpl_name: str, files: Filenames, filename: str, **args) -> bytes:
+    return env.get_template(tpl_name).render(
+        files=files,
+        filename=filename,
+        har_names=har_names,
+        af_name_mappings=af_name_mappings,
+        **args
+    ).encode()
+
+
+def generate_language(file: str, files: Filenames, output_dir: str) -> None:
     filename = os.path.basename(file)
     language = LanguageFile.load_native(file)
 
     with open(os.path.join(output_dir, f"{filename}.html"), "wb") as fd:
-        tpl = env.get_template("language_index.html")
-        content = tpl.render(language=language, files=files, filename=filename)
-        fd.write(content.encode())
+        fd.write(render("language_index.html", files, filename, language=language))
 
 
-def generate_sounds(file: str, files: Filenames, output_dir: str):
+def generate_sounds(file: str, files: Filenames, output_dir: str) -> None:
     filename = "SOUNDS.DAT"
     sounds = SoundFile.load_native(file)
 
@@ -69,12 +79,10 @@ def generate_sounds(file: str, files: Filenames, output_dir: str):
             sound.save_wav(os.path.join(output_dir, f"{filename}-{idx}.wav"))
 
     with open(os.path.join(output_dir, f"{filename}.html"), "wb") as fd:
-        tpl = env.get_template("sounds_index.html")
-        content = tpl.render(sounds=sounds, files=files, filename=filename)
-        fd.write(content.encode())
+        fd.write(render("sounds_index.html", files, filename, sounds=sounds))
 
 
-def generate_pics(file: str, files: Filenames, output_dir: str, src_pal: Palette):
+def generate_pics(file: str, files: Filenames, output_dir: str, src_pal: Palette) -> None:
     filename = os.path.basename(file)
     pic = PicFile.load_native(file)
 
@@ -86,21 +94,17 @@ def generate_pics(file: str, files: Filenames, output_dir: str, src_pal: Palette
             print(f"Skipping {sprite_file}")
 
     with open(os.path.join(output_dir, f"{filename}.html"), "wb") as fd:
-        tpl = env.get_template("pic_index.html")
-        content = tpl.render(pic=pic, files=files, filename=filename)
-        fd.write(content.encode())
+        fd.write(render("pic_index.html", files, filename, pic=pic))
 
 
-def generate_altpals(alt_pals: AltPaletteFile, files: Filenames, output_dir: str):
+def generate_altpals(alt_pals: AltPaletteFile, files: Filenames, output_dir: str) -> None:
     filename = "ALTPALS.DAT"
 
     with open(os.path.join(output_dir, f"{filename}.html"), "wb") as fd:
-        tpl = env.get_template("altpals_index.html")
-        content = tpl.render(alt_pals=alt_pals, files=files, filename=filename)
-        fd.write(content.encode())
+        fd.write(render("altpals_index.html", files, filename, alt_pals=alt_pals))
 
 
-def generate_trn(file: str, files: Filenames, output_dir: str):
+def generate_trn(file: str, files: Filenames, output_dir: str) -> None:
     filename = os.path.basename(file)
     trn = TournamentFile.load_native(file)
 
@@ -112,14 +116,10 @@ def generate_trn(file: str, files: Filenames, output_dir: str):
             print(f"Skipping {sprite_file}")
 
     with open(os.path.join(output_dir, f"{filename}.html"), "wb") as fd:
-        tpl = env.get_template("trn_index.html")
-        content = tpl.render(
-            trn=trn, files=files, filename=filename, har_names=har_names
-        )
-        fd.write(content.encode())
+        fd.write(render("trn_index.html", files, filename, trn=trn))
 
 
-def generate_bk(file: str, files: Filenames, output_dir: str):
+def generate_bk(file: str, files: Filenames, output_dir: str) -> None:
     filename = os.path.basename(file)
     bk = BKFile.load_native(file)
 
@@ -136,12 +136,10 @@ def generate_bk(file: str, files: Filenames, output_dir: str):
                 print(f"Skipping {sprite_file}")
 
     with open(os.path.join(output_dir, f"{filename}.html"), "wb") as fd:
-        tpl = env.get_template("bk_index.html")
-        content = tpl.render(bk=bk, files=files, filename=filename)
-        fd.write(content.encode())
+        fd.write(render("bk_index.html", files, filename, bk=bk))
 
 
-def generate_af(file: str, files: Filenames, output_dir: str, alt_pals: AltPaletteFile):
+def generate_af(file: str, files: Filenames, output_dir: str, alt_pals: AltPaletteFile) -> None:
     filename = os.path.basename(file)
     af = AFFile.load_native(file)
 
@@ -154,12 +152,10 @@ def generate_af(file: str, files: Filenames, output_dir: str, alt_pals: AltPalet
                 print(f"Skipping {sprite_file}")
 
     with open(os.path.join(output_dir, f"{filename}.html"), "wb") as fd:
-        tpl = env.get_template("af_index.html")
-        content = tpl.render(af=af, files=files, filename=filename)
-        fd.write(content.encode())
+        fd.write(render("af_index.html", files, filename, af=af))
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Generate HTML pages for OMF files")
     parser.add_argument("input_dir", help="Input directory")
     parser.add_argument("output_dir", help="Output directory")
@@ -175,7 +171,7 @@ def main():
     german_file = os.path.join(args.input_dir, "GERMAN.DAT")
 
     files = Filenames(
-        af=[os.path.basename(v) for v in af_files],
+        af=natsorted([os.path.basename(v) for v in af_files]),
         bk=[os.path.basename(v) for v in bk_files],
         trn=[os.path.basename(v) for v in trn_files],
         pic=[os.path.basename(v) for v in pic_files],

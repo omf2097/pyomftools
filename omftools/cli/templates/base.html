@@ -43,7 +43,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="fighterDropdown">
                             {% for file in files.af %}
-                                <a class="dropdown-item" href="{{ file }}.html">{{ file }}</a>
+                                <a class="dropdown-item" href="{{ file }}.html">{{ file }} - {{ af_name_mappings[file] }}</a>
                             {% endfor %}
                         </div>
                     </li>
