@@ -42,7 +42,7 @@
 "bg",0,"Credits fade effect unknown"
 "bi",1,"Credits fade effect color start index"
 "bk",1,
-"bn",0,
+"bn",0,"Unblockable move"
 "bo",1,
 "br",0,"Draw additively"
 "bt",0,"Dark tint, used by shadow HAR"
@@ -97,11 +97,11 @@
 "pd",1,"n < 256. Reference color index."
 "pe",0,"Switch HAR palette effect handling to the other HAR."
 "ph",0,"Disable HAR palette effects if HAR is not in damage animation (9)"
-"pp",1,"Duration of HAR palette effect in ticks."
+"pp",1,"Effect intensity"
 "ps",0,"Update the color palette"
-"ptd",1,"n < 128 Effect intensity."
-"ptp",1,"N < 128"
-"ptr",1,"N < 128"
+"ptd",1,"Effect fade-in time in ticks (0-127)"
+"ptp",1,"Effect constant max-value time in ticks (0-127)"
+"ptr",1,"Effect fade-out time in ticks (0-127)"
 "q",1,"Enable hit on current and next n-1 frames."
 "r",0,"Flip sprite horizontally"
 "s",1,"Play sound N from sound table footer"
