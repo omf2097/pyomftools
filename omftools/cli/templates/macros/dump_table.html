@@ -122,18 +122,18 @@
 {%- endmacro %}
 
 
-{% macro print_extra_strings(strings) -%}
+{% macro print_extra_strings(strings, selector, names) -%}
 <table class="table table-borderless table-hover table-sm">
     <thead>
         <tr>
-            <th scope="col">#</th>
+            <th scope="col">Type</th>
             <th scope="col">String</th>
         </tr>
     </thead>
     <tbody>
     {% for s in strings %}
         <tr>
-            <th scope="row">{{ loop.index }}</th>
+            <th scope="row">{{ names[selector][loop.index0] }}</th>
             <td>{{ s }}</td>
         </tr>
     {% endfor %}

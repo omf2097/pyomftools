@@ -9,6 +9,7 @@ from natsort import natsorted
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 from omftools.pyshadowdive.af import AFFile
+from omftools.pyshadowdive.afmove import ExtraStringSelector
 from omftools.pyshadowdive.bk import BKFile
 from omftools.pyshadowdive.tournament import TournamentFile
 from omftools.pyshadowdive.sounds import SoundFile
@@ -49,6 +50,33 @@ har_names = [
     "Nova",
 ]
 
+extra_string_names = {
+    ExtraStringSelector.NONE: ["Normal"],
+    ExtraStringSelector.ARM_SPEED: [f"ARM SPD {i}" for i in range(0, 10)],
+    ExtraStringSelector.LEG_SPEED: [f"LEG SPD {i}" for i in range(0, 10)],
+    ExtraStringSelector.SPECIAL_ARM: [
+        "Normal",
+        "Hyper",
+        "Enhancement 1",
+        "Enhancement 2",
+        "Enhancement 3",
+    ],
+    ExtraStringSelector.SPECIAL_LEG: [
+        "Normal",
+        "Hyper",
+        "Enhancement 1",
+        "Enhancement 2",
+        "Enhancement 3",
+    ],
+    ExtraStringSelector.SPECIAL: [
+        "Normal",
+        "Hyper",
+        "Enhancement 1",
+        "Enhancement 2",
+        "Enhancement 3",
+    ],
+}
+
 af_name_mappings = {f"FIGHTR{i}.AF": name for i, name in enumerate(har_names)}
 
 
@@ -60,6 +88,7 @@ def render(tpl_name: str, files: Filenames, filename: str, **args) -> bytes:
             filename=filename,
             har_names=har_names,
             af_name_mappings=af_name_mappings,
+            extra_string_names=extra_string_names,
             **args,
         )
         .encode()

@@ -70,8 +70,8 @@ class ExtraStringSelector(IntEnum):
     SPECIAL_ARM = 3
     SPECIAL_LEG = 4
 
-    # We don't know.
-    UNKNOWN = 5
+    # I am different.
+    SPECIAL = 5
 
     def __str__(self) -> str:
         return "{} ({})".format(self.name, self.value)
