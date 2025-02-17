@@ -48,7 +48,7 @@ class CollisionOpts(IntFlag):
     NONE = 0
     UNKNOWN_1 = 0x1
     UNKNOWN_2 = 0x2
-    UNKNOWN_4 = 0x4
+    GRAB_HAR = 0x4
     UNKNOWN_8 = 0x8
     UNKNOWN_10 = 0x10
     MOVE_BACK = 0x20
