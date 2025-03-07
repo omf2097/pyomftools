@@ -44,21 +44,6 @@ class PositionConstraint(IntFlag):
         return "{} ({})".format(self.name, self.value)
 
 
-class CollisionOpts(IntFlag):
-    NONE = 0
-    UNKNOWN_1 = 0x1
-    UNKNOWN_2 = 0x2
-    GRAB_HAR = 0x4
-    UNKNOWN_8 = 0x8
-    UNKNOWN_10 = 0x10
-    MOVE_BACK = 0x20
-    UNKNOWN_40 = 0x40
-    UNKNOWN_80 = 0x80
-
-    def __str__(self) -> str:
-        return "{} ({})".format(self.name, self.value)
-
-
 class ExtraStringSelector(IntEnum):
     NONE = 0
 
@@ -138,7 +123,7 @@ class AFMove(Animation):
         "block_stun_and_scrap",
         "successor_id",
         "damage_amount",
-        "collision_opts",
+        "throw_duration",
         "extra_string_selector",
         "points",
         "move_string",
@@ -165,7 +150,7 @@ class AFMove(Animation):
                 "block_stun_and_scrap": UInt8,
                 "successor_id": UInt8,
                 "damage_amount": UInt8,
-                "collision_opts": UInt8,
+                "throw_duration": UInt8,
                 "extra_string_selector": UInt8,
                 "points": UInt8,
                 "move_string": Str(maxlen=21),
@@ -192,7 +177,7 @@ class AFMove(Animation):
         self.block_stun_and_scrap: int = 0
         self.successor_id: int = 0
         self.damage_amount: int = 0
-        self.collision_opts: CollisionOpts = CollisionOpts.NONE
+        self.throw_duration: int = 0
         self.extra_string_selector: ExtraStringSelector = ExtraStringSelector.NONE
         self.points: int = 0
         self.move_string: str = ""
@@ -224,7 +209,7 @@ class AFMove(Animation):
         self.block_stun_and_scrap = parser.get_uint8()
         self.successor_id = parser.get_uint8()
         self.damage_amount = parser.get_uint8()
-        self.collision_opts = CollisionOpts(parser.get_uint8())
+        self.throw_duration = parser.get_uint8()
         self.extra_string_selector = ExtraStringSelector(parser.get_uint8())
         self.points = parser.get_uint8()
         self.move_string = parser.get_null_padded_str(21)
@@ -249,7 +234,7 @@ class AFMove(Animation):
         parser.put_uint8(self.block_stun_and_scrap)
         parser.put_uint8(self.successor_id)
         parser.put_uint8(self.damage_amount)
-        parser.put_uint8(self.collision_opts)
+        parser.put_uint8(self.throw_duration)
         parser.put_uint8(self.extra_string_selector.value)
         parser.put_uint8(self.points)
         parser.put_null_padded_str(self.move_string, 21)
@@ -275,7 +260,7 @@ class AFMove(Animation):
                 "block_stun_and_scrap": self.block_stun_and_scrap,
                 "successor_id": self.successor_id,
                 "damage_amount": self.damage_amount,
-                "collision_opts": self.collision_opts.value,
+                "throw_duration": self.throw_duration,
                 "extra_string_selector": self.extra_string_selector,
                 "points": self.points,
                 "move_string": self.move_string,
@@ -301,7 +286,7 @@ class AFMove(Animation):
         self.block_stun_and_scrap = data["block_stun_and_scrap"]
         self.successor_id = data["successor_id"]
         self.damage_amount = data["damage_amount"]
-        self.collision_opts = CollisionOpts(data["collision_opts"])
+        self.throw_duration = data["throw_duration"]
         self.extra_string_selector = data["extra_string_selector"]
         self.points = data["points"]
         self.move_string = data["move_string"]
