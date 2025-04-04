@@ -16,6 +16,7 @@ class TournamentFile(Entrypoint):
         "bk_name",
         "winnings_multiplier",
         "unknown_a",
+        "unknown_b",
         "registration_fee",
         "assumed_initial_value",
         "tournament_id",
@@ -32,6 +33,7 @@ class TournamentFile(Entrypoint):
         self.bk_name: str = ""
         self.winnings_multiplier: float = 0.0
         self.unknown_a: int = 0
+        self.unknown_b: int = 0
         self.registration_fee: int = 0
         self.assumed_initial_value: int = 0
         self.tournament_id: int = 0
@@ -48,6 +50,7 @@ class TournamentFile(Entrypoint):
             "bk_name": self.bk_name,
             "winnings_multiplier": self.winnings_multiplier,
             "unknown_a": self.unknown_a,
+            "unknonw_b": self.unknown_b,
             "registration_fee": self.registration_fee,
             "assumed_initial_value": self.assumed_initial_value,
             "tournament_id": self.tournament_id,
@@ -61,9 +64,11 @@ class TournamentFile(Entrypoint):
         }
 
     def read(self, parser: BinaryParser) -> TournamentFile:
-        enemy_count = parser.get_uint32()
+        enemy_count = parser.get_uint16()
+        unknown_b = parser.get_uint16()
         victory_text_offset = parser.get_uint32()
 
+        self.unknown_b = unknown_b
         self.bk_name = parser.get_null_padded_str(14)
         self.winnings_multiplier = parser.get_float()
         self.unknown_a = parser.get_uint32()
