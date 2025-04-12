@@ -1,6 +1,6 @@
 from typing import Final
 
-INVALID_TAGS: Final[set[str]] = {"u", "c", "p", "o", "z"}
+INVALID_TAGS: Final[set[str]] = {"c", "p", "o", "z"}
 
 # Tag: (has_argument, description)
 VALID_TAGS: Final[dict[str, tuple[bool, str]]] = {
