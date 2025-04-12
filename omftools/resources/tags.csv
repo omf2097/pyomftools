@@ -1,7 +1,7 @@
-"aa",0,
-"ab",0,
+"aa",0,"Reset your air attack state if you have already performed one"
+"ab",0,"Allow passing through walls"
 "ac",0,"Turn the HAR to face the center of the arena"
-"ad",0,
+"ad",0," Allow the HAR to turn in the held direction. Used in Katana's wall spin and Heel Stomp"
 "ae",0,
 "af",0,"Freeze opponent HAR"
 "ag",0,
@@ -11,12 +11,12 @@
 "as",0,"Makes the fire orb 'wander' in the fire pit b"
 "at",0,"Sets object position behind enemy har, used only by chronos' teleport"
 "aw",0,"Tells if the HAR can pass through walls"
-"ax",0,
+"ax",0,"Ignore the ground and fall through the floor"
 "ar",0,"Reverse player direction"
 "al",0,
 "b",0,
-"b1",0,
-"b2",0,
+"b1",0,"Advances you to fight Fire, and on Fire's stage advances you to fight Ice"
+"b2",0,"Breaks the grate on the floor of the Fire Pit, if it is breakable"
 "bb",1,"Vertical screen shake"
 "be",0,"Block the end of the round, used in scrap/destruct"
 "bf",1,"Blend finish"
@@ -117,6 +117,7 @@
 "sp",1,
 "sw",1,
 "t",0,"Prevent sound from playing if other HAR is blocking"
+"u",0,"Bring sprite to the front"
 "ua",0,"Sets enemy HAR to damage animation, if not already set."
 "ub",0,"Motion blur effect"
 "uc",0,
@@ -130,11 +131,11 @@
 "un",0,
 "ur",0,
 "us",0,
-"uz",0,
+"uz",0,"Used in shadow grab. Causes the shadow to disappear when the opponent takes damage"
 "v",0,"Velocity modifier for x/y"
 "vsx",0,
 "vsy",0,
-"w",0,"Sprite caching related ?"
+"w",0,"Push sprite to the back"
 "x-",1,"Set X coordinate to -N"
 "x+",1,"Set X coordinate to +N"
 "x=",1,"Interpolate X coordinate to N by next frame"

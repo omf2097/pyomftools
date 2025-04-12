@@ -13,7 +13,6 @@ InputRows = list[list[str]]
 
 def to_c_array(file_name: str, rows: InputRows) -> None:
     with open(file_name, "wb") as output_file:
-        output_file.write(b"#include <stdlib.h>\n")
         output_file.write(b'#include "formats/taglist.h"\n\n')
         output_file.write(b"// This file is generated automatically\n\n")
         output_file.write(b"const sd_tag sd_taglist[] = {\n")
