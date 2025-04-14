@@ -128,7 +128,7 @@
 "uh",0,
 "uj",0,
 "ul",0,"If the opponent is blocking, force them to stay blocking."
-"un",0,
+"un",0,"Disable cornerpush behavior"
 "ur",0,
 "us",0,
 "uz",0,"Used in shadow grab. Causes the shadow to disappear when the opponent takes damage"
