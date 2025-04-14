@@ -48,10 +48,10 @@
 "bt",0,"Dark tint, used by shadow HAR"
 "by",0,
 "cf",0,"Only used by shadow scrap, works with 'bm' tag to walk to far corner of arena"
-"cg",0,"Triggers behaviors when touching the ground. Used by Katana to trigger landing recovery. (Enabling the d<> tag)"
+"cg",0,"Triggers behaviors when touching the ground. Used by Katana Corkscrew Blade. (Enables the d<> tag)"
 "cl",0,"Triggers the next animation when touching the ground. Used by Pyros to proceed with scrap."
 "cp",0,"If hit collision succeeds, perform hit pause"
-"cw",0,"Enables a wall collision for the enemy and triggers as if this move had hit. Used in Flail's scrap to automatically trigger jn"
+"cw",0,"Enables a wall collision for the enemy and triggers a hit. Used in Flail's scrap to automatically trigger jn"
 "cx",1,"The player has horizontal control by holding left/right. Larger numbers mean faster movement"
 "cy",1,"The player has vertical control by holding up/down. Larger numbers mean faster movement"
 "d",1,"Re-enter animation at N ticks.  If negative, enter animation this many ticks from the end"
@@ -118,7 +118,7 @@
 "sw",1,
 "t",0,"Prevent sound from playing if other HAR is blocking"
 "u",0,"Bring sprite to the front"
-"ua",0,"Sets enemy HAR to a damage animation, even without hitting them. Also sets the enemy HAR's animation timing to match yours."
+"ua",0,"Sets enemy HAR to a damage animation and sets the enemy HAR's animation timing to match yours."
 "ub",0,"Motion blur effect"
 "uc",0,
 "ud",0,
