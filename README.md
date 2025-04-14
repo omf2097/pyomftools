@@ -14,3 +14,12 @@ https://katajakasa.fi/projects/openomf/cards/
 2. Create a virtualenv, eg. `poetry env use 3.12` and install deps `poetry install --no-root`.
 3. Activate the virtualenv, eg. `poetry shell`
 4. Run! eg. `python -m omftools.cli.af_compile -h`
+
+## How to ...
+
+### Generate the taglist.c
+
+1. Do the installation step above
+2. Make sure the tag `omftools/resources/tags.csv` is up-to-date.
+3. Run `poetry run python -m omftools.cli.tags -i omftools/resources/tags.csv taglist.c`
+4. Copy the generated `taglist.c` as required.
