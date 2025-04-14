@@ -48,13 +48,13 @@
 "bt",0,"Dark tint, used by shadow HAR"
 "by",0,
 "cf",0,"Only used by shadow scrap, works with 'bm' tag to walk to far corner of arena"
-"cg",0,
-"cl",0,
+"cg",0,"Triggers behaviors when touching the ground. Used by Katana to trigger landing recovery. (Enabling the d<> tag)"
+"cl",0,"Triggers the next animation when touching the ground. Used by Pyros to proceed with scrap."
 "cp",0,"If hit collision succeeds, perform hit pause"
-"cw",0,
+"cw",0,"Enables a wall collision for the enemy and triggers as if this move had hit. Used in Flail's scrap to automatically trigger jn"
 "cx",1,"The player has horizontal control by holding left/right. Larger numbers mean faster movement"
 "cy",1,"The player has vertical control by holding up/down. Larger numbers mean faster movement"
-"d",1,"Re-enter animation at N ticks"
+"d",1,"Re-enter animation at N ticks.  If negative, enter animation this many ticks from the end"
 "e",0,"Set position to enemy position"
 "f",0,"Flip sprite vertically"
 "g",0,"Set position to ground and zero velocity"
@@ -67,7 +67,7 @@
 "jj",0,"Allow chaining to airborne moves"
 "jl",0,"Allow chaining to 'low' moves"
 "jm",0,"Allow chaining to 'mid' moves"
-"jp",0,
+"jp",0,"Allow chaining to 'projectile' moves, not used"
 "jz",0,"Combination of all other j flags except jn"
 "jn",1,"Allow frame to chain to animation N"
 "k",1,"Knockback on hit"
@@ -118,16 +118,16 @@
 "sw",1,
 "t",0,"Prevent sound from playing if other HAR is blocking"
 "u",0,"Bring sprite to the front"
-"ua",0,"Sets enemy HAR to damage animation, if not already set."
+"ua",0,"Sets enemy HAR to a damage animation, even without hitting them. Also sets the enemy HAR's animation timing to match yours."
 "ub",0,"Motion blur effect"
 "uc",0,
 "ud",0,
 "ue",0,"Damage enemy if on the ground"
-"uf",0,
+"uf",0,"Only used by shadow grab (both forms) and shadow scrap. May have to do with opponent's ground state."
 "ug",0,
 "uh",0,
 "uj",0,
-"ul",0,
+"ul",0,"If the opponent is blocking, force them to stay blocking."
 "un",0,
 "ur",0,
 "us",0,
