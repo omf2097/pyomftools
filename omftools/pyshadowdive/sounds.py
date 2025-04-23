@@ -6,28 +6,36 @@ from .utils.parser import BinaryParser
 
 
 class Sound(DataObject):
-    __slots__ = ("data", "unknown")
+    __slots__ = ("data", "frequency")
 
     def __init__(self) -> None:
         self.data: list[int] = []
-        self.unknown: int = 0
+        self.frequency: int = 0
 
     def serialize(self) -> dict:
         return {
-            "unknown": self.unknown,
+            "frequency": self.frequency,
             "data": self.data,
         }
 
     def read(self, parser: BinaryParser) -> Sound:
         length = parser.get_uint16()
         if length > 0:
-            self.unknown = parser.get_uint8()
+            self.frequency = parser.get_uint8()
             self.data = [parser.get_uint8() for _ in range(length)]
         else:
-            self.unknown = 0
+            self.frequency = 0
             self.data = []
 
         return self
+
+    @property
+    def real_frequency(self) -> int:
+        return int(1000000 / (256 - self.frequency))
+
+    @real_frequency.setter
+    def real_frequency(self, value: int) -> None:
+        self.frequency = int(256 - (1000000 / value))
 
     def save_wav(self, filename: str):
         save_wav(self.data, filename)

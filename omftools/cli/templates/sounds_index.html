@@ -11,7 +11,8 @@
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Unknown</th>
+                            <th scope="col">Frequency value</th>
+                            <th scope="col">Hz</th>
                             <th scope="col">Length</th>
                             <th scope="col">Play</th>
                             <th scope="col">Download</th>
@@ -21,7 +22,8 @@
                     {% for sound in sounds.sounds %}
                         <tr>
                             <th scope="row" class="p-3">{{ loop.index0 }}</th>
-                            <td class="p-3">{{ sound.unknown }}</td>
+                            <td class="p-3">{{ sound.frequency }}</td>
+                        <td class="p-3">{{ sound.real_frequency }}</td>
                             <td class="p-3">{{ sound.data|length }}</td>
                             <td>
                                 {% if sound.data|length > 0 %}
