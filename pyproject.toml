@@ -13,7 +13,7 @@ pillow = "^11.1.0"
 validx = "^0.8.1"
 jinja2 = "^3.1.6"
 natsort = "^8.4.0"
-requests = "^2.32.3"
+requests = "^2.32.4"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.2.0"
