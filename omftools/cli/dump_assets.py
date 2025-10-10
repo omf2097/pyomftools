@@ -3,7 +3,7 @@ import argparse
 import os
 import typing
 import copy
-import configparser
+
 import re
 from glob import glob
 from pathlib import Path
@@ -49,113 +49,90 @@ def create_directory_structure(base_dir: str):
 
 def create_scene_ini(bk: BKFile, filename: str, output_path: str):
     """Create a header.ini file for a scene"""
-    config = configparser.ConfigParser()
-
-    # Add the scene header info
-    config["DEFAULT"] = {
-        "file_id": str(bk.file_id),
-        "background_width": str(bk.background_width),
-        "background_height": str(bk.background_height),
-    }
-
-    # Save the INI file
-    with open(os.path.join(output_path, "header.ini"), "w") as configfile:
-        config.write(configfile)
+    # Write the file directly in the format required by mod spec
+    with open(os.path.join(output_path, "header.ini"), "w") as f:
+        f.write(f"file_id = {bk.file_id}\n")
+        f.write(f"background_width = {bk.background_width}\n")
+        f.write(f"background_height = {bk.background_height}\n")
 
 
 def create_animation_ini(animation, output_path: str, is_scene: bool = True):
     """Create an animdata.ini file for an animation"""
-    config = configparser.ConfigParser()
+    # Write the file directly in the format required by mod spec
+    with open(os.path.join(output_path, "animdata.ini"), "w") as f:
+        if is_scene:
+            # For scene animations
+            if hasattr(animation, "chain_hit"):
+                f.write(f"chain_hit = {animation.chain_hit}\n")
+            if hasattr(animation, "chain_no_hit"):
+                f.write(f"chain_no_hit = {animation.chain_no_hit}\n")
+            if hasattr(animation, "repeat"):
+                f.write(f"repeat = {animation.repeat}\n")
+            if hasattr(animation, "probability"):
+                f.write(f"probability = {animation.probability}\n")
+            if hasattr(animation, "hazard_damage"):
+                f.write(f"hazard_damage = {animation.hazard_damage}\n")
+            if hasattr(animation, "footer_string"):
+                f.write(f'footer_string = "{animation.footer_string}"\n')
+            if hasattr(animation, "start_x"):
+                f.write(f"start_x = {animation.start_x}\n")
+            if hasattr(animation, "start_y"):
+                f.write(f"start_y = {animation.start_y}\n")
+            if hasattr(animation, "base_string"):
+                f.write(f'base_string = "{animation.base_string}"\n')
 
-    # Add animation data
-    anim_data = {}
-
-    if is_scene:
-        # For scene animations
-        if hasattr(animation, "chain_hit"):
-            anim_data["chain_hit"] = str(animation.chain_hit)
-        if hasattr(animation, "chain_no_hit"):
-            anim_data["chain_no_hit"] = str(animation.chain_no_hit)
-        if hasattr(animation, "repeat"):
-            anim_data["repeat"] = str(animation.repeat)
-        if hasattr(animation, "probability"):
-            anim_data["probability"] = str(animation.probability)
-        if hasattr(animation, "hazard_damage"):
-            anim_data["hazard_damage"] = str(animation.hazard_damage)
-        if hasattr(animation, "footer_string"):
-            anim_data["footer_string"] = str(animation.footer_string)
-        if hasattr(animation, "start_x"):
-            anim_data["start_x"] = str(animation.start_x)
-        if hasattr(animation, "start_y"):
-            anim_data["start_y"] = str(animation.start_y)
-        if hasattr(animation, "base_string"):
-            anim_data["base_string"] = str(animation.base_string)
-    else:
-        # For fighter animations
-        if hasattr(animation, "ai_opts"):
-            anim_data["ai_opts"] = str(animation.ai_opts)
-        if hasattr(animation, "pos_constraint"):
-            anim_data["pos_constraint"] = str(animation.pos_constraint)
-        if hasattr(animation, "next_animation_id"):
-            anim_data["next_animation_id"] = str(animation.next_animation_id)
-        if hasattr(animation, "category"):
-            anim_data["category"] = str(animation.category)
-        if hasattr(animation, "block_damage"):
-            anim_data["block_damage"] = str(animation.block_damage)
-        if hasattr(animation, "block_stun_and_scrap"):
-            anim_data["block_stun_and_scrap"] = str(animation.block_stun_and_scrap)
-        if hasattr(animation, "successor_id"):
-            anim_data["successor_id"] = str(animation.successor_id)
-        if hasattr(animation, "damage_amount"):
-            anim_data["damage_amount"] = str(animation.damage_amount)
-        if hasattr(animation, "throw_duration"):
-            anim_data["throw_duration"] = str(animation.throw_duration)
-        if hasattr(animation, "extra_string_selector"):
-            anim_data["extra_string_selector"] = str(animation.extra_string_selector)
-        if hasattr(animation, "points"):
-            anim_data["points"] = str(animation.points)
-        if hasattr(animation, "move_string"):
-            anim_data["move_string"] = str(animation.move_string)
-        if hasattr(animation, "enemy_string"):
-            anim_data["enemy_string"] = str(animation.enemy_string)
-        if hasattr(animation, "start_x"):
-            anim_data["start_x"] = str(animation.start_x)
-        if hasattr(animation, "start_y"):
-            anim_data["start_y"] = str(animation.start_y)
-        if hasattr(animation, "base_string"):
-            anim_data["base_string"] = str(animation.base_string)
-
-    config["DEFAULT"] = anim_data
-
-    # Save the INI file
-    with open(os.path.join(output_path, "animdata.ini"), "w") as configfile:
-        config.write(configfile)
+        else:
+            # For fighter animations
+            if hasattr(animation, "ai_opts"):
+                f.write(f"ai_opts = {animation.ai_opts}\n")
+            if hasattr(animation, "pos_constraint"):
+                f.write(f"pos_constraint = {animation.pos_constraint}\n")
+            if hasattr(animation, "next_animation_id"):
+                f.write(f"next_animation_id = {animation.next_animation_id}\n")
+            if hasattr(animation, "category"):
+                f.write(f"category = {animation.category}\n")
+            if hasattr(animation, "block_damage"):
+                f.write(f"block_damage = {animation.block_damage}\n")
+            if hasattr(animation, "block_stun_and_scrap"):
+                f.write(f"block_stun_and_scrap = {animation.block_stun_and_scrap}\n")
+            if hasattr(animation, "successor_id"):
+                f.write(f"successor_id = {animation.successor_id}\n")
+            if hasattr(animation, "damage_amount"):
+                f.write(f"damage_amount = {animation.damage_amount}\n")
+            if hasattr(animation, "throw_duration"):
+                f.write(f"throw_duration = {animation.throw_duration}\n")
+            if hasattr(animation, "extra_string_selector"):
+                f.write(f"extra_string_selector = {animation.extra_string_selector}\n")
+            if hasattr(animation, "points"):
+                f.write(f"points = {animation.points}\n")
+            if hasattr(animation, "move_string"):
+                f.write(f'move_string = "{animation.move_string}"\n')
+            if hasattr(animation, "enemy_string"):
+                f.write(f'enemy_string = "{animation.enemy_string}"\n')
+            if hasattr(animation, "start_x"):
+                f.write(f"start_x = {animation.start_x}\n")
+            if hasattr(animation, "start_y"):
+                f.write(f"start_y = {animation.start_y}\n")
+            if hasattr(animation, "base_string"):
+                f.write(f'base_string = "{animation.base_string}"\n')
 
 
 def create_fighter_ini(af: AFFile, output_path: str):
     """Create a header.ini file for a fighter"""
-    config = configparser.ConfigParser()
-
-    # Add the fighter header info
-    header_data = {}
-    if hasattr(af, "endurance"):
-        header_data["endurance"] = str(af.endurance)
-    if hasattr(af, "health"):
-        header_data["health"] = str(af.health)
-    if hasattr(af, "forward_speed"):
-        header_data["forward_speed"] = str(af.forward_speed)
-    if hasattr(af, "reverse_speed"):
-        header_data["reverse_speed"] = str(af.reverse_speed)
-    if hasattr(af, "jump_speed"):
-        header_data["jump_speed"] = str(af.jump_speed)
-    if hasattr(af, "fall_speed"):
-        header_data["fall_speed"] = str(af.fall_speed)
-
-    config["DEFAULT"] = header_data
-
-    # Save the INI file
-    with open(os.path.join(output_path, "header.ini"), "w") as configfile:
-        config.write(configfile)
+    # Write the file directly in the format required by mod spec
+    with open(os.path.join(output_path, "header.ini"), "w") as f:
+        if hasattr(af, "endurance"):
+            f.write(f"endurance = {af.endurance}\n")
+        if hasattr(af, "health"):
+            f.write(f"health = {af.health}\n")
+        if hasattr(af, "forward_speed"):
+            f.write(f"forward_speed = {af.forward_speed}\n")
+        if hasattr(af, "reverse_speed"):
+            f.write(f"reverse_speed = {af.reverse_speed}\n")
+        if hasattr(af, "jump_speed"):
+            f.write(f"jump_speed = {af.jump_speed}\n")
+        if hasattr(af, "fall_speed"):
+            f.write(f"fall_speed = {af.fall_speed}\n")
 
 
 def create_tournament_ini(trn: TournamentFile, output_path: str):
@@ -274,35 +251,125 @@ def create_tournament_ini(trn: TournamentFile, output_path: str):
 
 
 def create_pilot_ini(pilot, output_path: str, gender: str = "male"):
-    """Create a pilot info.ini file"""
-    config = configparser.ConfigParser()
+    """Create a pilot info.ini file according to mod specification"""
+    # Write the file directly in the format required by mod spec
+    with open(os.path.join(output_path, "pilot.ini"), "w") as f:
+        # Basic info
+        f.write(f'name = "{pilot.name}"\n\n')
+        f.write(f'gender = "{gender}"\n\n')
 
-    # Add basic pilot info
-    config["DEFAULT"] = {
-        "name": f'"{pilot.name}"',
-        "gender": f'"{gender}"',
-        "wins": str(pilot.wins),
-        "losses": str(pilot.losses),
-        "rank": str(pilot.rank),
-        "money": str(pilot.money),
-        "winnings": str(pilot.winnings),
-        "total_value": str(pilot.total_value),
-    }
+        # Language sections
+        f.write("language english {\n")
+        f.write(f'  quote = "{pilot.quotes[0]}"\n')
+        f.write("}\n\n")
 
-    # Add HAR and related info
-    if 0 <= pilot.har_id < len(har_names):
-        config["DEFAULT"]["robot"] = f'"{har_names[pilot.har_id]}"'
+        f.write("language german {\n")
+        f.write(f'  quote = "{pilot.quotes[1]}"\n')
+        f.write("}\n\n")
 
-    # Add other sections as needed
-    config["colors"] = {
-        "primary": str(pilot.color_1),
-        "secondary": str(pilot.color_2),
-        "tertiary": str(pilot.color_3),
-    }
+        # HAR and record
+        if 0 <= pilot.har_id < len(har_names):
+            f.write(f'robot = "{har_names[pilot.har_id]}"\n')
+        f.write(f'wins = "{pilot.wins}"\n')
+        f.write(f'losses = "{pilot.losses}"\n\n')
 
-    # Save the INI file
-    with open(os.path.join(output_path, "pilot.ini"), "w") as configfile:
-        config.write(configfile)
+        # HAR upgrades
+        f.write("# HAR upgrades\n")
+        f.write(f"arm_speed = {pilot.arm_speed}\n")
+        f.write(f"arm_power = {pilot.arm_power}\n\n")
+
+        f.write(f"leg_speed = {pilot.leg_speed}\n")
+        f.write(f"leg_power = {pilot.leg_power}\n\n")
+
+        f.write(f"armor = {pilot.armor}\n")
+        f.write(f"stun_resistance = {pilot.stun_resistance}\n\n")
+
+        # Pilot stats
+        f.write("# pilot stats\n")
+        f.write(f"speed = {pilot.agility}\n")
+        f.write(f"power = {pilot.power}\n")
+        f.write(f"endurance = {pilot.endurance}\n\n")
+
+        # Offense and defense
+        f.write("# General AI preferences for offense and defense. Max is 200.\n")
+        f.write(f"offense = {pilot.offense}\n")
+        f.write(f"defense = {pilot.defense}\n\n")
+
+        # Attitude section
+        f.write("attitude {\n")
+        f.write(f"  normal = {pilot.att_normal}\n")
+        f.write(f"  hyper = {pilot.att_hyper}\n")
+        f.write(f"  jump = {pilot.att_jump}\n")
+        f.write(f"  defense = {pilot.att_def}\n")
+        f.write(f"  sniper = {pilot.att_sniper}\n")
+        f.write("}\n\n")
+
+        # Attacks section
+        f.write("attacks {\n")
+        f.write(f"  throw = {pilot.ap_throw}\n")
+        f.write(f"  special = {pilot.ap_special}\n")
+        f.write(f"  jump = {pilot.ap_jump}\n")
+        f.write(f"  low = {pilot.ap_low}\n")
+        f.write(f"  middle = {pilot.ap_middle}\n")
+        f.write(f"  high = {pilot.ap_high}\n")
+        f.write("}\n\n")
+
+        # Preferences section
+        f.write("preferences {\n")
+        f.write(f"  jump = {pilot.pref_jump}\n")
+        f.write(f"  forward = {pilot.pref_fwd}\n")
+        f.write(f"  back = {pilot.pref_back}\n")
+        f.write("}\n\n")
+
+        # Learning and money
+        f.write(f"learning = {pilot.learning:.1f}\n")
+        f.write(f"forget = {pilot.forget:.1f}\n")
+        f.write(f"money = {pilot.money}\n\n")
+
+        # Colors section
+        f.write(
+            "# colors 0-15 are the predefined HAR colors, 16 and above use the colors from the first 48 colors in the pilot photo\n"
+        )
+        f.write("colors {\n")
+        f.write(f"  primary = {pilot.color_1}\n")
+        f.write(f"  secondary = {pilot.color_2}\n")
+        f.write(f"  tertiary = {pilot.color_3}\n")
+        f.write("}\n\n")
+
+        # Movement and winnings
+        if pilot.movement == 0:
+            f.write(
+                "# movement false setting will not allow player to move up and down in rank.\n"
+            )
+            f.write("movement = false\n")
+        f.write(f"winnings = {pilot.winnings}\n")
+
+        # Add requirements section for secret pilots
+        if hasattr(pilot, "secret") and pilot.secret:
+            f.write("\nsecret = true\n")
+            f.write("\n# Requirements for unlocking this secret character\n")
+            f.write("requirements {\n")
+            if hasattr(pilot, "req_enemy") and pilot.req_enemy:
+                f.write(f"  enemy = {pilot.req_enemy}\n")
+            if hasattr(pilot, "req_difficulty") and pilot.req_difficulty:
+                f.write(f"  difficulty = {pilot.req_difficulty}\n")
+            if hasattr(pilot, "req_rank") and pilot.req_rank:
+                f.write(f"  rank = {pilot.req_rank}\n")
+            if hasattr(pilot, "req_max_rank") and pilot.req_max_rank:
+                f.write(f"  max_rank = {pilot.req_max_rank}\n")
+            if hasattr(pilot, "req_vitality") and pilot.req_vitality:
+                f.write(f"  vitality = {pilot.req_vitality}\n")
+            if hasattr(pilot, "req_fighter") and pilot.req_fighter:
+                f.write(f"  fighter = {pilot.req_fighter}\n")
+            if hasattr(pilot, "req_accuracy") and pilot.req_accuracy:
+                f.write(f"  accuracy = {pilot.req_accuracy}\n")
+            if hasattr(pilot, "req_avg_dmg") and pilot.req_avg_dmg:
+                f.write(f"  avg_dmg = {pilot.req_avg_dmg}\n")
+            if hasattr(pilot, "req_scrap") and pilot.req_scrap:
+                f.write(f"  scrap = {pilot.req_scrap}\n")
+            if hasattr(pilot, "req_destroy") and pilot.req_destroy:
+                f.write(f"  destroy = {pilot.req_destroy}\n")
+            f.write("}\n")
 
 
 def process_scenes(bk_files: list, mod_dir: str, alt_pals: AltPaletteFile):
@@ -495,6 +562,9 @@ def process_tournaments(trn_files: list, mod_dir: str):
             else:
                 print(f"PIC file not found: {pic_filename} in {trn_dir}")
                 portrait_file = None
+
+            # Create pilot.ini with all the extracted information
+            create_pilot_ini(pilot, pilot_dir, gender)
 
 
 def process_sounds(sounds_file: str, mod_dir: str):
