@@ -198,6 +198,8 @@ def generate_af(
 
     # Use default palette for AF sprites
     default_palette = Palette()
+    # mask off the scene colors
+    default_palette.mask_range(0x60, 64)
 
     for key, animation in af.moves.items():
         for idx, sprite in enumerate(animation.sprites):

@@ -505,6 +505,8 @@ def process_fighters(af_files: list, mod_dir: str):
 
         # Use default palette for AF sprites
         default_palette = Palette()
+        # mask off the scene colors
+        default_palette.mask_range(0x60, 64)
 
         # Process animations
         for key, animation in af.moves.items():
