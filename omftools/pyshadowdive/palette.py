@@ -307,7 +307,7 @@ class Palette(DataObject):
     schema = Dict({"data": List(Tuple(UInt8, UInt8, UInt8))})
 
     def __init__(self) -> None:
-        self.data: list[Color] = list(DEFAULT_PALETTE)
+        self.data: list[Color] = DEFAULT_PALETTE
 
     def remap(self, remapping: Remapping) -> Palette:
         pal = Palette()

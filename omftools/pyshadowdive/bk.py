@@ -97,10 +97,7 @@ class BKFile(Entrypoint):
 
         # Read up all available color palettes
         palette_count = parser.get_uint8()
-        self.palettes = []
-        for _ in range(palette_count):
-            palette_mapping = PaletteMapping().read(parser)
-            self.palettes.append(palette_mapping)
+        self.palettes = [PaletteMapping().read(parser) for _ in range(palette_count)]
 
         # Get sound mappings
         self.sound_table = [parser.get_uint8() for _ in range(30)]
@@ -193,7 +190,7 @@ class BKFile(Entrypoint):
                 "MELEE",
             ]
         ):
-            palette.mask_range(0, 97)  # Blank out 0-96, the HAR colors
+            palette.reset_range(0, 96)  # Blank out 0-96, the HAR colors
             palette.reset_range(250, 6)  # Reset indices 250-255
 
         # NORTH_AM, WAR, KATUSHAI: Extended color slides
