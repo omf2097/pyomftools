@@ -36,13 +36,13 @@ har_names = [
 
 # Arena names and IDs
 arena_names = {
-    "ARENA0.BK": "0",
-    "ARENA1.BK": "1",
-    "ARENA2.BK": "2",
-    "ARENA3.BK": "3",
-    "ARENA4.BK": "4",
-    "ARENA5.BK": "5",
-    "ARENA6.BK": "6",
+    "ARENA0.BK": "ARENA0",
+    "ARENA1.BK": "ARENA1",
+    "ARENA2.BK": "ARENA2",
+    "ARENA3.BK": "ARENA3",
+    "ARENA4.BK": "ARENA4",
+    "ARENA5.BK": "ARENA5",
+    "ARENA6.BK": "ARENA6",
     "ARENA7.BK": "7",
     "ARENA8.BK": "8",
     "ARENA9.BK": "9",
@@ -186,41 +186,189 @@ def create_fighter_ini(af: AFFile, output_path: str):
 
 
 def create_tournament_ini(trn: TournamentFile, output_path: str):
-    """Create a tournament.ini file"""
-    config = configparser.ConfigParser()
+    """Create a tournament.ini file according to mod specification"""
+    # HAR names for specific endings
+    har_names = [
+        "jaguar",
+        "shadow",
+        "thorn",
+        "pyros",
+        "electra",
+        "katana",
+        "shredder",
+        "flail",
+        "gargoyle",
+        "chronos",
+        "nova",
+    ]
 
-    # Add tournament data
-    config["DEFAULT"] = {
-        "tournament_end": f'"{trn.bk_name}"',
-        "registration_fee": str(trn.registration_fee),
-        "winnings_multiplier": str(trn.winnings_multiplier),
-        # "offense_addition": str(trn.offense_inc),
-        # "defense_addition": str(trn.defense_inc),
-    }
+    # Write the file in the format required by mod spec
+    with open(os.path.join(output_path, "tournament.ini"), "w") as f:
+        # Tournament data
+        f.write(f'tournament_end = "{trn.bk_name}"\n')
+        f.write(f"registration_fee = {trn.registration_fee}\n")
+        f.write(f"winnings_multiplier = {trn.winnings_multiplier:.1f}\n")
+        # f.write(f'offense_addition = {trn.offense_inc}\n')
+        # f.write(f'defense_addition = {trn.defense_inc}\n')
+        f.write("\n")
 
-    # Add language section (English - index 0)
-    config["language english"] = {
-        "name": f'"{trn.locale_titles[0]}"',
-        "description": f'"{trn.locale_descriptions[0]}"',
-    }
+        # English section
+        f.write("# add a section for each language you want to support\n")
+        f.write("language english {\n")
+        f.write(f'    name = "{trn.locale_titles[0]}"\n')
+        f.write(
+            "    # note the description is a multi-line string and can use special formatting tags\n"
+        )
+        f.write(f'    description = "{trn.locale_descriptions[0]}"\n\n')
 
-    # Add language section (German - index 1)
-    config["language german"] = {
-        "name": f'"{trn.locale_titles[1]}"',
-        "description": f'"{trn.locale_descriptions[1]}"',
-    }
+        # Process English endings
+        if hasattr(trn, "locale_end_texts") and len(trn.locale_end_texts) > 0:
+            english_endings = trn.locale_end_texts[0]  # English endings
 
-    # Add ending sections (simplified for now)
-    config["ending all"] = {
-        "page1": '"As the hanger door closes on your robot, you can\'t stop thinking about the fight."',
-        "page2": '"The fight was hard, but you made it."',
-        "page3": '"You find it hard to walk, hard to breath, hard to do anything but think about the next fight..."',
-        "page4": '"Your next chance to prove that you are truely the greatest the world has ever seen."',
-    }
+            # Collect all texts for each page
+            page_texts = {}  # page_id -> list of texts
+            har_texts = {}  # har_id -> page_id -> text
 
-    # Save the INI file
-    with open(os.path.join(output_path, "tournament.ini"), "w") as configfile:
-        config.write(configfile)
+            # Structure is endings[har_id][page_id]
+            # First, get all texts for each page
+            for har_idx, har_endings in enumerate(english_endings):
+                if not har_endings:
+                    continue
+
+                # Index 0 is typically generic text
+                for page_idx, text in enumerate(har_endings):
+                    if not text:
+                        continue
+
+                    # Store by page
+                    if page_idx not in page_texts:
+                        page_texts[page_idx] = {}
+
+                    if text not in page_texts[page_idx]:
+                        page_texts[page_idx][text] = []
+
+                    page_texts[page_idx][text].append(har_idx)
+
+                    # Also store by HAR for easy lookup
+                    if har_idx not in har_texts:
+                        har_texts[har_idx] = {}
+                    har_texts[har_idx][page_idx] = text
+
+            # Find most common text for each page (appears in 2+ HARs)
+            common_texts = {}
+            for page_idx, text_counts in page_texts.items():
+                most_common = None
+                max_count = 1  # Must appear in at least 2 HARs
+
+                for text, har_indices in text_counts.items():
+                    if len(har_indices) > max_count:
+                        most_common = text
+                        max_count = len(har_indices)
+
+                if most_common:
+                    common_texts[page_idx] = most_common
+
+            # Write "ending all" section with common texts
+            f.write("    ending all {\n")
+            for page_idx, text in common_texts.items():
+                f.write(f'        page{page_idx + 1} = "{text}"\n')
+            f.write("    }\n\n")
+
+            # Write HAR-specific overrides
+            for har_idx, pages in har_texts.items():
+                has_unique = False
+                unique_pages = {}
+
+                # Check if this HAR has any unique texts
+                for page_idx, text in pages.items():
+                    if page_idx not in common_texts or text != common_texts[page_idx]:
+                        has_unique = True
+                        unique_pages[page_idx] = text
+
+                # Only create a section if this HAR has unique texts
+                if has_unique:
+                    f.write(f"    ending {har_names[har_idx]} {{\n")
+                    for page_idx, text in unique_pages.items():
+                        f.write(f'        page{page_idx + 1} = "{text}"\n')
+                    f.write("    }\n\n")
+        f.write("}\n\n")
+
+        # German section
+        f.write("language german {\n")
+        f.write(f'    name = "{trn.locale_titles[1]}"\n')
+        f.write(f'    description = "{trn.locale_descriptions[1]}"\n\n')
+
+        # Process German endings
+        if hasattr(trn, "locale_end_texts") and len(trn.locale_end_texts) > 1:
+            german_endings = trn.locale_end_texts[1]  # German endings
+
+            # Collect all texts for each page
+            page_texts = {}  # page_id -> list of texts
+            har_texts = {}  # har_id -> page_id -> text
+
+            # Structure is endings[har_id][page_id]
+            # First, get all texts for each page
+            for har_idx, har_endings in enumerate(german_endings):
+                if not har_endings:
+                    continue
+
+                # Index 0 is typically generic text
+                for page_idx, text in enumerate(har_endings):
+                    if not text:
+                        continue
+
+                    # Store by page
+                    if page_idx not in page_texts:
+                        page_texts[page_idx] = {}
+
+                    if text not in page_texts[page_idx]:
+                        page_texts[page_idx][text] = []
+
+                    page_texts[page_idx][text].append(har_idx)
+
+                    # Also store by HAR for easy lookup
+                    if har_idx not in har_texts:
+                        har_texts[har_idx] = {}
+                    har_texts[har_idx][page_idx] = text
+
+            # Find most common text for each page (appears in 2+ HARs)
+            common_texts = {}
+            for page_idx, text_counts in page_texts.items():
+                most_common = None
+                max_count = 1  # Must appear in at least 2 HARs
+
+                for text, har_indices in text_counts.items():
+                    if len(har_indices) > max_count:
+                        most_common = text
+                        max_count = len(har_indices)
+
+                if most_common:
+                    common_texts[page_idx] = most_common
+
+            # Write "ending all" section with common texts
+            f.write("    ending all {\n")
+            for page_idx, text in common_texts.items():
+                f.write(f'        page{page_idx + 1} = "{text}"\n')
+            f.write("    }\n\n")
+
+            # Write HAR-specific overrides
+            for har_idx, pages in har_texts.items():
+                has_unique = False
+                unique_pages = {}
+
+                # Check if this HAR has any unique texts
+                for page_idx, text in pages.items():
+                    if page_idx not in common_texts or text != common_texts[page_idx]:
+                        has_unique = True
+                        unique_pages[page_idx] = text
+
+                # Only create a section if this HAR has unique texts
+                if has_unique:
+                    f.write(f"    ending {har_names[har_idx]} {{\n")
+                    for page_idx, text in unique_pages.items():
+                        f.write(f'        page{page_idx + 1} = "{text}"\n')
+                    f.write("    }\n\n")
+        f.write("}\n")
 
 
 def create_pilot_ini(pilot, output_path: str, gender: str = "male"):
@@ -256,80 +404,12 @@ def create_pilot_ini(pilot, output_path: str, gender: str = "male"):
     if 0 <= pilot.har_id < len(har_names):
         config["DEFAULT"]["robot"] = f'"{har_names[pilot.har_id]}"'
 
-    # Add stats
-    config["stats"] = {
-        "arm_power": str(pilot.arm_power),
-        "leg_power": str(pilot.leg_power),
-        "arm_speed": str(pilot.arm_speed),
-        "leg_speed": str(pilot.leg_speed),
-        "armor": str(pilot.armor),
-        "stun_resistance": str(pilot.stun_resistance),
-        "power": str(pilot.power),
-        "agility": str(pilot.agility),
-        "endurance": str(pilot.endurance),
-        "offense": str(pilot.offense),
-        "defense": str(pilot.defense),
-    }
-
-    # Add colors
+    # Add other sections as needed
     config["colors"] = {
-        "color_1": str(pilot.color_1),
-        "color_2": str(pilot.color_2),
-        "color_3": str(pilot.color_3),
+        "primary": str(pilot.color_1),
+        "secondary": str(pilot.color_2),
+        "tertiary": str(pilot.color_3),
     }
-
-    # Add AI settings
-    config["ai"] = {
-        "att_normal": str(pilot.att_normal),
-        "att_hyper": str(pilot.att_hyper),
-        "att_jump": str(pilot.att_jump),
-        "att_def": str(pilot.att_def),
-        "att_sniper": str(pilot.att_sniper),
-        "ap_throw": str(pilot.ap_throw),
-        "ap_special": str(pilot.ap_special),
-        "ap_jump": str(pilot.ap_jump),
-        "ap_high": str(pilot.ap_high),
-        "ap_low": str(pilot.ap_low),
-        "ap_middle": str(pilot.ap_middle),
-        "pref_jump": str(pilot.pref_jump),
-        "pref_fwd": str(pilot.pref_fwd),
-        "pref_back": str(pilot.pref_back),
-        "learning": str(pilot.learning),
-        "forget": str(pilot.forget),
-        "movement": str(pilot.movement),
-    }
-
-    # Add tournament and difficulty info
-    config["tournament"] = {
-        "difficulty": str(
-            pilot.difficulty.value
-            if hasattr(pilot.difficulty, "value")
-            else pilot.difficulty
-        ),
-        "force_arena": str(pilot.force_arena),
-        "secret": str(pilot.secret),
-        "only_fight_once": str(pilot.only_fight_once),
-    }
-
-    # Add requirements
-    config["requirements"] = {
-        "req_enemy": str(pilot.req_enemy),
-        "req_difficulty": str(pilot.req_difficulty),
-        "req_rank": str(pilot.req_rank),
-        "req_max_rank": str(pilot.req_max_rank),
-        "req_vitality": str(pilot.req_vitality),
-        "req_fighter": str(pilot.req_fighter),
-        "req_accuracy": str(pilot.req_accuracy),
-        "req_avg_dmg": str(pilot.req_avg_dmg),
-        "req_scrap": str(pilot.req_scrap),
-        "req_destroy": str(pilot.req_destroy),
-    }
-
-    # Add English quote (index 0)
-    config["language english"] = {"quote": f'"{pilot.quotes[0]}"'}
-
-    # Add German quote (index 1)
-    config["language german"] = {"quote": f'"{pilot.quotes[1]}"'}
 
     # Save the INI file
     with open(os.path.join(output_path, "pilot.ini"), "w") as configfile:
@@ -362,7 +442,9 @@ def process_scenes(bk_files: list, mod_dir: str, alt_pals: AltPaletteFile):
         print(f"Processing scene: {filename}")
 
         bk = BKFile.load_native(bk_file)
-        arena_id = arena_names.get(filename, os.path.splitext(filename)[0])
+        arena_id = arena_names.get(
+            filename.upper(), os.path.splitext(filename)[0].upper()
+        )
 
         # Create arena directory
         arena_dir = os.path.join(mod_dir, "scenes", arena_id)
@@ -407,9 +489,11 @@ def process_fighters(af_files: list, mod_dir: str):
         print(f"Processing fighter: {filename}")
 
         af = AFFile.load_native(af_file)
-        fighter_match = re.match(r"FIGHTR(\d+)\.AF", filename, re.IGNORECASE)
+        fighter_match = re.match(r"(FIGHTR\d+)\.AF", filename, re.IGNORECASE)
         fighter_id = (
-            fighter_match.group(1) if fighter_match else os.path.splitext(filename)[0]
+            fighter_match.group(1).upper()
+            if fighter_match
+            else f"FIGHTR{os.path.splitext(filename)[0].upper()}"
         )
 
         # Create fighter directory
@@ -451,7 +535,7 @@ def process_tournaments(trn_files: list, mod_dir: str):
         print(f"Processing tournament: {filename}")
 
         trn = TournamentFile.load_native(trn_file)
-        tournament_name = os.path.splitext(filename)[0]
+        tournament_name = os.path.splitext(filename)[0].upper()
 
         # Create tournament directories
         legacy_dir = os.path.join(mod_dir, "tournaments", "legacy")
@@ -487,7 +571,7 @@ def process_tournaments(trn_files: list, mod_dir: str):
                 continue
 
             # Create pilot directory
-            pilot_dir = os.path.join(pilots_dir, str(idx))
+            pilot_dir = os.path.join(pilots_dir, f"{idx}")
             Path(pilot_dir).mkdir(parents=True, exist_ok=True)
 
             # Default gender (will be updated if photo is found)
@@ -546,9 +630,6 @@ def process_tournaments(trn_files: list, mod_dir: str):
             else:
                 print(f"PIC file not found: {pic_filename} in {trn_dir}")
                 portrait_file = None
-
-            # Create pilot.ini with all the extracted information
-            create_pilot_ini(pilot, pilot_dir, gender)
 
 
 def process_sounds(sounds_file: str, mod_dir: str):
