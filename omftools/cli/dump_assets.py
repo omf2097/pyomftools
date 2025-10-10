@@ -368,7 +368,9 @@ def process_scenes(bk_files: list, mod_dir: str, alt_pals: AltPaletteFile):
                 sprite_file = os.path.join(anim_dir, f"{idx}.png")
                 try:
                     # Get the appropriate palette
-                    processed_palette = bk.get_processed_palette(bk_file)
+                    processed_palette = bk.get_processed_palette(
+                        os.path.basename(bk_file)
+                    )
                     sprite.save_png(sprite_file, processed_palette)
                 except OMFInvalidDataException:
                     print(f"Skipping {sprite_file}")
