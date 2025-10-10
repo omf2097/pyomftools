@@ -53,32 +53,6 @@ arena_names = {
     "NEWGAME.BK": "NEWGAME",
 }
 
-# Common scene animations
-scene_common_animations = {
-    6: "round",
-    7: "number",
-    8: "you_lose",
-    9: "you_win",
-    10: "fight",
-    11: "ready",
-    24: "dust_1",
-    25: "dust_2",
-    26: "dust_3",
-    27: "match_counters",
-}
-
-# Common fighter animations
-fighter_common_animations = {
-    7: "burning_oil_stun",
-    8: "blocking_scrape",
-    12: "scrap_plate",
-    13: "scrap_bolt",
-    14: "scrap_chunk",
-    55: "blast",
-    56: "blast_2_small",
-    57: "blast_3",
-}
-
 
 def create_directory_structure(base_dir: str, mod_name: str):
     """Create the directory structure for the mod"""
@@ -224,14 +198,14 @@ def create_tournament_ini(trn: TournamentFile, output_path: str):
         # "defense_addition": str(trn.defense_inc),
     }
 
-    # Add language section (English)
+    # Add language section (English - index 0)
     config["language english"] = {
         "name": f'"{trn.locale_titles[0]}"',
         "description": f'"{trn.locale_descriptions[0]}"',
     }
 
-    # Add language section (English)
-    config["language english"] = {
+    # Add language section (German - index 1)
+    config["language german"] = {
         "name": f'"{trn.locale_titles[1]}"',
         "description": f'"{trn.locale_descriptions[1]}"',
     }
@@ -249,20 +223,23 @@ def create_tournament_ini(trn: TournamentFile, output_path: str):
         config.write(configfile)
 
 
-def create_pilot_ini(pilot, output_path: str):
+def create_pilot_ini(pilot, output_path: str, gender: str = "male"):
     """Create a pilot info.ini file"""
     config = configparser.ConfigParser()
 
     # Add basic pilot info
     config["DEFAULT"] = {
         "name": f'"{pilot.name}"',
-        "gender": '"male"',  # Default value, could be updated if available
+        "gender": f'"{gender}"',
+        "wins": str(pilot.wins),
+        "losses": str(pilot.losses),
+        "rank": str(pilot.rank),
+        "money": str(pilot.money),
+        "winnings": str(pilot.winnings),
+        "total_value": str(pilot.total_value),
     }
 
-    # Add English quote
-    config["language english"] = {"quote": f'"{pilot.quotes[0]}"'}
-
-    # Add HAR and record
+    # Add HAR and related info
     har_names = [
         "jaguar",
         "shadow",
@@ -278,15 +255,81 @@ def create_pilot_ini(pilot, output_path: str):
     ]
     if 0 <= pilot.har_id < len(har_names):
         config["DEFAULT"]["robot"] = f'"{har_names[pilot.har_id]}"'
-    config["DEFAULT"]["wins"] = str(pilot.rank)
-    config["DEFAULT"]["losses"] = "0"  # Default value, could be updated if available
 
-    # Add other sections as needed
-    config["colors"] = {
-        "primary": str(pilot.color_1),
-        "secondary": str(pilot.color_2),
-        "tertiary": str(pilot.color_3),
+    # Add stats
+    config["stats"] = {
+        "arm_power": str(pilot.arm_power),
+        "leg_power": str(pilot.leg_power),
+        "arm_speed": str(pilot.arm_speed),
+        "leg_speed": str(pilot.leg_speed),
+        "armor": str(pilot.armor),
+        "stun_resistance": str(pilot.stun_resistance),
+        "power": str(pilot.power),
+        "agility": str(pilot.agility),
+        "endurance": str(pilot.endurance),
+        "offense": str(pilot.offense),
+        "defense": str(pilot.defense),
     }
+
+    # Add colors
+    config["colors"] = {
+        "color_1": str(pilot.color_1),
+        "color_2": str(pilot.color_2),
+        "color_3": str(pilot.color_3),
+    }
+
+    # Add AI settings
+    config["ai"] = {
+        "att_normal": str(pilot.att_normal),
+        "att_hyper": str(pilot.att_hyper),
+        "att_jump": str(pilot.att_jump),
+        "att_def": str(pilot.att_def),
+        "att_sniper": str(pilot.att_sniper),
+        "ap_throw": str(pilot.ap_throw),
+        "ap_special": str(pilot.ap_special),
+        "ap_jump": str(pilot.ap_jump),
+        "ap_high": str(pilot.ap_high),
+        "ap_low": str(pilot.ap_low),
+        "ap_middle": str(pilot.ap_middle),
+        "pref_jump": str(pilot.pref_jump),
+        "pref_fwd": str(pilot.pref_fwd),
+        "pref_back": str(pilot.pref_back),
+        "learning": str(pilot.learning),
+        "forget": str(pilot.forget),
+        "movement": str(pilot.movement),
+    }
+
+    # Add tournament and difficulty info
+    config["tournament"] = {
+        "difficulty": str(
+            pilot.difficulty.value
+            if hasattr(pilot.difficulty, "value")
+            else pilot.difficulty
+        ),
+        "force_arena": str(pilot.force_arena),
+        "secret": str(pilot.secret),
+        "only_fight_once": str(pilot.only_fight_once),
+    }
+
+    # Add requirements
+    config["requirements"] = {
+        "req_enemy": str(pilot.req_enemy),
+        "req_difficulty": str(pilot.req_difficulty),
+        "req_rank": str(pilot.req_rank),
+        "req_max_rank": str(pilot.req_max_rank),
+        "req_vitality": str(pilot.req_vitality),
+        "req_fighter": str(pilot.req_fighter),
+        "req_accuracy": str(pilot.req_accuracy),
+        "req_avg_dmg": str(pilot.req_avg_dmg),
+        "req_scrap": str(pilot.req_scrap),
+        "req_destroy": str(pilot.req_destroy),
+    }
+
+    # Add English quote (index 0)
+    config["language english"] = {"quote": f'"{pilot.quotes[0]}"'}
+
+    # Add German quote (index 1)
+    config["language german"] = {"quote": f'"{pilot.quotes[1]}"'}
 
     # Save the INI file
     with open(os.path.join(output_path, "pilot.ini"), "w") as configfile:
@@ -337,16 +380,7 @@ def process_scenes(bk_files: list, mod_dir: str, alt_pals: AltPaletteFile):
 
         # Process animations
         for key, animation in bk.animations.items():
-            # Determine if this is a common animation
-            is_common = key in scene_common_animations
-
-            if is_common:
-                # Use descriptive name for common animations
-                anim_name = scene_common_animations[key]
-                anim_dir = os.path.join(mod_dir, "scenes", "common", anim_name)
-            else:
-                # Use ID for regular animations
-                anim_dir = os.path.join(arena_dir, str(key))
+            anim_dir = os.path.join(arena_dir, str(key))
 
             Path(anim_dir).mkdir(parents=True, exist_ok=True)
 
@@ -390,16 +424,7 @@ def process_fighters(af_files: list, mod_dir: str):
 
         # Process animations
         for key, animation in af.moves.items():
-            # Determine if this is a common animation
-            is_common = key in fighter_common_animations
-
-            if is_common:
-                # Use descriptive name for common animations
-                anim_name = fighter_common_animations[key]
-                anim_dir = os.path.join(mod_dir, "fighters", "common", anim_name)
-            else:
-                # Use ID for regular animations
-                anim_dir = os.path.join(fighter_dir, str(key))
+            anim_dir = os.path.join(fighter_dir, str(key))
 
             Path(anim_dir).mkdir(parents=True, exist_ok=True)
 
@@ -461,11 +486,12 @@ def process_tournaments(trn_files: list, mod_dir: str):
             if not pilot.name:  # Skip empty pilots
                 continue
 
+            # Create pilot directory
             pilot_dir = os.path.join(pilots_dir, str(idx))
             Path(pilot_dir).mkdir(parents=True, exist_ok=True)
 
-            # Create info.ini
-            create_pilot_ini(pilot, pilot_dir)
+            # Default gender (will be updated if photo is found)
+            gender = "male"
 
             # Save portrait if available
             # Extract the portrait from the tournament's PIC file
@@ -479,11 +505,22 @@ def process_tournaments(trn_files: list, mod_dir: str):
                     found = True
                     break
 
+            # Try to extract photo and gender
+            # Use photo_id from pilot if available, otherwise use pilot index
+            photo_id = (
+                pilot.photo_id
+                if hasattr(pilot, "photo_id") and pilot.photo_id is not None
+                else pilot_idx
+            )
             if found:
                 pic = PicFile.load_native(pic_path)
-                if pilot.photo_id < len(pic.photos):
+                if photo_id < len(pic.photos):
                     # Create a custom palette for this photo
-                    photo = pic.photos[pilot.photo_id]
+                    photo = pic.photos[photo_id]
+
+                    # Extract gender from the photo
+                    gender = "female" if photo.sex.value == 1 else "male"
+
                     custom_palette = Palette()
 
                     # Use the photo's own palette for indices 0x00-0x2F
@@ -509,9 +546,9 @@ def process_tournaments(trn_files: list, mod_dir: str):
             else:
                 print(f"PIC file not found: {pic_filename} in {trn_dir}")
                 portrait_file = None
-            print(
-                f"Note: Pilot portraits need to be extracted from PIC files separately"
-            )
+
+            # Create pilot.ini with all the extracted information
+            create_pilot_ini(pilot, pilot_dir, gender)
 
 
 def process_sounds(sounds_file: str, mod_dir: str):
