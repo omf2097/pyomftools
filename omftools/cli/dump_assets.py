@@ -19,59 +19,32 @@ from omftools.pyshadowdive.palette import Palette
 from omftools.pyshadowdive.language import LanguageFile
 
 
-# HAR names for reference
+# HAR names for reference - used for pilot.ini and tournament.ini
 har_names = [
-    "Jaguar",
-    "Shadow",
-    "Thorn",
-    "Pyros",
-    "Electra",
-    "Katana",
-    "Shredder",
-    "Flail",
-    "Gargoyle",
-    "Chronos",
-    "Nova",
+    "jaguar",
+    "shadow",
+    "thorn",
+    "pyros",
+    "electra",
+    "katana",
+    "shredder",
+    "flail",
+    "gargoyle",
+    "chronos",
+    "nova",
 ]
 
-# Arena names and IDs
-arena_names = {
-    "ARENA0.BK": "ARENA0",
-    "ARENA1.BK": "ARENA1",
-    "ARENA2.BK": "ARENA2",
-    "ARENA3.BK": "ARENA3",
-    "ARENA4.BK": "ARENA4",
-    "ARENA5.BK": "ARENA5",
-    "ARENA6.BK": "ARENA6",
-    "ARENA7.BK": "7",
-    "ARENA8.BK": "8",
-    "ARENA9.BK": "9",
-    "ARENA10.BK": "10",
-    "INTRO.BK": "INTRO",
-    "MENU.BK": "MENU",
-    "MECHLAB.BK": "MECHLAB",
-    "NEWGAME.BK": "NEWGAME",
-}
 
-
-def create_directory_structure(base_dir: str, mod_name: str):
+def create_directory_structure(base_dir: str):
     """Create the directory structure for the mod"""
-    mod_dir = os.path.join(base_dir, f"{mod_name}")
 
     # Create base directories
-    Path(os.path.join(mod_dir, "scenes", "common", "audio", "sounds")).mkdir(
-        parents=True, exist_ok=True
-    )
-    Path(os.path.join(mod_dir, "fighters", "common", "audio", "sounds")).mkdir(
-        parents=True, exist_ok=True
-    )
-    Path(os.path.join(mod_dir, "tournaments", "legacy")).mkdir(
-        parents=True, exist_ok=True
-    )
-    Path(os.path.join(mod_dir, "audio", "sounds")).mkdir(parents=True, exist_ok=True)
-    Path(os.path.join(mod_dir, "audio", "music")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(base_dir, "scenes")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(base_dir, "fighters")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(base_dir, "tournaments")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(base_dir, "audio", "sounds")).mkdir(parents=True, exist_ok=True)
 
-    return mod_dir
+    return base_dir
 
 
 def create_scene_ini(bk: BKFile, filename: str, output_path: str):
@@ -187,20 +160,6 @@ def create_fighter_ini(af: AFFile, output_path: str):
 
 def create_tournament_ini(trn: TournamentFile, output_path: str):
     """Create a tournament.ini file according to mod specification"""
-    # HAR names for specific endings
-    har_names = [
-        "jaguar",
-        "shadow",
-        "thorn",
-        "pyros",
-        "electra",
-        "katana",
-        "shredder",
-        "flail",
-        "gargoyle",
-        "chronos",
-        "nova",
-    ]
 
     # Write the file in the format required by mod spec
     with open(os.path.join(output_path, "tournament.ini"), "w") as f:
@@ -221,154 +180,97 @@ def create_tournament_ini(trn: TournamentFile, output_path: str):
         )
         f.write(f'    description = "{trn.locale_descriptions[0]}"\n\n')
 
-        # Process English endings
-        if hasattr(trn, "locale_end_texts") and len(trn.locale_end_texts) > 0:
-            english_endings = trn.locale_end_texts[0]  # English endings
+        # Process endings for both languages
+        def process_locale(language_idx, language_name):
+            """Process tournament locales for the given language index"""
+            f.write(f"language {language_name} {{\n")
+            f.write(f'    name = "{trn.locale_titles[language_idx]}"\n')
+            f.write(f'    description = "{trn.locale_descriptions[language_idx]}"\n\n')
 
-            # Collect all texts for each page
-            page_texts = {}  # page_id -> list of texts
-            har_texts = {}  # har_id -> page_id -> text
+            if (
+                hasattr(trn, "locale_end_texts")
+                and len(trn.locale_end_texts) > language_idx
+            ):
+                endings = trn.locale_end_texts[
+                    language_idx
+                ]  # Get endings for this language
 
-            # Structure is endings[har_id][page_id]
-            # First, get all texts for each page
-            for har_idx, har_endings in enumerate(english_endings):
-                if not har_endings:
-                    continue
+                # Collect all texts for each page
+                page_texts = {}  # page_id -> list of texts
+                har_texts = {}  # har_id -> page_id -> text
 
-                # Index 0 is typically generic text
-                for page_idx, text in enumerate(har_endings):
-                    if not text:
+                # Structure is endings[har_id][page_id]
+                # First, get all texts for each page
+                for har_idx, har_endings in enumerate(endings):
+                    if not har_endings:
                         continue
 
-                    # Store by page
-                    if page_idx not in page_texts:
-                        page_texts[page_idx] = {}
+                    for page_idx, text in enumerate(har_endings):
+                        if not text:
+                            continue
 
-                    if text not in page_texts[page_idx]:
-                        page_texts[page_idx][text] = []
+                        # Store by page
+                        if page_idx not in page_texts:
+                            page_texts[page_idx] = {}
 
-                    page_texts[page_idx][text].append(har_idx)
+                        if text not in page_texts[page_idx]:
+                            page_texts[page_idx][text] = []
 
-                    # Also store by HAR for easy lookup
-                    if har_idx not in har_texts:
-                        har_texts[har_idx] = {}
-                    har_texts[har_idx][page_idx] = text
+                        page_texts[page_idx][text].append(har_idx)
 
-            # Find most common text for each page (appears in 2+ HARs)
-            common_texts = {}
-            for page_idx, text_counts in page_texts.items():
-                most_common = None
-                max_count = 1  # Must appear in at least 2 HARs
+                        # Also store by HAR for easy lookup
+                        if har_idx not in har_texts:
+                            har_texts[har_idx] = {}
+                        har_texts[har_idx][page_idx] = text
 
-                for text, har_indices in text_counts.items():
-                    if len(har_indices) > max_count:
-                        most_common = text
-                        max_count = len(har_indices)
+                # Find most common text for each page (appears in 2+ HARs)
+                common_texts = {}
+                for page_idx, text_counts in page_texts.items():
+                    most_common = None
+                    max_count = 1  # Must appear in at least 2 HARs
 
-                if most_common:
-                    common_texts[page_idx] = most_common
+                    for text, har_indices in text_counts.items():
+                        if len(har_indices) > max_count:
+                            most_common = text
+                            max_count = len(har_indices)
 
-            # Write "ending all" section with common texts
-            f.write("    ending all {\n")
-            for page_idx, text in common_texts.items():
-                f.write(f'        page{page_idx + 1} = "{text}"\n')
-            f.write("    }\n\n")
+                    if most_common:
+                        common_texts[page_idx] = most_common
 
-            # Write HAR-specific overrides
-            for har_idx, pages in har_texts.items():
-                has_unique = False
-                unique_pages = {}
+                # Write "ending all" section with common texts
+                f.write("    ending all {\n")
+                for page_idx, text in common_texts.items():
+                    f.write(f'        page{page_idx + 1} = "{text}"\n')
+                f.write("    }\n\n")
 
-                # Check if this HAR has any unique texts
-                for page_idx, text in pages.items():
-                    if page_idx not in common_texts or text != common_texts[page_idx]:
-                        has_unique = True
-                        unique_pages[page_idx] = text
+                # Write HAR-specific overrides
+                for har_idx, pages in har_texts.items():
+                    has_unique = False
+                    unique_pages = {}
 
-                # Only create a section if this HAR has unique texts
-                if has_unique:
-                    f.write(f"    ending {har_names[har_idx]} {{\n")
-                    for page_idx, text in unique_pages.items():
-                        f.write(f'        page{page_idx + 1} = "{text}"\n')
-                    f.write("    }\n\n")
-        f.write("}\n\n")
+                    # Check if this HAR has any unique texts
+                    for page_idx, text in pages.items():
+                        if (
+                            page_idx not in common_texts
+                            or text != common_texts[page_idx]
+                        ):
+                            has_unique = True
+                            unique_pages[page_idx] = text
 
-        # German section
-        f.write("language german {\n")
-        f.write(f'    name = "{trn.locale_titles[1]}"\n')
-        f.write(f'    description = "{trn.locale_descriptions[1]}"\n\n')
+                    # Only create a section if this HAR has unique texts
+                    if has_unique:
+                        f.write(f"    ending {har_names[har_idx]} {{\n")
+                        for page_idx, text in unique_pages.items():
+                            f.write(f'        page{page_idx + 1} = "{text}"\n')
+                        f.write("    }\n\n")
+            f.write("}\n")
 
-        # Process German endings
-        if hasattr(trn, "locale_end_texts") and len(trn.locale_end_texts) > 1:
-            german_endings = trn.locale_end_texts[1]  # German endings
+        # Process English locale strings
+        process_locale(0, "english")
+        f.write("\n")
 
-            # Collect all texts for each page
-            page_texts = {}  # page_id -> list of texts
-            har_texts = {}  # har_id -> page_id -> text
-
-            # Structure is endings[har_id][page_id]
-            # First, get all texts for each page
-            for har_idx, har_endings in enumerate(german_endings):
-                if not har_endings:
-                    continue
-
-                # Index 0 is typically generic text
-                for page_idx, text in enumerate(har_endings):
-                    if not text:
-                        continue
-
-                    # Store by page
-                    if page_idx not in page_texts:
-                        page_texts[page_idx] = {}
-
-                    if text not in page_texts[page_idx]:
-                        page_texts[page_idx][text] = []
-
-                    page_texts[page_idx][text].append(har_idx)
-
-                    # Also store by HAR for easy lookup
-                    if har_idx not in har_texts:
-                        har_texts[har_idx] = {}
-                    har_texts[har_idx][page_idx] = text
-
-            # Find most common text for each page (appears in 2+ HARs)
-            common_texts = {}
-            for page_idx, text_counts in page_texts.items():
-                most_common = None
-                max_count = 1  # Must appear in at least 2 HARs
-
-                for text, har_indices in text_counts.items():
-                    if len(har_indices) > max_count:
-                        most_common = text
-                        max_count = len(har_indices)
-
-                if most_common:
-                    common_texts[page_idx] = most_common
-
-            # Write "ending all" section with common texts
-            f.write("    ending all {\n")
-            for page_idx, text in common_texts.items():
-                f.write(f'        page{page_idx + 1} = "{text}"\n')
-            f.write("    }\n\n")
-
-            # Write HAR-specific overrides
-            for har_idx, pages in har_texts.items():
-                has_unique = False
-                unique_pages = {}
-
-                # Check if this HAR has any unique texts
-                for page_idx, text in pages.items():
-                    if page_idx not in common_texts or text != common_texts[page_idx]:
-                        has_unique = True
-                        unique_pages[page_idx] = text
-
-                # Only create a section if this HAR has unique texts
-                if has_unique:
-                    f.write(f"    ending {har_names[har_idx]} {{\n")
-                    for page_idx, text in unique_pages.items():
-                        f.write(f'        page{page_idx + 1} = "{text}"\n')
-                    f.write("    }\n\n")
-        f.write("}\n")
+        # Process German locale strings
+        process_locale(1, "german")
 
 
 def create_pilot_ini(pilot, output_path: str, gender: str = "male"):
@@ -388,19 +290,6 @@ def create_pilot_ini(pilot, output_path: str, gender: str = "male"):
     }
 
     # Add HAR and related info
-    har_names = [
-        "jaguar",
-        "shadow",
-        "thorn",
-        "pyros",
-        "electra",
-        "katana",
-        "shredder",
-        "flail",
-        "gargoyle",
-        "chronos",
-        "nova",
-    ]
     if 0 <= pilot.har_id < len(har_names):
         config["DEFAULT"]["robot"] = f'"{har_names[pilot.har_id]}"'
 
@@ -416,25 +305,6 @@ def create_pilot_ini(pilot, output_path: str, gender: str = "male"):
         config.write(configfile)
 
 
-def create_manifest_ini(mod_name: str, output_path: str):
-    """Create a manifest.ini file for the mod"""
-    config = configparser.ConfigParser()
-
-    config["DEFAULT"] = {
-        "mod_api": "1.0",
-        "version": "1.0",
-        "author": "Asset Dumper",
-        "email": "example@example.com",
-        "name": mod_name,
-        "description": f"Dumped assets for {mod_name}",
-        "load_order": "0",
-    }
-
-    # Save the INI file
-    with open(os.path.join(output_path, "manifest.ini"), "w") as configfile:
-        config.write(configfile)
-
-
 def process_scenes(bk_files: list, mod_dir: str, alt_pals: AltPaletteFile):
     """Process BK files (scenes) and save them to the mod structure"""
     for bk_file in bk_files:
@@ -442,9 +312,7 @@ def process_scenes(bk_files: list, mod_dir: str, alt_pals: AltPaletteFile):
         print(f"Processing scene: {filename}")
 
         bk = BKFile.load_native(bk_file)
-        arena_id = arena_names.get(
-            filename.upper(), os.path.splitext(filename)[0].upper()
-        )
+        arena_id = os.path.splitext(filename)[0].upper()
 
         # Create arena directory
         arena_dir = os.path.join(mod_dir, "scenes", arena_id)
@@ -592,12 +460,7 @@ def process_tournaments(trn_files: list, mod_dir: str):
                     break
 
             # Try to extract photo and gender
-            # Use photo_id from pilot if available, otherwise use pilot index
-            photo_id = (
-                pilot.photo_id
-                if hasattr(pilot, "photo_id") and pilot.photo_id is not None
-                else pilot_idx
-            )
+            photo_id = pilot.photo_id
             if found:
                 pic = PicFile.load_native(pic_path)
                 if photo_id < len(pic.photos):
@@ -653,24 +516,12 @@ def process_sounds(sounds_file: str, mod_dir: str):
             sound.save_wav(sound_file)
 
 
-def process_pics(pic_files: list, mod_dir: str, alt_pals: AltPaletteFile):
-    """Process PIC files - empty function as we no longer dump PIC files independently"""
-    # PIC files are now processed directly in process_tournaments
-    pass
-
-
 def main():
     parser = argparse.ArgumentParser(
         description="Dump game assets according to the mod structure"
     )
     parser.add_argument("input_dir", help="Input directory containing OMF game files")
     parser.add_argument("output_dir", help="Output directory for the mod")
-    parser.add_argument(
-        "--mod-name",
-        dest="mod_name",
-        default="omf_assets_dump",
-        help="Name for the mod (default: omf_assets_dump)",
-    )
     args = parser.parse_args()
 
     # Find all relevant files
@@ -685,23 +536,13 @@ def main():
     alt_pals = AltPaletteFile.load_native(alt_pals_file)
 
     # Create mod directory structure
-    mod_dir = create_directory_structure(args.output_dir, args.mod_name)
-
-    # Create manifest.ini
-    create_manifest_ini(args.mod_name, mod_dir)
+    mod_dir = create_directory_structure(args.output_dir)
 
     # Process different types of assets
     process_scenes(bk_files, mod_dir, alt_pals)
     process_fighters(af_files, mod_dir)
     process_tournaments(trn_files, mod_dir)
     process_sounds(sounds_file, mod_dir)
-    # PIC files are now processed directly in process_tournaments
-
-    print(f"\nAsset dumping complete. Mod created at: {mod_dir}")
-    print("\nNOTE: Some manual organization may be needed, particularly for:")
-    print(
-        "1. Creating appropriate 'animdata.ini' files if special configuration is needed"
-    )
 
     return 0
 
