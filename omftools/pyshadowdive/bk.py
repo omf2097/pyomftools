@@ -2,10 +2,12 @@ from __future__ import annotations
 import typing
 from validx import Dict, List, Str
 import io
+import os
 
 from .protos import Entrypoint
 from .bkanim import BKAnimation
 from .palette_mapping import PaletteMapping
+from .palette import Palette
 
 from .utils.parser import BinaryParser
 from .utils.types import EncodedImage
@@ -95,7 +97,10 @@ class BKFile(Entrypoint):
 
         # Read up all available color palettes
         palette_count = parser.get_uint8()
-        self.palettes = [PaletteMapping().read(parser) for _ in range(palette_count)]
+        self.palettes = []
+        for _ in range(palette_count):
+            palette_mapping = PaletteMapping().read(parser)
+            self.palettes.append(palette_mapping)
 
         # Get sound mappings
         self.sound_table = [parser.get_uint8() for _ in range(30)]
@@ -140,12 +145,59 @@ class BKFile(Entrypoint):
             parser.put_uint8(sound)
 
     def save_background(self, filename: str) -> None:
+        # Apply appropriate palette processing based on the filename
+        palette = self.get_processed_palette(filename)
+
         save_png(
             generate_png(
                 self.background_image,
                 self.background_width,
                 self.background_height,
-                self.palettes[0].colors,
+                palette,
             ),
             filename,
         )
+
+    def get_processed_palette(self, filename: str) -> Palette:
+        """
+        Get palette with appropriate processing applied based on filename.
+
+        Args:
+            filename: File name used to determine palette processing
+        """
+        if not self.palettes:
+            return Palette()  # Return default palette if no palettes are available
+
+        # Start with a copy of the first palette's colors
+        palette = Palette()
+        for i in range(256):
+            palette.data[i] = self.palettes[0].colors.data[i]
+
+        # Extract basename and convert to uppercase for comparison
+        basename = os.path.basename(filename).upper()
+
+        # MECHLAB: Reset indices 0-47 and 250-255 to default
+        if "MECHLAB" in basename:
+            palette.reset_range(0, 48)  # Reset indices 0-47
+            palette.reset_range(250, 6)  # Reset indices 250-255
+        # ARENA0-ARENA4, VS, MELEE: Reset indices 0-96 and 250-255 to default
+        elif any(
+            name in basename
+            for name in [
+                "ARENA0",
+                "ARENA1",
+                "ARENA2",
+                "ARENA3",
+                "ARENA4",
+                "VS",
+                "MELEE",
+            ]
+        ):
+            palette.reset_range(0, 97)  # Reset indices 0-96
+            palette.reset_range(250, 6)  # Reset indices 250-255
+
+        # NORTH_AM, WAR, KATUSHAI: Extended color slides
+        elif any(name in basename for name in ["NORTH_AM", "WAR", "KATUSHAI"]):
+            palette.create_extended_slides()
+
+        return palette

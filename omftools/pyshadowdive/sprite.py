@@ -130,14 +130,28 @@ class Sprite(DataObject):
 
         return out
 
-    def save_png(self, filename: str, palette: Palette) -> None:
+    def save_png(self, filename: str, palette: Palette, asset_type: str = None) -> None:
         dec_data = self.decode_image()
         if not dec_data:
             raise OMFInvalidDataException(
                 "Decoded image data resulted in an image of size 0!"
             )
+
+        # Use a copy of the palette to avoid modifying the original
+        render_palette = Palette()
+
+        # For AF sprites, ensure we're using the default palette for the appropriate range
+        if asset_type == "af_sprite":
+            # Reset the 0x60-0x9F range to default values (which should be appropriate for AF sprites)
+            render_palette.reset_range(0x60, 64)
+            # Optionally mask any inappropriate ranges
+            render_palette.mask_range(0x30, 48)  # Mask 0x30-0x5F
+        else:
+            # For other asset types, use the provided palette
+            render_palette.data = list(palette.data)
+
         save_png(
-            img=generate_png(dec_data, self.width, self.height, palette),
+            img=generate_png(dec_data, self.width, self.height, render_palette),
             filename=filename,
             transparency=self.TRANSPARENCY_INDEX,
         )
