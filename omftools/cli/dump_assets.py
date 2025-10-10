@@ -62,77 +62,45 @@ def create_animation_ini(animation, output_path: str, is_scene: bool = True):
     with open(os.path.join(output_path, "animdata.ini"), "w") as f:
         if is_scene:
             # For scene animations
-            if hasattr(animation, "chain_hit"):
-                f.write(f"chain_hit = {animation.chain_hit}\n")
-            if hasattr(animation, "chain_no_hit"):
-                f.write(f"chain_no_hit = {animation.chain_no_hit}\n")
-            if hasattr(animation, "repeat"):
-                f.write(f"repeat = {animation.repeat}\n")
-            if hasattr(animation, "probability"):
-                f.write(f"probability = {animation.probability}\n")
-            if hasattr(animation, "hazard_damage"):
-                f.write(f"hazard_damage = {animation.hazard_damage}\n")
-            if hasattr(animation, "footer_string"):
-                f.write(f'footer_string = "{animation.footer_string}"\n')
-            if hasattr(animation, "start_x"):
-                f.write(f"start_x = {animation.start_x}\n")
-            if hasattr(animation, "start_y"):
-                f.write(f"start_y = {animation.start_y}\n")
-            if hasattr(animation, "base_string"):
-                f.write(f'base_string = "{animation.base_string}"\n')
+            f.write(f"chain_hit = {animation.chain_hit}\n")
+            f.write(f"chain_no_hit = {animation.chain_no_hit}\n")
+            f.write(f"repeat = {animation.repeat}\n")
+            f.write(f"probability = {animation.probability}\n")
+            f.write(f"hazard_damage = {animation.hazard_damage}\n")
+            f.write(f'footer_string = "{animation.footer_string}"\n')
+            f.write(f"start_x = {animation.start_x}\n")
+            f.write(f"start_y = {animation.start_y}\n")
+            f.write(f'base_string = "{animation.base_string}"\n')
 
         else:
             # For fighter animations
-            if hasattr(animation, "ai_opts"):
-                f.write(f"ai_opts = {animation.ai_opts}\n")
-            if hasattr(animation, "pos_constraint"):
-                f.write(f"pos_constraint = {animation.pos_constraint}\n")
-            if hasattr(animation, "next_animation_id"):
-                f.write(f"next_animation_id = {animation.next_animation_id}\n")
-            if hasattr(animation, "category"):
-                f.write(f"category = {animation.category}\n")
-            if hasattr(animation, "block_damage"):
-                f.write(f"block_damage = {animation.block_damage}\n")
-            if hasattr(animation, "block_stun_and_scrap"):
-                f.write(f"block_stun_and_scrap = {animation.block_stun_and_scrap}\n")
-            if hasattr(animation, "successor_id"):
-                f.write(f"successor_id = {animation.successor_id}\n")
-            if hasattr(animation, "damage_amount"):
-                f.write(f"damage_amount = {animation.damage_amount}\n")
-            if hasattr(animation, "throw_duration"):
-                f.write(f"throw_duration = {animation.throw_duration}\n")
-            if hasattr(animation, "extra_string_selector"):
-                f.write(f"extra_string_selector = {animation.extra_string_selector}\n")
-            if hasattr(animation, "points"):
-                f.write(f"points = {animation.points}\n")
-            if hasattr(animation, "move_string"):
-                f.write(f'move_string = "{animation.move_string}"\n')
-            if hasattr(animation, "enemy_string"):
-                f.write(f'enemy_string = "{animation.enemy_string}"\n')
-            if hasattr(animation, "start_x"):
-                f.write(f"start_x = {animation.start_x}\n")
-            if hasattr(animation, "start_y"):
-                f.write(f"start_y = {animation.start_y}\n")
-            if hasattr(animation, "base_string"):
-                f.write(f'base_string = "{animation.base_string}"\n')
+            f.write(f"ai_opts = {animation.ai_opts}\n")
+            f.write(f"pos_constraint = {animation.pos_constraint}\n")
+            f.write(f"next_animation_id = {animation.next_animation_id}\n")
+            f.write(f"category = {animation.category}\n")
+            f.write(f"block_damage = {animation.block_damage}\n")
+            f.write(f"block_stun_and_scrap = {animation.block_stun_and_scrap}\n")
+            f.write(f"successor_id = {animation.successor_id}\n")
+            f.write(f"damage_amount = {animation.damage_amount}\n")
+            f.write(f"throw_duration = {animation.throw_duration}\n")
+            f.write(f"extra_string_selector = {animation.extra_string_selector}\n")
+            f.write(f"points = {animation.points}\n")
+            f.write(f'move_string = "{animation.move_string}"\n')
+            f.write(f'enemy_string = "{animation.enemy_string}"\n')
+            f.write(f"start_x = {animation.start_x}\n")
+            f.write(f"start_y = {animation.start_y}\n")
+            f.write(f'base_string = "{animation.base_string}"\n')
 
 
 def create_fighter_ini(af: AFFile, output_path: str):
-    """Create a header.ini file for a fighter"""
-    # Write the file directly in the format required by mod spec
+    """Create a header.ini file for a fighter according to mod specification"""
     with open(os.path.join(output_path, "header.ini"), "w") as f:
-        if hasattr(af, "endurance"):
-            f.write(f"endurance = {af.endurance}\n")
-        if hasattr(af, "health"):
-            f.write(f"health = {af.health}\n")
-        if hasattr(af, "forward_speed"):
-            f.write(f"forward_speed = {af.forward_speed}\n")
-        if hasattr(af, "reverse_speed"):
-            f.write(f"reverse_speed = {af.reverse_speed}\n")
-        if hasattr(af, "jump_speed"):
-            f.write(f"jump_speed = {af.jump_speed}\n")
-        if hasattr(af, "fall_speed"):
-            f.write(f"fall_speed = {af.fall_speed}\n")
+        f.write(f"endurance = {af.endurance}\n")
+        f.write(f"health = {af.health}\n")
+        f.write(f"forward_speed = {af.forward_speed}\n")
+        f.write(f"reverse_speed = {af.reverse_speed}\n")
+        f.write(f"jump_speed = {af.jump_speed}\n")
+        f.write(f"fall_speed = {af.fall_speed}\n")
 
 
 def create_tournament_ini(trn: TournamentFile, output_path: str):
@@ -150,12 +118,6 @@ def create_tournament_ini(trn: TournamentFile, output_path: str):
 
         # English section
         f.write("# add a section for each language you want to support\n")
-        f.write("language english {\n")
-        f.write(f'    name = "{trn.locale_titles[0]}"\n')
-        f.write(
-            "    # note the description is a multi-line string and can use special formatting tags\n"
-        )
-        f.write(f'    description = "{trn.locale_descriptions[0]}"\n\n')
 
         # Process endings for both languages
         def process_locale(language_idx, language_name):
@@ -164,10 +126,7 @@ def create_tournament_ini(trn: TournamentFile, output_path: str):
             f.write(f'    name = "{trn.locale_titles[language_idx]}"\n')
             f.write(f'    description = "{trn.locale_descriptions[language_idx]}"\n\n')
 
-            if (
-                hasattr(trn, "locale_end_texts")
-                and len(trn.locale_end_texts) > language_idx
-            ):
+            if len(trn.locale_end_texts) > language_idx:
                 endings = trn.locale_end_texts[
                     language_idx
                 ]  # Get endings for this language
@@ -345,29 +304,29 @@ def create_pilot_ini(pilot, output_path: str, gender: str = "male"):
         f.write(f"winnings = {pilot.winnings}\n")
 
         # Add requirements section for secret pilots
-        if hasattr(pilot, "secret") and pilot.secret:
+        if pilot.secret:
             f.write("\nsecret = true\n")
             f.write("\n# Requirements for unlocking this secret character\n")
             f.write("requirements {\n")
-            if hasattr(pilot, "req_enemy") and pilot.req_enemy:
+            if pilot.req_enemy:
                 f.write(f"  enemy = {pilot.req_enemy}\n")
-            if hasattr(pilot, "req_difficulty") and pilot.req_difficulty:
+            if pilot.req_difficulty:
                 f.write(f"  difficulty = {pilot.req_difficulty}\n")
-            if hasattr(pilot, "req_rank") and pilot.req_rank:
+            if pilot.req_rank:
                 f.write(f"  rank = {pilot.req_rank}\n")
-            if hasattr(pilot, "req_max_rank") and pilot.req_max_rank:
+            if pilot.req_max_rank:
                 f.write(f"  max_rank = {pilot.req_max_rank}\n")
-            if hasattr(pilot, "req_vitality") and pilot.req_vitality:
+            if pilot.req_vitality:
                 f.write(f"  vitality = {pilot.req_vitality}\n")
-            if hasattr(pilot, "req_fighter") and pilot.req_fighter:
+            if pilot.req_fighter:
                 f.write(f"  fighter = {pilot.req_fighter}\n")
-            if hasattr(pilot, "req_accuracy") and pilot.req_accuracy:
+            if pilot.req_accuracy:
                 f.write(f"  accuracy = {pilot.req_accuracy}\n")
-            if hasattr(pilot, "req_avg_dmg") and pilot.req_avg_dmg:
+            if pilot.req_avg_dmg:
                 f.write(f"  avg_dmg = {pilot.req_avg_dmg}\n")
-            if hasattr(pilot, "req_scrap") and pilot.req_scrap:
+            if pilot.req_scrap:
                 f.write(f"  scrap = {pilot.req_scrap}\n")
-            if hasattr(pilot, "req_destroy") and pilot.req_destroy:
+            if pilot.req_destroy:
                 f.write(f"  destroy = {pilot.req_destroy}\n")
             f.write("}\n")
 
@@ -554,10 +513,10 @@ def process_tournaments(trn_files: list, mod_dir: str):
                     try:
                         photo.sprite.save_png(portrait_file, custom_palette)
                     except Exception as e:
-                        print(f"Error saving portrait for {pilot_name}: {e}")
+                        print(f"Error saving portrait for {pilot.name}: {e}")
                         portrait_file = None
                 else:
-                    print(f"No portrait found for pilot {pilot_name} in {pic_path}")
+                    print(f"No portrait found for pilot {pilot.name} in {pic_path}")
                     portrait_file = None
             else:
                 print(f"PIC file not found: {pic_filename} in {trn_dir}")
