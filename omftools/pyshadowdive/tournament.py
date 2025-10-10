@@ -93,6 +93,7 @@ class TournamentFile(Entrypoint):
 
         # Tournament palette
         self.palette = Palette().read_range(parser, 128, 40)
+        self.palette.mask_range(0, 48)
 
         # Tournament PIC file name
         self.pic_filename = parser.get_var_str(size_includes_zero=True)
