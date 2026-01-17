@@ -190,7 +190,7 @@ class BKFile(Entrypoint):
                 "MELEE",
             ]
         ):
-            palette.reset_range(0, 96)  # Blank out 0-96, the HAR colors
+            palette.mask_range(0, 96)  # Blank out 0-96, the HAR colors
             palette.reset_range(250, 6)  # Reset indices 250-255
 
         # NORTH_AM, WAR, KATUSHAI: Extended color slides

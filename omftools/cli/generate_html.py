@@ -124,19 +124,8 @@ def generate_pics(
     for idx, photo in enumerate(pic.photos):
         sprite_file = os.path.join(output_dir, f"{filename}-{idx}.png")
         try:
-            # Create a custom palette for this photo
-            # Start with default palette
-            custom_palette = Palette()
-
-            # Use the photo's own palette for indices 0x00-0x2F
-            for i in range(0x00, 0x30):
-                custom_palette.data[i] = photo.palette.data[i]
-
-            # Mask indices 0x60-0x9F with magenta
-            custom_palette.mask_range(0x60, 64)
-
             # Render using the custom palette
-            photo.sprite.save_png(sprite_file, custom_palette)
+            photo.sprite.save_png(sprite_file, photo.palette)
         except OMFInvalidDataException:
             print(f"Skipping {sprite_file}")
 

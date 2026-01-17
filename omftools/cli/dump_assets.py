@@ -17,6 +17,7 @@ from omftools.pyshadowdive.altpals import AltPaletteFile
 from omftools.pyshadowdive.utils.exceptions import OMFInvalidDataException
 from omftools.pyshadowdive.palette import Palette
 from omftools.pyshadowdive.language import LanguageFile
+from PIL import Image
 
 
 # HAR names for reference - used for pilot.ini and tournament.ini
@@ -209,13 +210,20 @@ def create_tournament_ini(trn: TournamentFile, output_path: str):
         process_locale(1, "german")
 
 
-def create_pilot_ini(pilot, output_path: str, gender: str = "male"):
+def create_pilot_ini(
+    pilot, output_path: str, gender: str = "male", width: int = None, height: int = None
+):
     """Create a pilot info.ini file according to mod specification"""
     # Write the file directly in the format required by mod spec
     with open(os.path.join(output_path, "pilot.ini"), "w") as f:
         # Basic info
         f.write(f'name = "{pilot.name}"\n\n')
         f.write(f'gender = "{gender}"\n\n')
+
+        # Image dimensions if available
+        if width is not None and height is not None:
+            f.write(f"width = {width}\n")
+            f.write(f"height = {height}\n\n")
 
         # Language sections
         f.write("language english {\n")
@@ -498,34 +506,41 @@ def process_tournaments(trn_files: list, mod_dir: str):
                     # Extract gender from the photo
                     gender = "female" if photo.sex.value == 1 else "male"
 
-                    custom_palette = Palette()
-
-                    # Use the photo's own palette for indices 0x00-0x2F
-                    for i in range(0x00, 0x30):
-                        custom_palette.data[i] = photo.palette.data[i]
-
-                    # Mask indices 0x60-0x9F with magenta
-                    custom_palette.mask_range(0x60, 64)
-
                     # Ensure portrait directory exists
                     Path(pilot_dir).mkdir(parents=True, exist_ok=True)
 
                     # Save the portrait
                     portrait_file = os.path.join(pilot_dir, "pilot.png")
                     try:
-                        photo.sprite.save_png(portrait_file, custom_palette)
+                        # Create har_color.png with the pilot's palette
+                        har_color_path = os.path.join(pilot_dir, "har_color.png")
+                        create_har_color_with_palette(photo.palette, har_color_path)
+
+                        photo.palette.mask_range(0, 96)
+                        photo.sprite.save_png(portrait_file, photo.palette)
                     except Exception as e:
                         print(f"Error saving portrait for {pilot.name}: {e}")
                         portrait_file = None
+                        width = None
+                        height = None
                 else:
                     print(f"No portrait found for pilot {pilot.name} in {pic_path}")
                     portrait_file = None
+                    width = None
+                    height = None
             else:
                 print(f"PIC file not found: {pic_filename} in {trn_dir}")
                 portrait_file = None
+                width = None
+                height = None
+
+            # Get width and height from photo if available
+            if portrait_file is not None:
+                width = photo.sprite.width
+                height = photo.sprite.height
 
             # Create pilot.ini with all the extracted information
-            create_pilot_ini(pilot, pilot_dir, gender)
+            create_pilot_ini(pilot, pilot_dir, gender, width, height)
 
 
 def process_sounds(sounds_file: str, mod_dir: str):
@@ -547,6 +562,90 @@ def process_sounds(sounds_file: str, mod_dir: str):
             sound.save_wav(sound_file)
 
 
+def process_players_pic(pic_file: str, mod_dir: str):
+    """Process PLAYERS.PIC and save player photos to the mod structure"""
+    if not os.path.exists(pic_file):
+        print(f"Players PIC file not found: {pic_file}")
+        return
+
+    print(f"Processing player photos: {pic_file}")
+
+    pic = PicFile.load_native(pic_file)
+
+    # Create players directory
+    players_dir = os.path.join(mod_dir, "players")
+    Path(players_dir).mkdir(parents=True, exist_ok=True)
+
+    # Process each photo
+    for idx, photo in enumerate(pic.photos):
+        if not photo.has_photo:
+            continue
+
+        # Create player directory
+        player_dir = os.path.join(players_dir, f"{idx}")
+        Path(player_dir).mkdir(parents=True, exist_ok=True)
+
+        # Get gender
+        gender = "female" if photo.sex.value == 1 else "male"
+
+        # Save the portrait
+        portrait_file = os.path.join(player_dir, "pilot.png")
+
+        # Create har_color.png with the player's palette
+        har_color_path = os.path.join(player_dir, "har_color.png")
+        create_har_color_with_palette(photo.palette, har_color_path)
+
+        photo.palette.mask_range(0, 96)
+        photo.sprite.save_png(portrait_file, photo.palette)
+
+        # Create pilot.ini with all required information
+        with open(os.path.join(player_dir, "pilot.ini"), "w") as f:
+            # Basic info
+            f.write(f'gender = "{gender}"\n\n')
+
+            # Image dimensions if available
+            if photo.sprite.width is not None and photo.sprite.height is not None:
+                f.write(f"width = {photo.sprite.width}\n")
+                f.write(f"height = {photo.sprite.height}\n\n")
+
+
+def create_har_color_with_palette(palette, output_path):
+    """Create a copy of har_color.png with a custom palette.
+
+    Args:
+        palette: Palette object to use for the image
+        output_path: Where to save the new image
+    """
+    # Get the path to har_color.png in the resources directory
+    har_color_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "resources",
+        "har_color.png",
+    )
+
+    if not os.path.exists(har_color_path):
+        print(f"har_color.png not found at {har_color_path}")
+        return
+
+    try:
+        # Open the har_color.png file
+        img = Image.open(har_color_path)
+
+        # Convert palette format (from list of tuples to flat list)
+        new_palette = []
+        for triplet in palette.data:
+            new_palette.extend(triplet)
+
+        # Replace the palette
+        img.putpalette(new_palette)
+
+        # Save with the new palette
+        img.save(output_path, "PNG")
+        print(f"Created har_color with custom palette at {output_path}")
+    except Exception as e:
+        print(f"Error creating har_color with custom palette: {e}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Dump game assets according to the mod structure"
@@ -562,6 +661,7 @@ def main():
     pic_files = glob(os.path.join(args.input_dir, "*.PIC"))
     alt_pals_file = os.path.join(args.input_dir, "ALTPALS.DAT")
     sounds_file = os.path.join(args.input_dir, "SOUNDS.DAT")
+    players_pic_file = os.path.join(args.input_dir, "PLAYERS.PIC")
 
     # Load ALTPALS.DAT for palette references
     alt_pals = AltPaletteFile.load_native(alt_pals_file)
@@ -574,6 +674,7 @@ def main():
     process_fighters(af_files, mod_dir)
     process_tournaments(trn_files, mod_dir)
     process_sounds(sounds_file, mod_dir)
+    process_players_pic(players_pic_file, mod_dir)
 
     return 0
 
