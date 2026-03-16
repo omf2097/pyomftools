@@ -6,7 +6,6 @@ from .animation import Animation
 from .utils.parser import BinaryParser
 from .utils.validator import UInt8, UInt16
 
-
 BK_ANIMATION_NAMES: typing.Final[dict[int, str]] = {
     6: "Round",
     7: "Number",
