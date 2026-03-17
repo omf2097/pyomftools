@@ -5,7 +5,7 @@ and back to help with poking at the binary.
 
 ## HTML cards
 
-Prebuilt version of the HTML data is available at 
+Prebuilt version of the HTML data is available at
 https://katajakasa.fi/projects/openomf/cards/
 
 ## Installation
@@ -14,6 +14,12 @@ https://katajakasa.fi/projects/openomf/cards/
 2. Create a virtualenv, eg. `poetry env use 3.12` and install deps `poetry install --no-root`.
 3. Activate the virtualenv, eg. `poetry shell`
 4. Run! eg. `python -m omftools.cli.af_compile -h`
+
+Or with pyenv:
+1. `pyenv install 3.11.4`
+2. `pyenv virtualenv 3.11.4 pyomftools-3.11`
+3. `pyenv local pyomftools-3.11`
+4. ...
 
 ## How to ...
 

@@ -124,7 +124,8 @@ def generate_pics(
     for idx, photo in enumerate(pic.photos):
         sprite_file = os.path.join(output_dir, f"{filename}-{idx}.png")
         try:
-            photo.sprite.save_png(sprite_file, src_pal)
+            # Render using the custom palette
+            photo.sprite.save_png(sprite_file, photo.palette)
         except OMFInvalidDataException:
             print(f"Skipping {sprite_file}")
 
@@ -160,15 +161,17 @@ def generate_bk(file: str, files: Filenames, output_dir: str) -> None:
     filename = os.path.basename(file)
     bk = BKFile.load_native(file)
 
+    # Save background using the processed palette from BKFile
     bk.save_background(os.path.join(output_dir, f"{filename}-bg.png"))
 
-    pal = copy.deepcopy(bk.palettes[0].colors)
+    # Get the appropriate palette based on filename
+    processed_palette = bk.get_processed_palette(file)
 
     for key, animation in bk.animations.items():
         for idx, sprite in enumerate(animation.sprites):
             sprite_file = os.path.join(output_dir, f"{filename}-{key}-{idx}.png")
             try:
-                sprite.save_png(sprite_file, pal)
+                sprite.save_png(sprite_file, processed_palette)
             except OMFInvalidDataException:
                 print(f"Skipping {sprite_file}")
 
@@ -182,11 +185,16 @@ def generate_af(
     filename = os.path.basename(file)
     af = AFFile.load_native(file)
 
+    # Use default palette for AF sprites
+    default_palette = Palette()
+    # mask off the scene colors
+    default_palette.mask_range(0x60, 64)
+
     for key, animation in af.moves.items():
         for idx, sprite in enumerate(animation.sprites):
             sprite_file = os.path.join(output_dir, f"{filename}-{key}-{idx}.png")
             try:
-                sprite.save_png(sprite_file, alt_pals.palettes[0])
+                sprite.save_png(sprite_file, default_palette, asset_type="af_sprite")
             except OMFInvalidDataException:
                 print(f"Skipping {sprite_file}")
 

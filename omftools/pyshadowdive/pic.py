@@ -43,6 +43,16 @@ class Photo(DataObject):
         self.is_player = parser.get_uint8() > 0
         self.sex = Sex(parser.get_uint16())
         self.palette = Palette().read_range(parser, 0, 48)
+        # Reset the 0th color, as sometimes it's not properly set
+        self.palette.reset_range(0, 1)
+        # Mask the 0x60-0x9F range with magenta
+        self.palette.mask_range(0x60, 64)
+        # Mask out above 0xf3 because those change between mechlab/vs/arena
+        self.palette.mask_range(0xf4, 7)
+
+        # Example of how to reset a range back to default values
+        # For instance, if we wanted to restore indices 0xA0-0xAF back to defaults:
+        # self.palette.reset_range(0xA0, 16)
         self.has_photo = parser.get_boolean()
         if self.has_photo:
             self.sprite = Sprite().read(parser)
@@ -83,7 +93,13 @@ class PicFile(Entrypoint):
         self.photos = []
         for offset in offsets:
             parser.set_pos(offset)
-            self.photos.append(Photo().read(parser))
+            photo = Photo().read(parser)
+
+            # Example of palette management for different assets:
+            # If we're processing another file type after this, we might want to reset specific ranges
+            # photo.palette.reset_range(0x00, 48)  # Reset the first 48 colors back to defaults
+
+            self.photos.append(photo)
 
         return self
 
