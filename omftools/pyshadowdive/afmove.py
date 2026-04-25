@@ -8,37 +8,56 @@ from .utils.parser import BinaryParser
 from .utils.validator import UInt8, UInt16
 
 
-class AIOptions(IntFlag):
+class AIMoveTriggers(IntFlag):
+    """AI context bits on an AF move.
+
+    Each bit marks a move as relevant for a specific opponent-state /
+    self-state combination.
+    """
     NONE = 0
-    FLAG_1 = 0x1
-    FLAG_2 = 0x2
-    FLAG_3 = 0x4
-    FLAG_4 = 0x8
-    FLAG_5 = 0x10
-    FLAG_6 = 0x20
-    FLAG_7 = 0x40
-    FLAG_8 = 0x80
-    FLAG_9 = 0x100
-    FLAG_10 = 0x200
-    FLAG_11 = 0x400
-    FLAG_12 = 0x800
-    FLAG_13 = 0x1000
-    FLAG_14 = 0x2000
-    FLAG_15 = 0x4000
-    FLAG_16 = 0x8000
+    GND_STATE_1 = 0x0001            # opponent grounded, AI stance 1
+    VS_HIGH_OR_IDLE = 0x0002        # opponent attack CAT_HIGH or ANIM_IDLE
+    VS_LOW_OR_CROUCH = 0x0004       # opponent attack CAT_LOW or ANIM_CROUCHING
+    VS_MEDIUM = 0x0008              # opponent attack CAT_MEDIUM
+    VS_PROJECTILE_HIGH = 0x0010     # CAT_PROJECTILE at/above y-threshold (ref: ai_projectile_y_threshold field)
+    GND_STATE_2 = 0x0020            # opponent grounded, AI stance 2
+    GND_STATE_3 = 0x0040            # opponent grounded, AI stance 3
+    GND_STATE_0 = 0x0080            # opponent grounded, AI stance 0
+    AIR_STATE_0 = 0x0100            # opponent airborne, AI stance 0
+    AIR_STATE_1 = 0x0200            # opponent airborne, AI stance 1
+    AIR_STATE_2 = 0x0400            # opponent airborne, AI stance 2
+    AIR_STATE_3 = 0x0800            # opponent airborne, AI stance 3
+    FLAG_1000 = 0x1000              # unknown — 3 uses in data (Jaguar leap/charge)
+    VS_PROJECTILE_LOW = 0x2000      # CAT_PROJECTILE below y-threshold (evade reaction) (ref: ai_projectile_y_threshold field)
+    FLAG_4000 = 0x4000              # reserved
+    FLAG_8000 = 0x8000              # reserved
 
     def __str__(self) -> str:
         return "{} ({})".format(self.name, self.value)
 
 
 class PositionConstraint(IntFlag):
+    """Positional / state requirements declared on an AF move.
+
+    Every set bit must be satisfied by the HAR's current state.
+    """
     NONE = 0
-    WALL = 1
-    AIRBORNE = 2
-    CLOSE = 4
-    SOMETHING_1 = 0x40
-    SOMETHING_2 = 0x2000
-    SOMETHING_3 = 0x4000
+    WALL = 0x0001                     # HAR near wall (pos_x_shft outside [0x1500, 0x12a00])
+    NO_DIST_CHECK = 0x0002            # bypass distance/position gating (chained moves)
+    JUMP_WALL_BOUNCE = 0x0004         # signal on target's jump anim: wall-bounce on aerial hit
+    IN_ARENA_0 = 0x0008               # require ARENA0 — unused in shipped data
+    IN_ARENA_1 = 0x0010               # require ARENA1 — unused
+    IN_ARENA_2 = 0x0020               # require ARENA2 — unused
+    IN_ARENA_3 = 0x0040               # require ARENA3 (Fire Pit)
+    IN_ARENA_4 = 0x0080               # require ARENA4 — unused
+    FLAG_100 = 0x0100                 # field_5A never sets this; reserved
+    FLAG_200 = 0x0200                 # reserved
+    FLAG_400 = 0x0400                 # reserved
+    FLAG_800 = 0x0800                 # reserved
+    FLAG_1000 = 0x1000                # signal on target anim; never set in shipped data
+    FIRE_ICE_ALLOWED = 0x2000         # require can_perform_fire_ice_move global
+    OPP_FIRE_ICE_DESTRUCT = 0x4000    # require opponent's pilot.force_arena & 0x400
+    FLAG_8000 = 0x8000                # reserved
 
     def __str__(self) -> str:
         return "{} ({})".format(self.name, self.value)
@@ -63,18 +82,19 @@ class ExtraStringSelector(IntEnum):
 
 
 class MoveCategory(IntEnum):
+    """ Animation/move category """
     MISCELLANEOUS = 0
-    UNKNOWN_A = 1
+    UNKNOWN_1 = 1
     CLOSE = 2
-    UNKNOWN_B = 3
+    UNKNOWN_3 = 3
     LOW = 4
     MEDIUM = 5
     HIGH = 6
     JUMPING = 7
     PROJECTILE = 8
     BASIC = 9
-    VICTORY_DEFEAT = 10
-    FIRE_ICE = 11
+    BK_HAZARD = 10
+    VICTORY = 11
     SCRAP = 12
     DESTRUCTION = 13
 
@@ -107,7 +127,7 @@ AF_ANIMATION_NAMES: typing.Final[dict[int, str]] = {
 
 class AFMove(Animation):
     __slots__ = (
-        "ai_opts",
+        "ai_flags",
         "pos_constraint",
         "unknown_4",
         "unknown_5",
@@ -134,7 +154,7 @@ class AFMove(Animation):
         {
             **Animation.schema.schema,  # type: ignore
             **{
-                "ai_opts": UInt16,
+                "ai_flags": UInt16,
                 "pos_constraint": UInt16,
                 "unknown_4": UInt8,
                 "unknown_5": UInt8,
@@ -161,7 +181,7 @@ class AFMove(Animation):
 
     def __init__(self) -> None:
         super(AFMove, self).__init__()
-        self.ai_opts: AIOptions = AIOptions.NONE
+        self.ai_flags: AIMoveTriggers = AIMoveTriggers.NONE
         self.pos_constraint: PositionConstraint = PositionConstraint.NONE
         self.unknown_4: int = 0
         self.unknown_5: int = 0
@@ -193,7 +213,7 @@ class AFMove(Animation):
 
     def read(self, parser: BinaryParser) -> AFMove:
         super(AFMove, self).read(parser)
-        self.ai_opts = AIOptions(parser.get_uint16())
+        self.ai_flags = AIMoveTriggers(parser.get_uint16())
         self.pos_constraint = PositionConstraint(parser.get_uint16())
         self.unknown_4 = parser.get_uint8()
         self.unknown_5 = parser.get_uint8()
@@ -218,7 +238,7 @@ class AFMove(Animation):
 
     def write(self, parser: BinaryParser) -> None:
         super(AFMove, self).write(parser)
-        parser.put_uint16(self.ai_opts)
+        parser.put_uint16(self.ai_flags)
         parser.put_uint16(self.pos_constraint)
         parser.put_uint8(self.unknown_4)
         parser.put_uint8(self.unknown_5)
@@ -244,7 +264,7 @@ class AFMove(Animation):
         return {
             **super(AFMove, self).serialize(),
             **{
-                "ai_opts": self.ai_opts.value,
+                "ai_flags": self.ai_flags.value,
                 "pos_constraint": self.pos_constraint.value,
                 "unknown_4": self.unknown_4,
                 "unknown_5": self.unknown_5,
@@ -270,7 +290,7 @@ class AFMove(Animation):
 
     def unserialize(self, data: dict) -> AFMove:
         super(AFMove, self).unserialize(data)
-        self.ai_opts = AIOptions(data["ai_opts"])
+        self.ai_flags = AIMoveTriggers(data["ai_flags"])
         self.pos_constraint = PositionConstraint(data["pos_constraint"])
         self.unknown_4 = data["unknown_4"]
         self.unknown_5 = data["unknown_5"]

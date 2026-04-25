@@ -4,6 +4,7 @@ from enum import IntEnum
 
 from .protos import DataObject
 from .palette import Palette
+from .pic import Sex
 from .utils.parser import BinaryParser
 
 
@@ -27,6 +28,40 @@ class Difficulty(IntEnum):
     IRON = 1
     STEEL = 2
     HEAVY_METAL = 3
+
+
+class PilotPhoto(DataObject):
+    """Embedded `pilot_photo` block at pilot +280..+427 (148 B).
+
+    Mirrors the runtime `pilot_photo` struct in the binary minus the leading
+    `data` pointer (which is read as file garbage and skipped by the caller).
+    The on-disk PHOTOS.DAT entry layout is *different* — see `pic.Photo`.
+    """
+
+    __slots__ = ("palette", "is_player", "photo_id", "sex")
+
+    def __init__(self) -> None:
+        self.palette: Palette = Palette()
+        self.is_player: int = 0  # int16
+        self.photo_id: int = 0   # low 10 bits of char_sex (PHOTOS.DAT index)
+        self.sex: Sex = Sex.MALE  # bits 10-11 of char_sex
+
+    def serialize(self) -> dict:
+        return {
+            "palette": self.palette.serialize(),
+            "is_player": self.is_player,
+            "photo_id": self.photo_id,
+            "sex": self.sex.value,
+        }
+
+    def read(self, parser: BinaryParser) -> "PilotPhoto":
+        self.palette = Palette().read_range(parser, 0, 48)  # photo.palette (144 B)
+        self.is_player = parser.get_int16()                 # photo.is_player
+        # photo.char_sex packs photo_id in bits 0-9 and sex in bits 10-11.
+        char_sex = parser.get_uint16()
+        self.photo_id = char_sex & 0x3FF
+        self.sex = Sex((char_sex >> 10) & 0x3)
+        return self
 
 
 class Pilot(DataObject):
@@ -95,6 +130,7 @@ class Pilot(DataObject):
         "att_def",
         "att_sniper",
         "unk_block_d",
+        "ap_close",
         "ap_throw",
         "ap_special",
         "ap_jump",
@@ -110,6 +146,9 @@ class Pilot(DataObject):
     )
 
     OTHER_GROUP: typing.Final[tuple] = (
+        "sound_1",
+        "sound_2",
+        "sound_3",
         "unk_block_f",
         "enemies_inc_unranked",
         "enemies_ex_unranked",
@@ -117,10 +156,10 @@ class Pilot(DataObject):
         "unk_d_b",
         "winnings",
         "total_value",
-        "unk_f_a",
+        "current_health",
+        "maximum_health",
         "unk_f_b",
-        "unk_block_i",
-        "photo_id",
+        # `photo` (PilotPhoto) is rendered as its own cards in trn_index.html.
     )
 
     QUOTES_BLOCK: typing.Final[tuple] = ("quotes",)
@@ -178,6 +217,7 @@ class Pilot(DataObject):
         "att_def",
         "att_sniper",
         "unk_block_d",
+        "ap_close",
         "ap_throw",
         "ap_special",
         "ap_jump",
@@ -190,6 +230,9 @@ class Pilot(DataObject):
         "unknown_e",
         "learning",
         "forget",
+        "sound_1",
+        "sound_2",
+        "sound_3",
         "unk_block_f",
         "enemies_inc_unranked",
         "enemies_ex_unranked",
@@ -197,11 +240,10 @@ class Pilot(DataObject):
         "unk_d_b",
         "winnings",
         "total_value",
-        "unk_f_a",
+        "current_health",
+        "maximum_health",
         "unk_f_b",
-        "palette",
-        "unk_block_i",
-        "photo_id",
+        "photo",
         "quotes",
     )
 
@@ -261,7 +303,8 @@ class Pilot(DataObject):
         self.att_def: int = 0  # uint8_t
         self.att_sniper: int = 0  # uint8_t
 
-        self.unk_block_d: list[int] = []  # uint16_t
+        self.unk_block_d: list[int] = []  # uint16_t × 2 (pilot +196..+199; field_C4, field_C6)
+        self.ap_close: int = 0  # int16_t (pilot +200; AI weight for CAT_CLOSE moves)
         self.ap_throw: int = 0  # int16_t
         self.ap_special: int = 0  # int16_t
         self.ap_jump: int = 0  # int16_t
@@ -274,7 +317,10 @@ class Pilot(DataObject):
         self.unknown_e: int = 0  # uint32_t
         self.learning: float = 0.0  # float
         self.forget: float = 0.0  # float
-        self.unk_block_f: list[int] = []  # char
+        self.sound_1: int = 0  # int16_t
+        self.sound_2: int = 0  # int16_t
+        self.sound_3: int = 0  # int16_t
+        self.unk_block_f: list[int] = []  # uint16_t × 4
         self.enemies_inc_unranked: int = 0  # uint16_t
         self.enemies_ex_unranked: int = 0  # uint16_t
 
@@ -283,11 +329,10 @@ class Pilot(DataObject):
 
         self.winnings: int = 0  # uint32_t
         self.total_value: int = 0  # uint32_t
-        self.unk_f_a: float = 0.0  # float
+        self.current_health: int = 0  # int16_t (health.current_health)
+        self.maximum_health: int = 0  # int16_t (health.maximum_health)
         self.unk_f_b: float = 0.0  # float
-        self.palette: Palette = Palette()  # sd_palette
-        self.unk_block_i: int = 0  # uint16_t
-        self.photo_id: int = 0  # uint16_t
+        self.photo: PilotPhoto = PilotPhoto()
 
         self.quotes: list[str] = []
 
@@ -345,6 +390,7 @@ class Pilot(DataObject):
             "att_def": self.att_def,
             "att_sniper": self.att_sniper,
             "unk_block_d": self.unk_block_d,
+            "ap_close": self.ap_close,
             "ap_throw": self.ap_throw,
             "ap_special": self.ap_special,
             "ap_jump": self.ap_jump,
@@ -357,6 +403,9 @@ class Pilot(DataObject):
             "unknown_e": self.unknown_e,
             "learning": self.learning,
             "forget": self.forget,
+            "sound_1": self.sound_1,
+            "sound_2": self.sound_2,
+            "sound_3": self.sound_3,
             "unk_block_f": self.unk_block_f,
             "enemies_inc_unranked": self.enemies_inc_unranked,
             "enemies_ex_unranked": self.enemies_ex_unranked,
@@ -364,11 +413,10 @@ class Pilot(DataObject):
             "unk_d_b": self.unk_d_b,
             "winnings": self.winnings,
             "total_value": self.total_value,
-            "unk_f_a": self.unk_f_a,
+            "current_health": self.current_health,
+            "maximum_health": self.maximum_health,
             "unk_f_b": self.unk_f_b,
-            "palette": self.palette,
-            "unk_block_i": self.unk_block_i,
-            "photo_id": self.photo_id,
+            "photo": self.photo.serialize(),
             "quotes": self.quotes,
         }
 
@@ -445,7 +493,8 @@ class Pilot(DataObject):
         self.att_def = att[2] & 0x7F
         self.att_sniper = (att[2] >> 7) & 0x7F
 
-        self.unk_block_d = [parser.get_uint16() for _ in range(3)]
+        self.unk_block_d = [parser.get_uint16() for _ in range(2)]
+        self.ap_close = parser.get_int16()
 
         self.ap_throw = parser.get_int16()
         self.ap_special = parser.get_int16()
@@ -461,7 +510,10 @@ class Pilot(DataObject):
         self.learning = parser.get_float()
         self.forget = parser.get_float()
 
-        self.unk_block_f = [parser.get_uint8() for _ in range(14)]
+        self.sound_1 = parser.get_int16()
+        self.sound_2 = parser.get_int16()
+        self.sound_3 = parser.get_int16()
+        self.unk_block_f = [parser.get_uint16() for _ in range(4)]
 
         self.enemies_inc_unranked = parser.get_uint16()
         self.enemies_ex_unranked = parser.get_uint16()
@@ -470,14 +522,12 @@ class Pilot(DataObject):
         self.winnings = parser.get_uint32()
         self.total_value = parser.get_uint32()
 
-        self.unk_f_a = parser.get_float()
+        self.current_health = parser.get_int16()
+        self.maximum_health = parser.get_int16()
         self.unk_f_b = parser.get_float()
         parser.skip(8)
 
-        self.palette = Palette().read_range(parser, 0, 48)
-
-        self.unk_block_i = parser.get_uint16()
-        self.photo_id = parser.get_uint16() & 0x3FF
+        self.photo = PilotPhoto().read(parser)
 
     def read(self, parser: BinaryParser) -> Pilot:
         parser.set_xor_key(self.PILOT_BLOCK_LENGTH & 0xFF)
