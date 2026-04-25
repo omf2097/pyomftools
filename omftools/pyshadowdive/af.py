@@ -14,99 +14,99 @@ class AFFile(Entrypoint):
     MOVE_MAX_NUMBER = 70
 
     __slots__ = (
-        "file_id",
+        "fighter_id",
         "exec_window",
         "endurance",
-        "unknown_b",
+        "upwards_jump_frame_limit",
         "health",
         "forward_speed",
         "reverse_speed",
         "jump_speed",
         "fall_speed",
         "version_1",
-        "version_2",
+        "ai_projectile_y_threshold",
         "sound_table",
         "moves",
     )
 
     schema = Dict(
         {
-            "file_id": UInt16,
+            "fighter_id": UInt16,
             "exec_window": UInt16,
             "endurance": UInt32,
-            "unknown_b": UInt8,
+            "upwards_jump_frame_limit": UInt8,
             "health": UInt16,
             "forward_speed": Int32,
             "reverse_speed": Int32,
             "jump_speed": Int32,
             "fall_speed": Int32,
             "version_1": UInt8,
-            "version_2": UInt8,
+            "ai_projectile_y_threshold": UInt8,
             "sound_table": List(UInt8, maxlen=30, minlen=30),
             "moves": Dict(extra=(Str(pattern=r"^[0-9]+$"), AFMove.schema)),
         }
     )
 
     def __init__(self) -> None:
-        self.file_id: int = 0
+        self.fighter_id: int = 0
         self.exec_window: int = 0
         self.endurance: int = 0
-        self.unknown_b: int = 0
+        self.upwards_jump_frame_limit: int = 0
         self.health: int = 0
         self.forward_speed: int = 0
         self.reverse_speed: int = 0
         self.jump_speed: int = 0
         self.fall_speed: int = 0
         self.version_1: int = 0
-        self.version_2: int = 0
+        self.ai_projectile_y_threshold: int = 0
         self.moves: dict[int, AFMove] = {}
         self.sound_table: list[int] = []
 
     def serialize(self) -> dict[str, typing.Any]:
         return {
-            "file_id": self.file_id,
+            "fighter_id": self.fighter_id,
             "exec_window": self.exec_window,
             "endurance": self.endurance,
-            "unknown_b": self.unknown_b,
+            "upwards_jump_frame_limit": self.upwards_jump_frame_limit,
             "health": self.health,
             "forward_speed": self.forward_speed,
             "reverse_speed": self.reverse_speed,
             "jump_speed": self.jump_speed,
             "fall_speed": self.fall_speed,
             "version_1": self.version_1,
-            "version_2": self.version_2,
+            "ai_projectile_y_threshold": self.ai_projectile_y_threshold,
             "moves": {k: v.serialize() for k, v in self.moves.items()},
             "sound_table": self.sound_table,
         }
 
     def unserialize(self, data: dict) -> AFFile:
-        self.file_id = data["file_id"]
+        self.fighter_id = data["fighter_id"]
         self.exec_window = data["exec_window"]
         self.endurance = data["endurance"]
-        self.unknown_b = data["unknown_b"]
+        self.upwards_jump_frame_limit = data["upwards_jump_frame_limit"]
         self.health = data["health"]
         self.forward_speed = data["forward_speed"]
         self.reverse_speed = data["reverse_speed"]
         self.jump_speed = data["jump_speed"]
         self.fall_speed = data["fall_speed"]
         self.version_1 = data["version_1"]
-        self.version_2 = data["version_2"]
+        self.ai_projectile_y_threshold = data["ai_projectile_y_threshold"]
         self.moves = {int(k): AFMove().unserialize(v) for k, v in data["moves"].items()}
         self.sound_table = data["sound_table"]
         return self
 
     def read(self, parser: BinaryParser) -> AFFile:
-        self.file_id = parser.get_uint16()
+        self.fighter_id = parser.get_uint16()
         self.exec_window = parser.get_uint16()
         self.endurance = parser.get_uint32()
-        self.unknown_b = parser.get_uint8()
+        self.upwards_jump_frame_limit = parser.get_uint8()
         self.health = parser.get_uint16()
         self.forward_speed = parser.get_int32()
         self.reverse_speed = parser.get_int32()
         self.jump_speed = parser.get_int32()
         self.fall_speed = parser.get_int32()
         self.version_1 = parser.get_uint8()
-        self.version_2 = parser.get_uint8()
+        self.ai_projectile_y_threshold = parser.get_uint8()
 
         # Read all animations (up to max MOVE_MAX_NUMBER)
         while True:
@@ -132,17 +132,17 @@ class AFFile(Entrypoint):
         return self
 
     def write(self, parser: BinaryParser) -> None:
-        parser.put_uint16(self.file_id)
+        parser.put_uint16(self.fighter_id)
         parser.put_uint16(self.exec_window)
         parser.put_uint32(self.endurance)
-        parser.put_uint8(self.unknown_b)
+        parser.put_uint8(self.upwards_jump_frame_limit)
         parser.put_uint16(self.health)
         parser.put_int32(self.forward_speed)
         parser.put_int32(self.reverse_speed)
         parser.put_int32(self.jump_speed)
         parser.put_int32(self.fall_speed)
         parser.put_uint8(self.version_1)
-        parser.put_uint8(self.version_2)
+        parser.put_uint8(self.ai_projectile_y_threshold)
 
         # Write moves
         for key, move in self.moves.items():

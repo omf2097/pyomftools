@@ -1,5 +1,6 @@
 from __future__ import annotations
 import typing
+from enum import IntFlag
 from validx import Dict, List, Str
 import io
 
@@ -13,11 +14,26 @@ from .utils.validator import UInt16, UInt32, UInt8
 from .utils.images import generate_png, save_png
 
 
+class MusicMask(IntFlag):
+    """Bitmask of PSM music tracks referenced by a BK scene."""
+    NONE = 0
+    END = 0x02      # end.psm
+    MENU = 0x04     # menu.psm
+    ARENA0 = 0x08   # arena0.psm
+    ARENA1 = 0x10   # arena1.psm
+    ARENA2 = 0x20   # arena2.psm
+    ARENA3 = 0x40   # arena3.psm
+    ARENA4 = 0x80   # arena4.psm
+
+    def __str__(self) -> str:
+        return "{} ({})".format(self.name, self.value)
+
+
 class BKFile(Entrypoint):
     ANIMATION_MAX_NUMBER: typing.Final[int] = 50
 
     __slots__ = (
-        "file_id",
+        "music_mask",
         "unknown_a",
         "background_width",
         "background_height",
@@ -29,7 +45,7 @@ class BKFile(Entrypoint):
 
     schema = Dict(
         {
-            "file_id": UInt32,
+            "music_mask": UInt32,
             "unknown_a": UInt8,
             "background_width": UInt16,
             "background_height": UInt16,
@@ -41,7 +57,7 @@ class BKFile(Entrypoint):
     )
 
     def __init__(self) -> None:
-        self.file_id: int = 0
+        self.music_mask: MusicMask = MusicMask.NONE
         self.unknown_a: int = 0
         self.background_width: int = 0
         self.background_height: int = 0
@@ -52,7 +68,7 @@ class BKFile(Entrypoint):
 
     def serialize(self) -> dict:
         return {
-            "file_id": self.file_id,
+            "music_mask": self.music_mask.value,
             "unknown_a": self.unknown_a,
             "background_width": self.background_width,
             "background_height": self.background_height,
@@ -63,7 +79,7 @@ class BKFile(Entrypoint):
         }
 
     def unserialize(self, data: dict) -> BKFile:
-        self.file_id = data["file_id"]
+        self.music_mask = MusicMask(data["music_mask"])
         self.unknown_a = data["unknown_a"]
         self.background_width = data["background_width"]
         self.background_height = data["background_height"]
@@ -76,7 +92,7 @@ class BKFile(Entrypoint):
         return self
 
     def read(self, parser: BinaryParser) -> BKFile:
-        self.file_id = parser.get_uint32()
+        self.music_mask = MusicMask(parser.get_uint32())
         self.unknown_a = parser.get_uint8()
         self.background_width = parser.get_uint16()
         self.background_height = parser.get_uint16()
@@ -103,7 +119,7 @@ class BKFile(Entrypoint):
         return self
 
     def write(self, parser: BinaryParser) -> None:
-        parser.put_uint32(self.file_id)
+        parser.put_uint32(self.music_mask.value)
         parser.put_uint8(self.unknown_a)
         parser.put_uint16(self.background_width)
         parser.put_uint16(self.background_height)

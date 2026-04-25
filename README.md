@@ -23,3 +23,9 @@ https://katajakasa.fi/projects/openomf/cards/
 2. Make sure the tag `omftools/resources/tags.csv` is up-to-date.
 3. Run `poetry run python -m omftools.cli.tags -i omftools/resources/tags.csv taglist.c`
 4. Copy the generated `taglist.c` as required.
+
+### Generate the HTML cards
+
+1. Do the installation step above
+2. Run `poetry run python -m omftools.cli.generate_html <resource-dir> <output-dir>`
+3. Check out the shiny HTML!
