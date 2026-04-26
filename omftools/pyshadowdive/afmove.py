@@ -119,9 +119,6 @@ AF_ANIMATION_NAMES: typing.Final[dict[int, str]] = {
     14: "Screw",
     48: "Victory",
     49: "Loss",
-    55: "Blast 1",
-    56: "Blast 2",
-    57: "Blast 3",
 }
 
 
