@@ -5,6 +5,8 @@ import sqlite3
 import sys
 from pathlib import Path
 
+from omftools.cli.enumize_tags import to_ident
+
 PROJECT_ROOT = Path(__file__).parent.parent
 TAGS_CSV_FILE = PROJECT_ROOT / "resources" / "tags.csv"
 
@@ -13,16 +15,20 @@ InputRows = list[list[str]]
 
 def to_c_array(file_name: str, rows: InputRows) -> None:
     with open(file_name, "wb") as output_file:
-        output_file.write(b'#include "formats/taglist.h"\n\n')
+        output_file.write(b'#include "formats/tag_list.h"\n')
+        output_file.write(b'#include "formats/script_tag.h"\n')
+        output_file.write(b"#include <stddef.h>\n\n")
         output_file.write(b"// This file is generated automatically\n\n")
-        output_file.write(b"const sd_tag sd_taglist[] = {\n")
+        output_file.write(b"const tag_descriptor tag_descriptor_list[] = {\n")
 
         for row in rows:
             row[2] = f'"{row[2]}"' if row[2] else "NULL"
-            output_file.write(f'    {{"{row[0]}", {row[1]}, {row[2]}}},\n'.encode())
+            output_file.write(
+                f'    [{to_ident(row[0])}] = {{"{row[0]}", {row[1]}, {row[2]}}},\n'.encode()
+            )
 
         output_file.write(b"};\n\n")
-        output_file.write(b"const int sd_taglist_size = %d;\n\n" % len(rows))
+        output_file.write(b"const int tag_descriptor_count = %d;\n\n" % len(rows))
 
 
 def to_json(file_name: str, rows: InputRows) -> None:
