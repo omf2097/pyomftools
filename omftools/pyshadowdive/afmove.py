@@ -15,18 +15,18 @@ class AIMoveTriggers(IntFlag):
     self-state combination.
     """
     NONE = 0
-    GND_STATE_1 = 0x0001            # opponent grounded, AI stance 1
+    VS_AIR_STATE_1 = 0x0001         # opponent airborne, range bucket 1
     VS_HIGH_OR_IDLE = 0x0002        # opponent attack CAT_HIGH or ANIM_IDLE
     VS_LOW_OR_CROUCH = 0x0004       # opponent attack CAT_LOW or ANIM_CROUCHING
     VS_MEDIUM = 0x0008              # opponent attack CAT_MEDIUM
     VS_PROJECTILE_HIGH = 0x0010     # CAT_PROJECTILE at/above y-threshold (ref: ai_projectile_y_threshold field)
-    GND_STATE_2 = 0x0020            # opponent grounded, AI stance 2
-    GND_STATE_3 = 0x0040            # opponent grounded, AI stance 3
-    GND_STATE_0 = 0x0080            # opponent grounded, AI stance 0
-    AIR_STATE_0 = 0x0100            # opponent airborne, AI stance 0
-    AIR_STATE_1 = 0x0200            # opponent airborne, AI stance 1
-    AIR_STATE_2 = 0x0400            # opponent airborne, AI stance 2
-    AIR_STATE_3 = 0x0800            # opponent airborne, AI stance 3
+    VS_AIR_STATE_2 = 0x0020         # opponent airborne, range bucket 2
+    VS_AIR_STATE_3 = 0x0040         # opponent airborne, range bucket 3
+    VS_AIR_STATE_0 = 0x0080         # opponent airborne, range bucket 0
+    VS_GND_STATE_0 = 0x0100         # opponent grounded, range bucket 0
+    VS_GND_STATE_1 = 0x0200         # opponent grounded, range bucket 1
+    VS_GND_STATE_2 = 0x0400         # opponent grounded, range bucket 2
+    VS_GND_STATE_3 = 0x0800         # opponent grounded, range bucket 3
     FLAG_1000 = 0x1000              # unknown — 3 uses in data (Jaguar leap/charge)
     VS_PROJECTILE_LOW = 0x2000      # CAT_PROJECTILE below y-threshold (evade reaction) (ref: ai_projectile_y_threshold field)
     FLAG_4000 = 0x4000              # reserved
