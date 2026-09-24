@@ -36,6 +36,104 @@ har_names = [
 ]
 
 
+def save_hitcoord_png(sprite, filename: str, hit_coords):
+    """Save a hit coordinate overlay PNG for a sprite frame.
+
+    Hit coordinates are the attack points -- where a move can land a
+    hit on another fighter's sprite pixels. These are stored as 10-bit
+    integers per frame in the animation data, separate from the sprite
+    image (which is used as the defensive "can be hit" mask directly).
+
+    The canvas is expanded beyond the sprite bounds so the origin
+    point (obj->pos, the character's reference point) is always
+    visible. The sprite occupies the region starting at (offset_x,
+    offset_y) within the output image.
+
+    Palette:
+      - index 0 = transparent
+      - index 1 = hit coordinate (red, attack point)
+      - index 2 = origin marker (green)
+
+    Hit coordinates and origin are both relative to obj->pos (the
+    animation origin). sprite->pos_x/pos_y is the offset from
+    obj->pos to the top-left of the sprite.
+    """
+    w, h = sprite.width, sprite.height
+    if w == 0 or h == 0:
+        return
+
+    # Compute bounding box that includes the sprite rect and the
+    # origin (0,0 in obj->pos space) and all hit coords.
+    # In obj->pos space, sprite occupies [pos_x .. pos_x+w, pos_y .. pos_y+h].
+    min_x = min(0, sprite.pos_x)
+    min_y = min(0, sprite.pos_y)
+    max_x = max(1, sprite.pos_x + w)
+    max_y = max(1, sprite.pos_y + h)
+
+    if hit_coords:
+        for coord in hit_coords:
+            min_x = min(min_x, coord["x"])
+            min_y = min(min_y, coord["y"])
+            max_x = max(max_x, coord["x"] + 1)
+            max_y = max(max_y, coord["y"] + 1)
+
+    canvas_w = max_x - min_x
+    canvas_h = max_y - min_y
+    if canvas_w <= 0 or canvas_h <= 0:
+        return
+
+    mask = [0] * (canvas_w * canvas_h)
+
+    # Offset to convert from obj->pos space to canvas space.
+    off_x = -min_x
+    off_y = -min_y
+
+    # Draw order: corners first, then hit coords, then origin.
+    # Later layers overwrite earlier ones so hits show on top of
+    # corners and origin shows on top of everything.
+
+    # 1. L-shaped corner markers for sprite bounding box (index 3).
+    sx = sprite.pos_x + off_x
+    sy = sprite.pos_y + off_y
+    corners = [
+        (sx, sy, 1, 0, 0, 1),              # top-left: right + down
+        (sx + w - 1, sy, -1, 0, 0, 1),     # top-right: left + down
+        (sx, sy + h - 1, 1, 0, 0, -1),     # bottom-left: right + up
+        (sx + w - 1, sy + h - 1, -1, 0, 0, -1),  # bottom-right: left + up
+    ]
+    for cx, cy, dx1, dy1, dx2, dy2 in corners:
+        for px, py in [(cx, cy), (cx + dx1, cy + dy1), (cx + dx2, cy + dy2)]:
+            if 0 <= px < canvas_w and 0 <= py < canvas_h:
+                mask[py * canvas_w + px] = 3
+
+    # 2. Hit coordinates (index 1).
+    if hit_coords:
+        for coord in hit_coords:
+            cx = coord["x"] + off_x
+            cy = coord["y"] + off_y
+            if 0 <= cx < canvas_w and 0 <= cy < canvas_h:
+                mask[cy * canvas_w + cx] = 1
+
+    # 3. Origin marker at (0,0) in obj->pos space (index 2).
+    ox = off_x
+    oy = off_y
+    if 0 <= ox < canvas_w and 0 <= oy < canvas_h:
+        mask[oy * canvas_w + ox] = 2
+
+    if not any(mask):
+        return
+
+    img = Image.new("P", (canvas_w, canvas_h), color=0)
+    img.putdata(mask)
+    pal = [0] * 768
+    pal[3], pal[4], pal[5] = 255, 0, 0      # index 1: red (attack point)
+    pal[6], pal[7], pal[8] = 0, 255, 0      # index 2: green (origin)
+    pal[9], pal[10], pal[11] = 255, 255, 0  # index 3: yellow (sprite bbox)
+    img.putpalette(pal)
+    with open(filename, "wb") as fd:
+        img.save(fd, "png", transparency=0)
+
+
 def create_directory_structure(base_dir: str):
     """Create the directory structure for the mod"""
 
@@ -371,15 +469,23 @@ def process_scenes(bk_files: list, mod_dir: str, alt_pals: AltPaletteFile):
             # Create animation data INI
             create_animation_ini(animation, anim_dir)
 
+            # Group hit coords by frame_id
+            frame_coords = {}
+            for coord in animation.hit_coords:
+                fid = coord["frame_id"]
+                frame_coords.setdefault(fid, []).append(coord)
+
             # Save sprites
             for idx, sprite in enumerate(animation.sprites):
                 sprite_file = os.path.join(anim_dir, f"{idx}.png")
+                hitcoord_file = os.path.join(anim_dir, f"{idx}-hitcoords.png")
                 try:
                     # Get the appropriate palette
                     processed_palette = bk.get_processed_palette(
                         os.path.basename(bk_file)
                     )
                     sprite.save_png(sprite_file, processed_palette)
+                    save_hitcoord_png(sprite, hitcoord_file, frame_coords.get(idx))
                 except OMFInvalidDataException:
                     print(f"Skipping {sprite_file}")
                 except Exception as e:
@@ -421,13 +527,21 @@ def process_fighters(af_files: list, mod_dir: str):
             # Create animation data INI
             create_animation_ini(animation, anim_dir, is_scene=False)
 
+            # Group hit coords by frame_id
+            frame_coords = {}
+            for coord in animation.hit_coords:
+                fid = coord["frame_id"]
+                frame_coords.setdefault(fid, []).append(coord)
+
             # Save sprites
             for idx, sprite in enumerate(animation.sprites):
                 sprite_file = os.path.join(anim_dir, f"{idx}.png")
+                hitcoord_file = os.path.join(anim_dir, f"{idx}-hitcoords.png")
                 try:
                     sprite.save_png(
                         sprite_file, default_palette, asset_type="af_sprite"
                     )
+                    save_hitcoord_png(sprite, hitcoord_file, frame_coords.get(idx))
                 except OMFInvalidDataException:
                     print(f"Skipping {sprite_file}")
                 except Exception as e:
