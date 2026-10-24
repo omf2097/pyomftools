@@ -13,6 +13,18 @@ class Sex(IntEnum):
     MALE = 0
     FEMALE = 1
 
+    def get_hint(self) -> typing.Optional[str]:
+        match self:
+            case Sex.MALE:
+                return "Newsroom text uses his / him / he."
+            case Sex.FEMALE:
+                return "Newsroom text uses her / her / she."
+            case _:
+                return None
+
+    def __str__(self) -> str:
+        return "{} ({})".format(self.name, self.value)
+
 
 class Photo(DataObject):
     __slots__ = (

@@ -15,22 +15,68 @@ class AIMoveTriggers(IntFlag):
     self-state combination.
     """
     NONE = 0
-    VS_AIR_STATE_1 = 0x0001         # opponent airborne, range bucket 1
-    VS_HIGH_OR_IDLE = 0x0002        # opponent attack CAT_HIGH or ANIM_IDLE
-    VS_LOW_OR_CROUCH = 0x0004       # opponent attack CAT_LOW or ANIM_CROUCHING
-    VS_MEDIUM = 0x0008              # opponent attack CAT_MEDIUM
-    VS_PROJECTILE_HIGH = 0x0010     # CAT_PROJECTILE at/above y-threshold (ref: ai_projectile_y_threshold field)
-    VS_AIR_STATE_2 = 0x0020         # opponent airborne, range bucket 2
-    VS_AIR_STATE_3 = 0x0040         # opponent airborne, range bucket 3
-    VS_AIR_STATE_0 = 0x0080         # opponent airborne, range bucket 0
-    VS_GND_STATE_0 = 0x0100         # opponent grounded, range bucket 0
-    VS_GND_STATE_1 = 0x0200         # opponent grounded, range bucket 1
-    VS_GND_STATE_2 = 0x0400         # opponent grounded, range bucket 2
-    VS_GND_STATE_3 = 0x0800         # opponent grounded, range bucket 3
-    FLAG_1000 = 0x1000              # unknown — 3 uses in data (Jaguar leap/charge)
-    VS_PROJECTILE_LOW = 0x2000      # CAT_PROJECTILE below y-threshold (evade reaction) (ref: ai_projectile_y_threshold field)
-    FLAG_4000 = 0x4000              # reserved
-    FLAG_8000 = 0x8000              # reserved
+    VS_AIR_STATE_1 = 0x0001
+    VS_HIGH_OR_IDLE = 0x0002
+    VS_LOW_OR_CROUCH = 0x0004
+    VS_MEDIUM = 0x0008
+    VS_PROJECTILE_HIGH = 0x0010
+    VS_AIR_STATE_2 = 0x0020
+    VS_AIR_STATE_3 = 0x0040
+    VS_AIR_STATE_0 = 0x0080
+    VS_GND_STATE_0 = 0x0100
+    VS_GND_STATE_1 = 0x0200
+    VS_GND_STATE_2 = 0x0400
+    VS_GND_STATE_3 = 0x0800
+    FLAG_1000 = 0x1000
+    VS_PROJECTILE_LOW = 0x2000
+    FLAG_4000 = 0x4000
+    FLAG_8000 = 0x8000
+
+    def get_hint(self) -> typing.Optional[str]:
+        match self:
+            case AIMoveTriggers.VS_AIR_STATE_1:
+                return "Opponent is airborne, distance band 1."
+            case AIMoveTriggers.VS_HIGH_OR_IDLE:
+                return "Opponent is doing a high attack, or is idle."
+            case AIMoveTriggers.VS_LOW_OR_CROUCH:
+                return "Opponent is doing a low attack, or is crouching."
+            case AIMoveTriggers.VS_MEDIUM:
+                return "Opponent is doing a medium attack."
+            case AIMoveTriggers.VS_PROJECTILE_HIGH:
+                return (
+                    "Opponent projectile at or above the HAR's "
+                    "ai_projectile_y_threshold."
+                )
+            case AIMoveTriggers.VS_AIR_STATE_2:
+                return "Opponent is airborne, distance band 2."
+            case AIMoveTriggers.VS_AIR_STATE_3:
+                return "Opponent is airborne, distance band 3."
+            case AIMoveTriggers.VS_AIR_STATE_0:
+                return "Opponent is airborne, distance band 0."
+            case AIMoveTriggers.VS_GND_STATE_0:
+                return "Opponent is on the ground, distance band 0."
+            case AIMoveTriggers.VS_GND_STATE_1:
+                return "Opponent is on the ground, distance band 1."
+            case AIMoveTriggers.VS_GND_STATE_2:
+                return "Opponent is on the ground, distance band 2."
+            case AIMoveTriggers.VS_GND_STATE_3:
+                return "Opponent is on the ground, distance band 3."
+            case AIMoveTriggers.FLAG_1000:
+                return (
+                    "Unknown; used by 3 moves in the shipped data (Jaguar leap / "
+                    "charge)."
+                )
+            case AIMoveTriggers.VS_PROJECTILE_LOW:
+                return (
+                    "Opponent projectile below the HAR's ai_projectile_y_threshold "
+                    "(evade reaction)."
+                )
+            case AIMoveTriggers.FLAG_4000:
+                return "Reserved."
+            case AIMoveTriggers.FLAG_8000:
+                return "Reserved."
+            case _:
+                return None
 
     def __str__(self) -> str:
         return "{} ({})".format(self.name, self.value)
@@ -42,22 +88,65 @@ class PositionConstraint(IntFlag):
     Every set bit must be satisfied by the HAR's current state.
     """
     NONE = 0
-    WALL = 0x0001                     # HAR near wall (pos_x_shft outside [0x1500, 0x12a00])
-    NO_DIST_CHECK = 0x0002            # bypass distance/position gating (chained moves)
-    JUMP_WALL_BOUNCE = 0x0004         # signal on target's jump anim: wall-bounce on aerial hit
-    IN_ARENA_0 = 0x0008               # require ARENA0 — unused in shipped data
-    IN_ARENA_1 = 0x0010               # require ARENA1 — unused
-    IN_ARENA_2 = 0x0020               # require ARENA2 — unused
-    IN_ARENA_3 = 0x0040               # require ARENA3 (Fire Pit)
-    IN_ARENA_4 = 0x0080               # require ARENA4 — unused
-    FLAG_100 = 0x0100                 # field_5A never sets this; reserved
-    FLAG_200 = 0x0200                 # reserved
-    FLAG_400 = 0x0400                 # reserved
-    FLAG_800 = 0x0800                 # reserved
-    FLAG_1000 = 0x1000                # signal on target anim; never set in shipped data
-    FIRE_ICE_ALLOWED = 0x2000         # require can_perform_fire_ice_move global
-    OPP_FIRE_ICE_DESTRUCT = 0x4000    # require opponent's pilot.force_arena & 0x400
-    FLAG_8000 = 0x8000                # reserved
+    WALL = 0x0001
+    NO_DIST_CHECK = 0x0002
+    JUMP_WALL_BOUNCE = 0x0004
+    IN_ARENA_0 = 0x0008
+    IN_ARENA_1 = 0x0010
+    IN_ARENA_2 = 0x0020
+    IN_ARENA_3 = 0x0040
+    IN_ARENA_4 = 0x0080
+    FLAG_100 = 0x0100
+    FLAG_200 = 0x0200
+    FLAG_400 = 0x0400
+    FLAG_800 = 0x0800
+    FLAG_1000 = 0x1000
+    FIRE_ICE_ALLOWED = 0x2000
+    OPP_FIRE_ICE_DESTRUCT = 0x4000
+    FLAG_8000 = 0x8000
+
+    def get_hint(self) -> typing.Optional[str]:
+        match self:
+            case PositionConstraint.WALL:
+                return "HAR must be near a wall (x below 21 or above 298 pixels)."
+            case PositionConstraint.NO_DIST_CHECK:
+                return "Skip the distance / position checks (used by chained moves)."
+            case PositionConstraint.JUMP_WALL_BOUNCE:
+                return (
+                    "Set on the target's jump animation: an aerial hit makes it bounce "
+                    "off the wall."
+                )
+            case PositionConstraint.IN_ARENA_0:
+                return "Only in arena 0. Unused in the shipped data."
+            case PositionConstraint.IN_ARENA_1:
+                return "Only in arena 1. Unused in the shipped data."
+            case PositionConstraint.IN_ARENA_2:
+                return "Only in arena 2. Unused in the shipped data."
+            case PositionConstraint.IN_ARENA_3:
+                return "Only in arena 3 (Fire Pit)."
+            case PositionConstraint.IN_ARENA_4:
+                return "Only in arena 4. Unused in the shipped data."
+            case PositionConstraint.FLAG_100:
+                return "Reserved."
+            case PositionConstraint.FLAG_200:
+                return "Reserved."
+            case PositionConstraint.FLAG_400:
+                return "Reserved."
+            case PositionConstraint.FLAG_800:
+                return "Reserved."
+            case PositionConstraint.FLAG_1000:
+                return "Set on the target's animation; never set in the shipped data."
+            case PositionConstraint.FIRE_ICE_ALLOWED:
+                return "Only while fire / ice moves are allowed."
+            case PositionConstraint.OPP_FIRE_ICE_DESTRUCT:
+                return (
+                    "Only when the opponent pilot has been destroyed this fight "
+                    "(Pilot.destroyed)."
+                )
+            case PositionConstraint.FLAG_8000:
+                return "Reserved."
+            case _:
+                return None
 
     def __str__(self) -> str:
         return "{} ({})".format(self.name, self.value)
@@ -65,17 +154,32 @@ class PositionConstraint(IntFlag):
 
 class ExtraStringSelector(IntEnum):
     NONE = 0
-
-    # Select string by ARM speed or LEG speed value
     ARM_SPEED = 1
     LEG_SPEED = 2
-
-    # The string selector uses the enhancement level but the damage modifier uses arm/leg power
     SPECIAL_ARM = 3
     SPECIAL_LEG = 4
-
-    # I am different.
     SPECIAL = 5
+
+    def get_hint(self) -> typing.Optional[str]:
+        match self:
+            case ExtraStringSelector.ARM_SPEED:
+                return "Extra string chosen by the pilot's arm speed."
+            case ExtraStringSelector.LEG_SPEED:
+                return "Extra string chosen by the pilot's leg speed."
+            case ExtraStringSelector.SPECIAL_ARM:
+                return (
+                    "Extra string chosen by the special-move enhancement level; damage "
+                    "scaled by arm power."
+                )
+            case ExtraStringSelector.SPECIAL_LEG:
+                return (
+                    "Extra string chosen by the special-move enhancement level; damage "
+                    "scaled by leg power."
+                )
+            case ExtraStringSelector.SPECIAL:
+                return "Special case, handled differently from the others."
+            case _:
+                return None
 
     def __str__(self) -> str:
         return "{} ({})".format(self.name, self.value)
@@ -97,6 +201,27 @@ class MoveCategory(IntEnum):
     VICTORY = 11
     SCRAP = 12
     DESTRUCTION = 13
+
+    def get_hint(self) -> typing.Optional[str]:
+        match self:
+            case MoveCategory.LOW:
+                return "Low attack."
+            case MoveCategory.MEDIUM:
+                return "Medium-height attack."
+            case MoveCategory.HIGH:
+                return "High attack."
+            case MoveCategory.JUMPING:
+                return "Attack performed in the air."
+            case MoveCategory.PROJECTILE:
+                return "Projectile attack."
+            case MoveCategory.BK_HAZARD:
+                return "Attack by an arena hazard."
+            case MoveCategory.SCRAP:
+                return "Scrap finishing move."
+            case MoveCategory.DESTRUCTION:
+                return "Destruction finishing move (also counts as scrapping)."
+            case _:
+                return None
 
     def __str__(self) -> str:
         return "{} ({})".format(self.name, self.value)

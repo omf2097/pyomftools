@@ -15,7 +15,7 @@ class AFFile(Entrypoint):
 
     __slots__ = (
         "fighter_id",
-        "exec_window",
+        "move_timeout_window",
         "endurance",
         "upwards_jump_frame_limit",
         "health",
@@ -32,7 +32,7 @@ class AFFile(Entrypoint):
     schema = Dict(
         {
             "fighter_id": UInt16,
-            "exec_window": UInt16,
+            "move_timeout_window": UInt16,
             "endurance": UInt32,
             "upwards_jump_frame_limit": UInt8,
             "health": UInt16,
@@ -49,7 +49,7 @@ class AFFile(Entrypoint):
 
     def __init__(self) -> None:
         self.fighter_id: int = 0
-        self.exec_window: int = 0
+        self.move_timeout_window: int = 0
         self.endurance: int = 0
         self.upwards_jump_frame_limit: int = 0
         self.health: int = 0
@@ -62,10 +62,47 @@ class AFFile(Entrypoint):
         self.moves: dict[int, AFMove] = {}
         self.sound_table: list[int] = []
 
+    def get_hint(self, attr: str) -> typing.Optional[str]:
+        match attr:
+            case "endurance":
+                return (
+                    "24.8 fixed point. Scaled by the pilot's stats when the HAR is "
+                    "loaded."
+                )
+            case "forward_speed":
+                return (
+                    "24.8 fixed point; the decoded value is pixels per tick, before "
+                    "pilot-stat scaling."
+                )
+            case "reverse_speed":
+                return (
+                    "24.8 fixed point; the decoded value is pixels per tick, before "
+                    "pilot-stat scaling."
+                )
+            case "jump_speed":
+                return (
+                    "24.8 fixed point; the decoded value is pixels per tick, before "
+                    "pilot-stat scaling."
+                )
+            case "fall_speed":
+                return (
+                    "24.8 fixed point; gravity added to the vertical speed every tick, "
+                    "before pilot-stat scaling."
+                )
+            case "move_timeout_window":
+                return (
+                    "Ticks a held direction stays part of a motion input (e.g. the "
+                    "down, down-forward, forward of a special move)."
+                )
+            case "version_1":
+                return "Always 50 (0x32). The game reads it but never uses it."
+            case _:
+                return super().get_hint(attr)
+
     def serialize(self) -> dict[str, typing.Any]:
         return {
             "fighter_id": self.fighter_id,
-            "exec_window": self.exec_window,
+            "move_timeout_window": self.move_timeout_window,
             "endurance": self.endurance,
             "upwards_jump_frame_limit": self.upwards_jump_frame_limit,
             "health": self.health,
@@ -81,7 +118,7 @@ class AFFile(Entrypoint):
 
     def unserialize(self, data: dict) -> AFFile:
         self.fighter_id = data["fighter_id"]
-        self.exec_window = data["exec_window"]
+        self.move_timeout_window = data["move_timeout_window"]
         self.endurance = data["endurance"]
         self.upwards_jump_frame_limit = data["upwards_jump_frame_limit"]
         self.health = data["health"]
@@ -97,7 +134,7 @@ class AFFile(Entrypoint):
 
     def read(self, parser: BinaryParser) -> AFFile:
         self.fighter_id = parser.get_uint16()
-        self.exec_window = parser.get_uint16()
+        self.move_timeout_window = parser.get_uint16()
         self.endurance = parser.get_uint32()
         self.upwards_jump_frame_limit = parser.get_uint8()
         self.health = parser.get_uint16()
@@ -133,7 +170,7 @@ class AFFile(Entrypoint):
 
     def write(self, parser: BinaryParser) -> None:
         parser.put_uint16(self.fighter_id)
-        parser.put_uint16(self.exec_window)
+        parser.put_uint16(self.move_timeout_window)
         parser.put_uint32(self.endurance)
         parser.put_uint8(self.upwards_jump_frame_limit)
         parser.put_uint16(self.health)

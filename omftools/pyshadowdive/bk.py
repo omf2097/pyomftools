@@ -17,13 +17,32 @@ from .utils.images import generate_png, save_png
 class MusicMask(IntFlag):
     """Bitmask of PSM music tracks referenced by a BK scene."""
     NONE = 0
-    END = 0x02      # end.psm
-    MENU = 0x04     # menu.psm
-    ARENA0 = 0x08   # arena0.psm
-    ARENA1 = 0x10   # arena1.psm
-    ARENA2 = 0x20   # arena2.psm
-    ARENA3 = 0x40   # arena3.psm
-    ARENA4 = 0x80   # arena4.psm
+    END = 0x02
+    MENU = 0x04
+    ARENA0 = 0x08
+    ARENA1 = 0x10
+    ARENA2 = 0x20
+    ARENA3 = 0x40
+    ARENA4 = 0x80
+
+    def get_hint(self) -> typing.Optional[str]:
+        match self:
+            case MusicMask.END:
+                return "end.psm"
+            case MusicMask.MENU:
+                return "menu.psm"
+            case MusicMask.ARENA0:
+                return "arena0.psm"
+            case MusicMask.ARENA1:
+                return "arena1.psm"
+            case MusicMask.ARENA2:
+                return "arena2.psm"
+            case MusicMask.ARENA3:
+                return "arena3.psm"
+            case MusicMask.ARENA4:
+                return "arena4.psm"
+            case _:
+                return None
 
     def __str__(self) -> str:
         return "{} ({})".format(self.name, self.value)

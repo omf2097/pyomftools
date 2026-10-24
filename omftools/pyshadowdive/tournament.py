@@ -45,12 +45,33 @@ class TournamentFile(Entrypoint):
         self.locale_end_texts: list[list[list[str]]] = []
         self.pilots: list[Pilot] = []
 
+    def get_hint(self, attr: str) -> typing.Optional[str]:
+        match attr:
+            case "bk_name":
+                return "BK scene shown on the tournament-end screen."
+            case "winnings_multiplier":
+                return (
+                    "Copied into the player's pilot when it is created; multiplies "
+                    "every prize paid in this tournament."
+                )
+            case "unknown_a":
+                return "Unused by the game."
+            case "registration_fee":
+                return "Charged when the player registers for the tournament."
+            case "assumed_initial_value":
+                return (
+                    "Expected worth of a new pilot. A pilot that starts out richer gets"
+                    " extra simulated tournament rounds before its first fight."
+                )
+            case _:
+                return super().get_hint(attr)
+
     def serialize(self) -> dict:
         return {
             "bk_name": self.bk_name,
             "winnings_multiplier": self.winnings_multiplier,
             "unknown_a": self.unknown_a,
-            "unknonw_b": self.unknown_b,
+            "unknown_b": self.unknown_b,
             "registration_fee": self.registration_fee,
             "assumed_initial_value": self.assumed_initial_value,
             "tournament_id": self.tournament_id,

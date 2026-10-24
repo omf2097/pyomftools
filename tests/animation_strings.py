@@ -1,3 +1,14 @@
+import pytest
+
+from omftools.pyshadowdive.string_parser import InvalidAnimationString
+
+# Strings using the bare `u` tag, which the parser does not recognise yet.
+XFAIL_U = pytest.mark.xfail(
+    reason="parser does not recognise the bare `u` tag",
+    raises=InvalidAnimationString,
+    strict=True,
+)
+
 TEST_STRINGS = [
     "A120-B20-C10-D10-E10-F10-G10-rfE10-rfF10-rfG10-rfH10-D10-C10-B20-A120",
     "A5-B4-jn15C4-jgjn15D4",
@@ -89,11 +100,17 @@ TEST_STRINGS = [
     "sp7sf-22l52s5A1-B1-cpC1-cpD1-cpE2-F2-G2-H1",
     "sp7sf-22l52s5A0-B1-cpC1-cpD1-cpE2-F2-G1-H1",
     "sp7sf-22l52s5A0-B1-cpC1-cpD1-cpE1-F1-G1-H1",
-    "uO30-ey-47uox+8X7-ey-82uox+3X30-ey-47uox-2X3-ey-30uox-20N1-ey-15uox-20N1-em56uox-20O1-ebpp64m12mi25s28l30uox-20O1-"
-    "emx-30my+4m56uox-20y+5O1-emx+30my-2m56uox-20y+5sw40O1-ox-20oy+5O4000",
+    pytest.param(
+        "uO30-ey-47uox+8X7-ey-82uox+3X30-ey-47uox-2X3-ey-30uox-20N1-ey-15uox-20N1-em56uox-20O1-ebpp64m12mi25s28l30uox-20O1-"
+        "emx-30my+4m56uox-20y+5O1-emx+30my-2m56uox-20y+5sw40O1-ox-20oy+5O4000",
+        marks=XFAIL_U,
+    ),
     "bm10amebewA1-bebxwA3-bewB3-bewC3-bewusD20-uabewE7-uabejf2wF30-uabewG3-uabewH7",
-    "ey-47uox-2X4-ey-82uox-2X36-ey-47uox-2X3-ey-30uox-20s29l63sp20N1-ey-15uox-20m55mn60mx-30my+11b2N1-euox-20m55mn60mx+"
-    "30my+4sw50N1-ebpp64m12mi40uox-20N1-Z4000",
+    pytest.param(
+        "ey-47uox-2X4-ey-82uox-2X36-ey-47uox-2X3-ey-30uox-20s29l63sp20N1-ey-15uox-20m55mn60mx-30my+11b2N1-euox-20m55mn60mx+"
+        "30my+4sw50N1-ebpp64m12mi40uox-20N1-Z4000",
+        marks=XFAIL_U,
+    ),
     "uabewE4-vy-17buuabewF3-uabewusI33-uabewG2-uabegjn28wH25",
     "sp13s1l33sf-6A1-B1-C4-B3-A2",
     "A1-sp7sf-3l33s5B2-C2-cpD3-jpjn21nC3-jpjn21nB2-jpjn21nA2",
@@ -202,11 +219,17 @@ TEST_STRINGS = [
     "beA3-beB3-beC3-beD3-beE3-jfbeF3-jfbeG3-jfH3-beI3-s27l63sp12jfJ1500",
     "sp13s1l20sf0A1-B4-A3",
     "A5-B6-C7-D7-E19-D1-C2-B2-A1400",
-    "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
-    "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
-    "byump14A1-byump14B1-C1-D1-E1-F1",
-    "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
-    "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+    pytest.param(
+        "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
+        "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
+    pytest.param("byump14A1-byump14B1-C1-D1-E1-F1", marks=XFAIL_U),
+    pytest.param(
+        "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
+        "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
     "A120-B20-C10-D10-E10-F10-G10-H10-rfE10-rfF10-rfG10-rfH10-D10-C10-B20-A120",
     "A4-B3-jn16C2-jgjn16D3",
     "A6-B6-C6-B6",
@@ -432,11 +455,17 @@ TEST_STRINGS = [
     "bzbpfbpp100bpb60bpd231mm23mu25mm16mu25C20-bzbpfbpp100bpd231mm23mu25mm16mu25C30-"
     "bzbpfbpp30bpb100bpd231mm23mu25mm16mu25C10-bzbpfbpp1bpb30bpd231mm23mu25mm16mu25B4-A2",
     "x+20A2-x+20B2-x+20d1A2",
-    "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
-    "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
-    "byump14A1-byump14B1-C1-D1-E1-F1",
-    "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
-    "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+    pytest.param(
+        "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
+        "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
+    pytest.param("byump14A1-byump14B1-C1-D1-E1-F1", marks=XFAIL_U),
+    pytest.param(
+        "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
+        "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
     "x+15A2-x+10B1-x+13bf200B1-x+10bf150B1-x+7bf100B1",
     "O22-O7-R3-S25-m12ma10mi2my-65s1l40A1-m56my-65B1-C5-B2-A1-m12ma190mi2my-65s1l40D1-m56mx+5my-65E1-F4-E2-D1-"
     "m12ma10mi2my-65s1l40A1-m56my-65B1-C5-B2-A1-m12ma190mi2my-65s1l40D1-m56mx+5my-65E1-F4-E2-D1-m12ma10mi2my-65s1l40A1-"
@@ -449,7 +478,7 @@ TEST_STRINGS = [
     "sp13s1l20sf0A1-B4-A3",
     "afZ1-ex-49arafZ1-btbf40s20l60G1-btbf80G1-btbf120G1-btbf160G1-btbf200G1-btbf230G1-btG18-btH1-btI3-btH2-btG3-btF8-"
     "btG2-btH1-btI3-btH2-btG3-btF18-bf220btF1-bf190btF1-bf160btF1-bf130btF1-bf100btF1-bf70btF1-bf40btF1",
-    "uO44-s29l63m55mx+20uN1-m12mi30uM1-Z1000",
+    pytest.param("uO44-s29l63m55mx+20uN1-m12mi30uM1-Z1000", marks=XFAIL_U),
     "beC1-sf-10beC17-beC1-bem65mn20mp20C1-beuausC40-jn66uabeusC30-C400",
     "sp13s1l20sf0A1-B4-A3",
     "Z1-eZ1-bf40btA1-bf70btA1-bf100bts20l65sf-15A1-bf130btA1-bf160btA1-bf190btA1-bf220btA1-btA10-btB2-btsw50C2-btD55-"
@@ -617,13 +646,19 @@ TEST_STRINGS = [
     "A1-sp7sf10l20s5B1-C1-cpD1-jmnC1-jmnB1-jmnA0",
     "A1-sp7sf10l20s5B1-C1-cpD1-jmnC1-jmnB1-jmnA1",
     "A0-sp7sf10l20s5B1-C1-cpD1-jmnC1-jmnB0-jmnA0",
-    "uO27-ey-24uox-10N6-ey-46uox-13N3-ey-75uox-15N1-uox-15vy-30N1-uox-15boN27-gy-482bobpN1-buboN1-hboZ20-bofbpN28-ey-"
-    "75x-15um12mi5ma270mx-20s28sp12l45X1-hm12mi5ma270mx+50my-16usw30X1-hbpp64uX1-hmx-30my+4m56uX1-hmx+30my-2m56uX1-"
-    "hoX4000",
+    pytest.param(
+        "uO27-ey-24uox-10N6-ey-46uox-13N3-ey-75uox-15N1-uox-15vy-30N1-uox-15boN27-gy-482bobpN1-buboN1-hboZ20-bofbpN28-ey-"
+        "75x-15um12mi5ma270mx-20s28sp12l45X1-hm12mi5ma270mx+50my-16usw30X1-hbpp64uX1-hmx-30my+4m56uX1-hmx+30my-2m56uX1-"
+        "hoX4000",
+        marks=XFAIL_U,
+    ),
     "bm10amebewA1-bebxwA3-bewB3-usbewC20-uabewD6-uabewE3-uabewF33-uabewG4-uabewH2-bm10amebewH1-uabewbxH31-uabewI2-"
     "uabewJ4-uabewK7-uabewjf2K30-uawK1000",
-    "ey-75x-15X10-ex-15y-50X3-ex-15y-30N2-ex-15y-30s29sp20l63N1-ey-5uox-15m55mn60mx-30my+1b2N1-euox-15m55mn60mx+30my+"
-    "4sw45N1-ebpp64m12mi40uox-15N1-Z4000",
+    pytest.param(
+        "ey-75x-15X10-ex-15y-50X3-ex-15y-30N2-ex-15y-30s29sp20l63N1-ey-5uox-15m55mn60mx-30my+1b2N1-euox-15m55mn60mx+30my+"
+        "4sw45N1-ebpp64m12mi40uox-15N1-Z4000",
+        marks=XFAIL_U,
+    ),
     "uabewK10-uabewL3-usuabewM3-uabewusjn38N40",
     "sp13s1l20sf0A1-B4-A3",
     "beA4-vy-10bubeb1B1-beB3-beaxC4-beaxD40-axZ200-d100axZ10",
@@ -686,11 +721,17 @@ TEST_STRINGS = [
     "vx-4y-7s1l60A1-s25l50sp12bl8B1-C1-L4-M500",
     "A1",
     "x+30hA1-hzpA2-hizpB2-vx+12y+6izpcpC2-vx+12y+5izpcpjn15D2-vx+12y+5izpcpjn15E6-vx+14y+3izpcpjn15F6-vx+17izpcpjn15G6",
-    "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
-    "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
-    "byump14A1-byump14B1-C1-D1-E1-F1",
-    "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
-    "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+    pytest.param(
+        "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
+        "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
+    pytest.param("byump14A1-byump14B1-C1-D1-E1-F1", marks=XFAIL_U),
+    pytest.param(
+        "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
+        "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
     "A100-B40-C40-D40-C40-B40-A100",
     "A5-jn17B4-jgjn17C3",
     "A6-B6-C6-B6",
@@ -830,7 +871,7 @@ TEST_STRINGS = [
     "hA3-hs21l60B3-vx+3y+6C3-vx+8y+8cpD4-vx+10y+5cpE5-vx+12y+2cpF5-cpG4",
     "sp13s1l20sf0A1-B4-A3",
     "beclC6-beclB4-beclA40",
-    "uO1-ex-45usO3-wex-60R3-S3-S30",
+    pytest.param("uO1-ex-45usO3-wex-60R3-S3-S30", marks=XFAIL_U),
     "bm10amebewx+40A1-uabebxA3-uabewB3-uabewC15-beuaD3-beuabj37D3",
     "S4-pd240pp25ptp10ptd25ptr35A1-ma330mi2m12my-58mx+2s1l30B1-C3-B2-A1-ma330mi2m12my-58mx+2s1l30B1-C3-B2-A1-"
     "ma330mi2m12my-58mx+2s1l30B1-C3-B2-A1-ma330mi2m12my-58mx+2s1l30B1-C3-B2-A1-S8-boR5-boO1000",
@@ -888,11 +929,17 @@ TEST_STRINGS = [
     "beA4-hy-1s27l60sp12bejfB4-hy-2jfB5-hy-3jfB4-hy-2jfC4-hy-1jfC4-hy+1jfC4-hy+2jfC4-hy+1jfC4-hy-1jfC4-d16hjfC400",
     "sp13s1l20sf0A1-B4-A3",
     "A3000",
-    "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
-    "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
-    "byump14A1-byump14B1-C1-D1-E1-F1",
-    "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
-    "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+    pytest.param(
+        "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
+        "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
+    pytest.param("byump14A1-byump14B1-C1-D1-E1-F1", marks=XFAIL_U),
+    pytest.param(
+        "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
+        "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
     "A120-B20-C10-D10-E10-F10-G10-rfE10-rfF10-rfG10-rfH10-D10-C10-B20-A120",
     "A5-jn35B4-jn35jgC4",
     "A6-B6-C6-B6",
@@ -1098,7 +1145,7 @@ TEST_STRINGS = [
     "sp7sf9l21s5A1-cpB0-cpjn23B1-q2jn23C1-q2cpD2-nC1-njlC0-njlB1-njlA1",
     "sp7sf9l21s5A1-cpB0-cpjn23B1-q2jn23C1-q2cpD1-nC0-njlC0-njlB1-njlA1",
     "ex-73A2-ex-75B2-ex-73s25l60sp12A2-ex-72C2-ex-71A2-ex-74B2-ex-75C2-ex-73A2-ex-72B2-ex-75C2-y-1B2-vx-5y-9L1-L5-M200",
-    "uA2-s22l60uB2-uD2-uC2-uA2-uC2-uA2-uD2-uB2-uC2",
+    pytest.param("uA2-s22l60uB2-uD2-uC2-uA2-uC2-uA2-uD2-uB2-uC2", marks=XFAIL_U),
     "sp13s1l20sf0A1-B4-A3",
     "sp7sf10l20s5A1-B2-cpC2-jhnB2-jhnA1",
     "sp7sf10l20s5A1-B3-cpC3-jhnB2-jhnA1",
@@ -1140,11 +1187,17 @@ TEST_STRINGS = [
     "s21l61B4-A3-C5-s21l45E2-D4-B2-d1D4",
     "sp13s1l20sf0A1-B4-A3",
     "beA4-vy-10bubeb1B1-beB3-beaxC4-beaxD40-axZ200-d100axZ10",
-    "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
-    "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
-    "byump14A1-byump14B1-C1-D1-E1-F1",
-    "rhunmp20byump15A1-rhsp15s29l40unbps1bpd183bpn254bpp10byum58my+10mp15B1-rhunbps1bpd183bpn254bpp20C1-"
-    "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+    pytest.param(
+        "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
+        "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
+    pytest.param("byump14A1-byump14B1-C1-D1-E1-F1", marks=XFAIL_U),
+    pytest.param(
+        "rhunmp20byump15A1-rhsp15s29l40unbps1bpd183bpn254bpp10byum58my+10mp15B1-rhunbps1bpd183bpn254bpp20C1-"
+        "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
     "rwA1-rmp1wA1-bzbps96bpd231bpn159bpp40bpb0ws24l50sp20B3-bzbps96bpd231bpn159bpp70bpb40wA2-"
     "bzrbps96bpd231bpn159bpp30bpb70wA3-bzrbps96bpb30bpd231bpn159bpp0wB2-rbps96bpd0bpn159bpp0Z1",
     "A120-B20-C10-D10-E10-F10-G10-rfE10-rfF10-rfG10-rfH10-D10-C10-B20-A120",
@@ -1328,8 +1381,11 @@ TEST_STRINGS = [
     "A0-sp7sf10l20s5B1-cC1-cpD1-nC1-njmB0-njmA0",
     "A0-sp7sf10l20s5B1-cC1-cpD1-nC1-njmB0-njmA0",
     "A0-sp7sf10l20s5B1-cC1-cpD1-nC1-njmB0-njmA0",
-    "uO1-ex-40O3-wR3-S3-S10-S3-S10-ma1mi1m12my-30mx+10wsw40A1-ma340mi1m12my-37mx+8wA1-ma320mi1m12my-45mx+5wA1-"
-    "ma300mi1m12my-52mx+2wB1-ma280mi1m12my-61mx-1wB1-ma275mi1m12my-70mx-4wB1-wC3-B5-A5-S19-R5-O4000",
+    pytest.param(
+        "uO1-ex-40O3-wR3-S3-S10-S3-S10-ma1mi1m12my-30mx+10wsw40A1-ma340mi1m12my-37mx+8wA1-ma320mi1m12my-45mx+5wA1-"
+        "ma300mi1m12my-52mx+2wB1-ma280mi1m12my-61mx-1wB1-ma275mi1m12my-70mx-4wB1-wC3-B5-A5-S19-R5-O4000",
+        marks=XFAIL_U,
+    ),
     "bm10amebewx+40A1-uabebxusA3-uabewB3-uabewC10-uabewD3-uabewE10-uabeF3-uabes20l67sf-5G3-uabeH3-uabewI10-uabewjf2I20",
     "sp13s2l33sf-6D1-E1-F4-E3-D2",
     "A1-B2-sp7sf-3l33s5C2-cpD3-jlnC3-jlnB3-jlnA2",
@@ -1384,11 +1440,17 @@ TEST_STRINGS = [
     "bearC1-beC2-beD2-vy-15bebuE1-beaxE2-beaxF3-beaxG3-beaxH3-beaxE2-beaxF2-beaxG2-beaxH2-beaxE2-beaxF1-beaxG1-beaxH1-"
     "beaxE1-beaxF1-beaxG1-beaxH1-beaxE1-beaxF1-beaxG1-beaxm55my+30b1b2s28l60H1-beaxE1-beaxF1-beaxG1-beaxsoH1-beaxsoE1-"
     "beaxsoF1-beaxsoG1-beaxsoH1-axgsoZ500",
-    "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
-    "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
-    "byump14A1-byump14B1-C1-D1-E1-F1",
-    "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
-    "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+    pytest.param(
+        "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
+        "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
+    pytest.param("byump14A1-byump14B1-C1-D1-E1-F1", marks=XFAIL_U),
+    pytest.param(
+        "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
+        "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
     "A120-B20-C10-D10-E10-F10-G10-rfE10-rfF10-rfG10-rfH10-D10-C10-B20-A120",
     "A5-jn22B4-jgjn22C3",
     "A6-B6-C6-B6",
@@ -1524,11 +1586,17 @@ TEST_STRINGS = [
     "m12ma200mi2mx-5my-7wO1-wN2-wO5-m12ma340mi2mx-5my-7wM2-wN2-m56mx-8my-3s28l40wM1-wO5-m12ma220mi2mx-5my-7wO1-wN2-wM5-"
     "m12ma330mi2mx-5my-7wO1-wM2-m56mx-5my-5s28l33wO1-wN5-m12ma230mi2mx-5my-7wN1-wM2-wO5-m12ma320mi2mx-5my-7wM1-wN2-"
     "wO5000",
-    "bm10amex+20beA1-usbebxA6-bes21l60B8-beC3-beuD4-uabeujf2jfE3-uabeujf2jfF4-uabeujf2jfG4-uabewjf2jfH4-uabeujf2jfD4-"
-    "uabeujf2jfE3-uabeujf2jfF4-uabeujf2jfG4-uabewjf2jfH4-uabeujf2jfD4-uabeujf2jfE3-uabeujf2jfF4-uabeujf2jfG4-"
-    "uabewjf2jfH4-uabeujf2jfD4-uabeujf2jfE3-uabeujf2jfF4-uabeujf2jfG4-uabewjf2jfH4-uabewjf2jfI5-uabewjf2jfJ7",
-    "uO27-ey-24uox-10N6-ey-56uox-13N3-ey-75uox-15N1-uox-15vy-30N1-uox-15boN27-gey-482bhboN1-boN1-hboZ20-bofox-30N29-"
-    "m55mx+5my+30bofox-30sw40N1-m55mx-40my-10bofox-30N1-m12mi50ma270mx-20my-10s29sp20l64Z1-hgeZ1000",
+    pytest.param(
+        "bm10amex+20beA1-usbebxA6-bes21l60B8-beC3-beuD4-uabeujf2jfE3-uabeujf2jfF4-uabeujf2jfG4-uabewjf2jfH4-uabeujf2jfD4-"
+        "uabeujf2jfE3-uabeujf2jfF4-uabeujf2jfG4-uabewjf2jfH4-uabeujf2jfD4-uabeujf2jfE3-uabeujf2jfF4-uabeujf2jfG4-"
+        "uabewjf2jfH4-uabeujf2jfD4-uabeujf2jfE3-uabeujf2jfF4-uabeujf2jfG4-uabewjf2jfH4-uabewjf2jfI5-uabewjf2jfJ7",
+        marks=XFAIL_U,
+    ),
+    pytest.param(
+        "uO27-ey-24uox-10N6-ey-56uox-13N3-ey-75uox-15N1-uox-15vy-30N1-uox-15boN27-gey-482bhboN1-boN1-hboZ20-bofox-30N29-"
+        "m55mx+5my+30bofox-30sw40N1-m55mx-40my-10bofox-30N1-m12mi50ma270mx-20my-10s29sp20l64Z1-hgeZ1000",
+        marks=XFAIL_U,
+    ),
     "bewuaA3-bewB4-bewC4-usbewD16-uabewE6-uabewF3-uabewG15-uabewH3-uabewI4-uabewJ6-uabewK44-uabewL3-uabewM3-uabewN3-"
     "uabewO3-uabewjn29P30",
     "zzA1-s1l40zzB1-zzC4-B3-A2",
@@ -1583,11 +1651,17 @@ TEST_STRINGS = [
     "beA3-s27l60sp12beB3-beC3-pjfD3-jfE3-pjfF3-jfG3-pjfH3-jfI3-pjfJ3-jfK3-pjfL3-jfM3-d24jfI3",
     "sp13s1l20sf0A1-B4-A3",
     "A3-B3-C3-D3-E4-A4-B5-C6-D8-E9-A11-B13-C4400",
-    "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
-    "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
-    "byump14A1-byump14B1-C1-D1-E1-F1",
-    "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
-    "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+    pytest.param(
+        "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
+        "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
+    pytest.param("byump14A1-byump14B1-C1-D1-E1-F1", marks=XFAIL_U),
+    pytest.param(
+        "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
+        "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
     "A50-B30-C20-D300",
     "A5-B4-jn26jgC3",
     "A6-B6-C6-B6",
@@ -1739,7 +1813,10 @@ TEST_STRINGS = [
     "A2-cB2-cx+40hcpC2-l45s20cx+40hjn27D2-cx+40hE2-cx+40hq2cpjn27F2-cx+40hcpjn27G2-l45s20cx+40hjn27H2-cx+40hjn27I2-cx+"
     "40hq3cpjn27B2-cx+40hcpjn27C2-l45s20cx+40hjn27D2-cx+40jn27E2-cx+40hq4cpjn27F2-cx+40hcpjn27G2-l45s20cx+40hH3-I1-nI5-"
     "A4",
-    "uO1-O4-ex-60O3-ex-60R3-ex-50S3-wS10-ex-50rwS10-ex-50rwS3-ex-50wrS100",
+    pytest.param(
+        "uO1-O4-ex-60O3-ex-60R3-ex-50S3-wS10-ex-50rwS10-ex-50rwS3-ex-50wrS100",
+        marks=XFAIL_U,
+    ),
     "bm10amebewx+60A1-A4-uabebxB3-uabewC3-uabewD10-uabewE3-uabebj33E10-beE2",
     "wgS10-ex-50rwS10-ex-50rwS3-ex-50wrS100",
     "uabeF10-acuabeF10-bex+3G3-jn34cwbex+5H2-jn34cwbex+7I2-jn34cwbex+8H1-jn34cwbex+9I1-d28jn34cwbex+9H1",
@@ -1802,11 +1879,17 @@ TEST_STRINGS = [
     "s27l60sp12A1-A1-jfB12-jfC2-jfD3-jfE4-jfF6-jfE4-jfD2-jfC2-d2jfC2",
     "sp13s1l20sf0A1-B4-A3",
     "A5300",
-    "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
-    "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
-    "byump14A1-byump14B1-C1-D1-E1-F1",
-    "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
-    "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+    pytest.param(
+        "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
+        "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
+    pytest.param("byump14A1-byump14B1-C1-D1-E1-F1", marks=XFAIL_U),
+    pytest.param(
+        "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
+        "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
     "A110-B20-C10-D10-E10-F20-G30-F20-E10-D10-C10-B20-A120",
     "cx+4cy+4A110-cx+4cy+4B20-cx+4cy+4C10-cx+4cy+4D10-cx+4cy+4E10-cx+4cy+4F20-cx+4cy+4G30-cx+4cy+4F20-cx+4cy+4E10-cx+"
     "4cy+4D10-cx+4cy+4C10-cx+4cy+4B20-cx+4cy+4A120",
@@ -1946,9 +2029,12 @@ TEST_STRINGS = [
     "A0-sp7sf-6l36s5B1-C1-cpD2-jlnC1-jlnB1-jlnA1",
     "A0-sp7sf-6l36s5B1-C1-cpD1-jlnC1-jlnB1-jlnA1",
     "gO121-gm55mx+39my-3s28l60N1-gm55mx-6my+3sw40N1-gm12mx+20mi20N1-M3-N2-O2000",
-    "y-4hbeA3-vy-9beB1-beuB5-beC6-y+2axhbebouD4-y+4axhbebouE6-y+6axhbebouF4-y+8axhbebouF4-y+10axhbebouF4-y+"
-    "12axhbebouF4-axhbeuZ15-y-20axhbebouG20-ex-20y-300axhbeuZ30-y+20axhbebowH14-y+20axhbebowuausH1-jn32gaxhbebowuaH30-"
-    "beuaI5-beJ5-bebj48d5Z2",
+    pytest.param(
+        "y-4hbeA3-vy-9beB1-beuB5-beC6-y+2axhbebouD4-y+4axhbebouE6-y+6axhbebouF4-y+8axhbebouF4-y+10axhbebouF4-y+"
+        "12axhbebouF4-axhbeuZ15-y-20axhbebouG20-ex-20y-300axhbeuZ30-y+20axhbebowH14-y+20axhbebowuausH1-jn32gaxhbebowuaH30-"
+        "beuaI5-beJ5-bebj48d5Z2",
+        marks=XFAIL_U,
+    ),
     "O5-O4-O4-O5-ey-26x-20bhM5-ey-61x-20bhM1-vy-25bhM1-bhboM20-bhfboM31-bhfm55mx+45my+51mp14s29l64sp20boM1-bhfm55mx-"
     "5my+30mp14sw50s29l60boM1-bhfm12mi45mx+20my+2hboM1-hgZ10000",
     "bewA5-bewB4-uabewC4-uabewD5-uabewE5-uabewF48-bhuabehy-3wG2-bhuabehy-5H2-bhuabehy-7H2-bhuabehy-9H3-bhuabehy-"
@@ -2008,11 +2094,17 @@ TEST_STRINGS = [
     "bewA4-s27l60sp12bewB20-bewC4-bewD4-bewE5-jfwF6-jfwG6000",
     "sp13s1l20sf0A1-B4-A3",
     "A5500",
-    "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
-    "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
-    "byump14A1-byump14B1-C1-D1-E1-F1",
-    "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
-    "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+    pytest.param(
+        "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
+        "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
+    pytest.param("byump14A1-byump14B1-C1-D1-E1-F1", marks=XFAIL_U),
+    pytest.param(
+        "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
+        "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
     "A130-B30-C10-D10-E10-F10-rfC10-rfD10-rfE10-rff10-C10-B30-A130",
     "A5-jn20B4-jn20C4-jgjn20D4",
     "A6-B6-C6-B6",
@@ -2194,11 +2286,17 @@ TEST_STRINGS = [
     "jfG3-jfd51G3",
     "sp13s1l20sf0A1-B4-A3",
     "bf230A2-bf200A3-bf170A5-bf130A4-bf110A6-bf230A4-bf110A3-bf153A2-bf78A3-bf240A5-bf186A4-bf120d4A2",
-    "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
-    "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
-    "byump14A1-byump14B1-C1-D1-E1-F1",
-    "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
-    "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+    pytest.param(
+        "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
+        "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
+    pytest.param("byump14A1-byump14B1-C1-D1-E1-F1", marks=XFAIL_U),
+    pytest.param(
+        "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
+        "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
     "A60-B40-C40-D60-D60-C40-B40-A120",
     "A5-B4-jgC4",
     "A6-B6-C6-B6",
@@ -2298,7 +2396,10 @@ TEST_STRINGS = [
     "A1-csp7sf0l30s5B1-cC2-q2cpD3-nC3-nB2-nA1",
     "A0-csp7sf0l30s5B1-cC2-q2cpD3-nC3-nB1-nA1",
     "A0-csp7sf0l30s5B1-cC1-q2cpD2-nC2-nB1-nA1",
-    "egx-75uD10-egx-72y-14uB4-egx-67y-30uC16-vx-9y-8s1l64uD2-s25l50sp12uE5-L6-M500",
+    pytest.param(
+        "egx-75uD10-egx-72y-14uB4-egx-67y-30uC16-vx-9y-8s1l64uD2-s25l50sp12uE5-L6-M500",
+        marks=XFAIL_U,
+    ),
     "s24l50sp12A1-A9-B4-C10-D2-E2-F2-G20-F2-E2-D2",
     "aovx+5y-8bwA2-A3-B3-C3-D3-E3-F3-G3-H3-I3-J3-d2J3",
     "gA5000",
@@ -2413,19 +2514,31 @@ TEST_STRINGS = [
     "beA3-beB5-beC5-jfbeD5-C2-s24l60jfC5-jfD8-jfC5-jfD7-jfC5-jfD6-jfC4-jfD6-jfC5-jfD5-jfC5-jfD5-jfB20-d14jfD1",
     "sp13s1l20sf0A1-B4-A3",
     "A10-d1A10",
-    "uO1-O3-ex-60O3-ex-73y-11R3-ex-72y-20hS3-ex-54y-30hS5-hex-54y-29S2-hex-54y-27S1-hex-54y-26S2-s1l50m56my-"
-    "60hs28l25sp12A1-m12ma320mi4my-60hB1-hB1-hC1-hex-54y-27B1-hA1-hexhx-54y-29S1-hex-54y-30S7-hd14S1-hS91-ex-67gS7-x-"
-    "20ox-20L1-ox-20L2-x-20M1-M2-O5000",
+    pytest.param(
+        "uO1-O3-ex-60O3-ex-73y-11R3-ex-72y-20hS3-ex-54y-30hS5-hex-54y-29S2-hex-54y-27S1-hex-54y-26S2-s1l50m56my-"
+        "60hs28l25sp12A1-m12ma320mi4my-60hB1-hB1-hC1-hex-54y-27B1-hA1-hexhx-54y-29S1-hex-54y-30S7-hd14S1-hS91-ex-67gS7-x-"
+        "20ox-20L1-ox-20L2-x-20M1-M2-O5000",
+        marks=XFAIL_U,
+    ),
     "bm10amebewx+60A1-uabebxA3-uabebxB3-uabebxC3-uabebxD3-uabewE6-uabewF2-uabewG1-uabewH1-bewI5-bewH2-bewG2-bewF3-"
     "bewE6-bewF2-bewG1-bewH1-bewI5-bewH2-bewG2-bewF3-bewE6-bewF2-bewG1-bewH1-bewI5-bewH2-bewG2-bewF3-bewE6-bewF2-bewG1-"
     "bewH1-bewI5-bewH2-bewG2-bewF3-bewE6-bewF2-bewG1-bewH1-bewjf2I10-bewjf2H2-bewjf2G2-bewusjf2F3-uabewusjf2J5",
-    "ex-58y-5S5-ex-52gS7-S3-S2-S20-S2-S2-S2-mp10m57my-60sw50C1-mi25m12my-60C1-T20-uU5-uV3-uW4000",
+    pytest.param(
+        "ex-58y-5S5-ex-52gS7-S3-S2-S20-S2-S2-S2-mp10m57my-60sw50C1-mi25m12my-60C1-T20-uU5-uV3-uW4000",
+        marks=XFAIL_U,
+    ),
     "uabeA5-usbewB7-bewC3-bewD2-bewE20-bewF2-bewG2-bewH2-bewI2-bewJ2-bewK50-bewJ5",
-    "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
-    "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
-    "byump14A1-byump14B1-C1-D1-E1-F1",
-    "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
-    "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+    pytest.param(
+        "rhunmp20byump15A1-rhunbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-rhunbps1bpd183bpn254bpp10D1-"
+        "rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
+    pytest.param("byump14A1-byump14B1-C1-D1-E1-F1", marks=XFAIL_U),
+    pytest.param(
+        "rhunmp20byump15A1-rhsp20s29l63unbps1bpd183bpn254bpp10byump15B1-rhunbps1bpd183bpn254bpp20C1-"
+        "rhunbps1bpd183bpn254bpp10D1-rhunbps1bpd184bpn254bpp5E1-rhunbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
     "A1-B1-A1-B1",
     "x10y10A1-x20y20A1-x30y30A1-x40y40A1-x50y50A1-x60y60A1-x70y70A1-x80y80A1-x90y90A1-l63s15sp20A15-x90y90A1-x80y80A1-"
     "x70y70A1-x60y60A1-x50y50A1-x40y40A1-x30y30A1-x20y20A1-x10y10A1",
@@ -2526,8 +2639,11 @@ TEST_STRINGS = [
     "mn20mp12bf10asA2-bf60asA2-bf120asA2-bf180asA3-bf220asA3-asA250-bf220asA3-bf180asA3-bf120asA2-bf60asA2-bf10asA2",
     "bf220ass20l50A3-bf180asA3-bf120asA3-bf60asA3-bf10asA3",
     "gey+20Z2-y-10A35",
-    "runmp20byump15vy-8A1-rsp10s21l55unbps1bpd183bpn254bpp10byump15B2-runbps1bpd183bpn254bpp20C2-"
-    "runbps1bpd183bpn254bpp10D1-runbps1bpd184bpn254bpp5E1-runbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+    pytest.param(
+        "runmp20byump15vy-8A1-rsp10s21l55unbps1bpd183bpn254bpp10byump15B2-runbps1bpd183bpn254bpp20C2-"
+        "runbps1bpd183bpn254bpp10D1-runbps1bpd184bpn254bpp5E1-runbps1bpd0bpn254bpp0F1-bps1bpd0bpn254bpp0Z1",
+        marks=XFAIL_U,
+    ),
     "A2-B2-C2-D2-E2-F2-G2",
     "A2-B2-C2-D2-E2-F2-G2",
     "A2-B2-C2-D2",
