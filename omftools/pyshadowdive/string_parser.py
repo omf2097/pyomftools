@@ -13,6 +13,7 @@ class Errata(Enum):
     LEADING_ZERO = "LEADING_ZERO"
     LEADING_PLUS = "LEADING_PLUS"
     INVALID = "INVALID"
+    UNEXPECTED_ARGUMENT = "UNEXPECTED_ARGUMENT"
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,6 +67,13 @@ class Script:
         return pos
 
     @classmethod
+    def has_number(cls, test: str, pos: int) -> bool:
+        """True if an optionally signed number starts at pos."""
+        if pos < len(test) and test[pos] in ["+", "-"]:
+            pos += 1
+        return pos < len(test) and test[pos].isdigit()
+
+    @classmethod
     def read_int(cls, test: str, pos: int) -> tuple[int | None, list[Errata], int]:
         end = cls.find_numeric_span(test, pos)
         if pos == end:
@@ -107,17 +115,15 @@ class Script:
             end_pos = start_pos + test
             tag = in_str[start_pos:end_pos]
 
-            if tag == "usw" and cls.find_numeric_span(in_str, end_pos) > end_pos:
-                return None
-
             value: int | None = None
             erratas: list[Errata] = []
             if not is_valid_tag(tag):
                 continue
             if tag_has_arg(tag):
                 value, erratas, end_pos = cls.read_int(in_str, end_pos)
-            elif cls.find_numeric_span(in_str, end_pos) > end_pos:
-                return None  # If value is not expected and we got one, fail.
+            elif cls.has_number(in_str, end_pos):
+                value, erratas, end_pos = cls.read_int(in_str, end_pos)
+                erratas.append(Errata.UNEXPECTED_ARGUMENT)
             return tag, value, erratas, end_pos
         return None
 
@@ -129,22 +135,6 @@ class Script:
         if is_invalid_tag(tag):
             return tag, [Errata.INVALID], pos + 1
         return None
-
-    @classmethod
-    def parse_bad_frame(
-        cls, in_str: str, pos: int
-    ) -> tuple[str, int | None, list[Errata], int] | None:
-        ch = in_str[pos]
-        if not is_tag_like(ch):  # Expect lowercase frame key
-            return None
-        next_ch = in_str[pos + 1]
-        if not next_ch.isdigit():
-            return None  # Next char must be a digit
-
-        # Read as normal, but convert frame key to uppercase.
-        key = in_str[pos].upper()
-        duration, erratas, pos = cls.read_int(in_str, pos + 1)
-        return key, duration, erratas, pos
 
     @classmethod
     def parse_next_frame(cls, in_str: str, now: int) -> tuple[Frame, int] | None:
@@ -167,9 +157,6 @@ class Script:
             if inv_tag_data := cls.parse_invalid_tag(in_str, now):
                 tag, erratas, now = inv_tag_data
                 tags.append(Tag(tag, None, erratas))
-                continue
-            if bad_frame_data := cls.parse_bad_frame(in_str, now):
-                frame_key, frame_duration, frame_erratas, now = bad_frame_data
                 continue
             if in_str[now] == "-":
                 now += 1
